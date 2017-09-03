@@ -57,8 +57,18 @@ while (True):
 
     cv2.imshow("contours", frame)
     cv2.imshow("dif", diff)
-    if cv2.waitKey(1000 / 12) & 0xff == ord("q"):
+    # keys should be Left, Right, Up, Down, Widen and Narrow which should set all routes
+    key = cv2.waitKey(1000 / 12) & 0xff
+    if key == ord("l"):
+        centrex -= 1
+        routepoints = routeplan.calc_route(centrex, centrey, halfwidth, radius)
+    elif key == ord("r"):
+        centrex += 1
+        routepoints = routeplan.calc_route(centrex, centrey, halfwidth, radius)
+    elif key == ord("q"):
         break
+    # if \cv2.waitKey(1000 / 12) & 0xff == ord("q"):
+    # break
 
 cv2.destroyAllWindows()
 camera.release()
