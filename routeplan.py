@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 #
 """
 This file should do the following things
@@ -7,15 +8,13 @@ This file should do the following things
         consequently whether to go left or right
 """
 
-flightpath=calc_route
-
 def calc_route(centrex=400, centrey=300, halfwidth=200, radius=100):
     """This just calculates the 6 points in our basic figure of eight
     should be easy enough and we then draw lines between each point and
     get the last point
 
     >>> calc_route(400, 300, 200, 100)
-    [(100,0)]
+    [(200, 400), (100, 300), (200, 200), (600, 400), (700, 300), (600, 200)]
     """
 
 
@@ -42,11 +41,12 @@ def get_phase(x,y,width):
     phase = 'left'
     return phase
 
+flightpath = calc_route()
+
 
 def _test():
     import doctest
     doctest.testmod()
-
 
 if __name__ == '__main__':
     # Can run with -v option if you want to confirm tests were run
