@@ -2,6 +2,8 @@
 import cv2
 import numpy as np
 import routeplan
+from collections import deque
+
 
 #camera = cv2.VideoCapture(0)
 #camera=cv2.VideoCapture('IMG_0464.MOV')
@@ -11,6 +13,12 @@ es = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10,10))
 kernel = np.ones((5,5),np.uint8)
 background = None
 
+# initialize the list of tracked points, the frame counter,
+# and the coordinate deltas
+pts = deque(maxlen=16)
+counter = 0
+(dX, dY) = (0, 0)
+direction = ""
 
 #http://www.pyimagesearch.com/2014/08/04/opencv-python-color-detection/
 # define the list of boundaries
@@ -94,12 +102,65 @@ while (True):
             #outputframe = cv2.bitwise_and(roi, mask, mask=mask)
             cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 255, 0), 2)
             finalframe = frame[y:y+h, x:x+w]
+            center = (x +(w//2), y + (h // 2))
+            pts.appendleft(center)
+            for i in np.arange(1, len(pts)):
+                if pts[i] is None:
+                    continue
+
+                # check to see if enough points have been accumulated in
+                # the buffer
+                if counter >= 10 and i == 1 and pts[10] is not None:
+                # compute the difference between the x and y
+                # coordinates and re-initialize the direction
+                # text variables
+                    dX = pts[i][0] - pts[-10][0]
+                    dY = pts[i][1] - pts[-10][1]
+                    (dirX, dirY) = ("", "")
+
+                    # ensure there is significant movement in the
+                    # x-direction
+                    if np.abs(dX) > 20:
+                        dirX = "East" if np.sign(dX) == 1 else "West"
+
+                    # ensure there is significant movement in the
+                    # y-direction
+                    if np.abs(dY) > 20:
+                        dirY = "South" if np.sign(dY) == 1 else "North"
+
+                    # handle when both directions are non-empty
+                    if dirX != "" and dirY != "":
+                        direction = "{}-{}".format(dirY, dirX)
+
+                    # otherwise, only one direction is non-empty
+                    else:
+                        direction = dirX if dirX != "" else dirY
+
+                    # otherwise, compute the thickness of the line and
+                    # draw the connecting lines
+                    thickness = int(np.sqrt(32 / float(i + 1)) * 2.5)
+                    cv2.line(frame, pts[i - 1], pts[i], (0, 0, 255), thickness)
+
+                    # show the movement deltas and the direction of movement on
+                    # the frame
+                    cv2.putText(frame, direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX,
+                        0.65, (0, 0, 255), 3)
+                    cv2.putText(frame, "dx: {}, dy: {}".format(dX, dY),
+                        (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX,
+                        0.35, (0, 0, 255), 1)
+                    continue
             continue
 
     drawroute(routepoints)
-    cv2.imshow("roi", finalframe)
+    #cv2.imshow("roi", finalframe)
     #cv2.imshow("mask", mask)
     cv2.imshow("contours", frame)
+    counter += 1
+    if counter % 100 == 0:
+        print(center)
+        print(pts[10][0],pts[10][1])
+        print(dX, dY)
+        print(direction)
     # cv2.imshow("dif", diff)
     # keys should be Left, Right, Up, Down, Widen and Narrow, Extend and Contract which should set all routes
     key = cv2.waitKey(1000 / 12) & 0xff
