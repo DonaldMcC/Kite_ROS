@@ -4,7 +4,6 @@ import numpy as np
 import routeplan
 from collections import deque
 
-
 #camera = cv2.VideoCapture(0)
 #camera=cv2.VideoCapture('IMG_0464.MOV')
 camera=cv2.VideoCapture('choppedkite_horizshort.mp4')
@@ -55,21 +54,25 @@ for (lower, upper) in boundaries:
     upp = np.array(upper, dtype="uint8")
 
 try: # this will fail for now but don't need yet
+    mode = rospy.get_param('mode')
     centrex = rospy.get_param('centrex')
     centrey = rospy.get_param('centrey')
     halfwidth = rospy.get_param('halfwidth')
     radius = rospy.get_param('radius')
 except NameError:
+    mode='fig8'
+    # mode='park'
     centrex = 400
     centrey = 300
     halfwidth = 200
     radius = 100
 
-routepoints = routeplan.calc_route(centrex, centrey, halfwidth, radius)
+routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
 
+#this is just for display flight decisions will be elsewhere
 def drawroute(routepoints):
     for i, j in enumerate(routepoints):
-        if i < 5:
+        if i < len(routepoints):
             cv2.line(frame, (j[0], j[1]), (routepoints[i+1][0], routepoints[i+1][1]), (255, 0, 255), thickness=1, lineType=8, shift=0)
         else:
             cv2.line(frame, (j[0], j[1]), (routepoints[0][0], routepoints[0][1]), (255, 0, 255), thickness=1,
