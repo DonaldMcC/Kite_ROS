@@ -60,8 +60,8 @@ try: # this will fail for now but don't need yet
     halfwidth = rospy.get_param('halfwidth')
     radius = rospy.get_param('radius')
 except NameError:
-    mode='fig8'
-    # mode='park'
+    #mode='fig8'
+    mode='park'
     centrex = 400
     centrey = 300
     halfwidth = 200
@@ -72,7 +72,7 @@ routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
 #this is just for display flight decisions will be elsewhere
 def drawroute(routepoints):
     for i, j in enumerate(routepoints):
-        if i < len(routepoints):
+        if i < len(routepoints) - 1:
             cv2.line(frame, (j[0], j[1]), (routepoints[i+1][0], routepoints[i+1][1]), (255, 0, 255), thickness=1, lineType=8, shift=0)
         else:
             cv2.line(frame, (j[0], j[1]), (routepoints[0][0], routepoints[0][1]), (255, 0, 255), thickness=1,
@@ -166,13 +166,14 @@ while (True):
         print(direction)
     # cv2.imshow("dif", diff)
     # keys should be Left, Right, Up, Down, Widen and Narrow, Extend and Contract which should set all routes
+    # TODO add remaining key controls
     key = cv2.waitKey(1000 / 12) & 0xff
     if key == ord("l"):
         centrex -= 1
-        routepoints = routeplan.calc_route(centrex, centrey, halfwidth, radius)
+        routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
     elif key == ord("r"):
         centrex += 1
-        routepoints = routeplan.calc_route(centrex, centrey, halfwidth, radius)
+        routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
     elif key == ord("q"):
         break
     # if \cv2.waitKey(1000 / 12) & 0xff == ord("q"):
