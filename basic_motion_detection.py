@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import routeplan
 from collections import deque
+from move_func import get_angle
 
 #camera = cv2.VideoCapture(0)
 #camera=cv2.VideoCapture('IMG_0464.MOV')
@@ -107,6 +108,17 @@ while (True):
             finalframe = frame[y:y+h, x:x+w]
             center = (x +(w//2), y + (h // 2))
             pts.appendleft(center)
+
+            #Min Araa seems reasonable to get angle of kite
+            rect = cv2.minAreaRect(c)
+            box = cv2.boxPoints(rect)  # cv2.boxPoints(rect) for OpenCV 3.x
+            box = np.int0(box)
+            kiteangle = get_angle(box)
+            if counter % 100 == 0:
+                for i, item in enumerate(box):
+                    print(i, item)
+            cv2.drawContours(frame, [box], 0, (0, 0, 255), 2)
+
             for i in np.arange(1, len(pts)):
                 if pts[i] is None:
                     continue
@@ -160,10 +172,11 @@ while (True):
     cv2.imshow("contours", frame)
     counter += 1
     if counter % 100 == 0:
-        print(center)
-        print(pts[10][0],pts[10][1])
-        print(dX, dY)
-        print(direction)
+        pass
+        #print(center)
+        #print(pts[10][0],pts[10][1])
+        #print(dX, dY)
+        #print(direction)
     # cv2.imshow("dif", diff)
     # keys should be Left, Right, Up, Down, Widen and Narrow, Extend and Contract which should set all routes
     # TODO add remaining key controls
@@ -177,7 +190,8 @@ while (True):
     elif key == ord("q"):
         break
     # if \cv2.waitKey(1000 / 12) & 0xff == ord("q"):
-    # break
+    # break++
+
 
 cv2.destroyAllWindows()
 camera.release()

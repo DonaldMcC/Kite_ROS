@@ -7,6 +7,7 @@ This file should do the following things
     2   When given the current position of the kite identify the target vector and current vector and
         consequently whether to go left or right
 """
+import numpy as np
 
 def calc_route(mode='park', centrex=400, centrey=300, halfwidth=200, radius=100):
     """This just calculates the 6 points in our basic figure of eight
@@ -51,6 +52,12 @@ def get_phase(x,y,width):
     return phase
 
 #flightpath = calc_route()
+
+def get_angle(box):
+    #(0, array([809, 359], dtype=int64))
+    #(1, array([743, 310], dtype=int64))
+    #(2, array([802, 230], dtype=int64))
+    #(3, array([868, 279], dtype=int64))
 
 
 def _test():
