@@ -4,6 +4,7 @@
 
 import math
 from utils import order_points
+import numpy as np
 
 # set up the colors
 #BLACK = (0, 0, 0)
@@ -26,20 +27,22 @@ def distance(xyz1,xyz2):
     else:
         return math.hypot((xyz1[0]-xyz2[0]), (xyz1[1]-xyz2[1]))
 
-def get_angle(box, prevangle=0)
+def get_angle(box, prevangle=0):
     # orderbox is sorted tl, tr, br, bl
     """returns a unit vector for the heading from vector1 to vector2
-       >>> heading ((2,2),(3,3))
-       (0.7071067811865475, 0.7071067811865475)
+       >>> get_angle(np.array([[2, 2], [8, 2],[8, 4],[2, 4]]))
+       (0.0)
        >>>
        """
 
     orderbox = order_points(box)
     # we want the angle of the short side of the rectangle
-    if distance(orderbox(3), orderbox(0)) > distance(orderbox(1), orderbox(0)):
-        angle=get_heading(heading(orderbox(1), orderbox(0)))
+    if distance(orderbox[3], orderbox[0]) > distance(orderbox[1], orderbox[0]):
+        unitvect = heading(orderbox[1], orderbox[0])
     else:
-        angle = get_heading(heading(orderbox(3), orderbox(0)))
+        unitvect = heading(orderbox[3], orderbox[0])
+    print unitvect
+    angle = get_heading(unitvect[1], unitvect[0])
     # TODO will bring in prevangle to get this right but starting approaxch assumes right way up
 
     return angle
@@ -59,7 +62,7 @@ def heading(xyz1,xyz2):
        (0.7071067811865475, 0.7071067811865475)
        >>>
        '''
-    d = distance(xyz1,xyz2)
+    d = distance(xyz1, xyz2)
     if len(xyz1) == 3 and len(xyz2) == 3:
         try:
             x = (xyz2[0]-xyz1[0])/d
@@ -129,18 +132,18 @@ def rotate3d(point,angle, axis='y'):
     
 
 
-def get_heading(x, y ):
-    '''Calcs angle in degrees based on single point and origin
-       >>> get_heading(0,1)
+def get_heading(x, y):
+    """Calcs angle in degrees based on single point and origin
+       >>> get_heading(0, 1)
        0.0
-       >>> get_heading(1,2)
+       >>> get_heading(1.0, 2.0)
        26.56505117707799
-       >>> get_heading(-30,15)
+       >>> get_heading(-30, 15)
        -63.43494882292201
-       >>> get_heading(1,-1)
+       >>> get_heading(1, -1)
        135.0
        >>>
-       '''
+       """
     if y < 0:
         return 180 + math.degrees(math.atan(x/y))
     elif y != 0:
@@ -197,7 +200,7 @@ def get_angled_corners(x, y, anglechange, centx=0,centy=0):
     >>> get_angled_corners(-3,4,180)
     (3.0, -4.0)
     >>> get_angled_corners(-3,-4,180)
-    (2.9999999999999987, 4.000000000000002)
+    (2.9999999999999982, 4.000000000000002)
     >>>
     '''
     x = x - centx
@@ -227,16 +230,16 @@ def get_angled_corners(x, y, anglechange, centx=0,centy=0):
     return (cx,cy)
 
 
-def get_corners(x,y,width,height,shape='rectangle',bottom=0, angle=0):
+def get_corners(x, y, width, height, shape='rectangle', bottom=0, angle=0):
     '''This takes a centre point and calculates the corresponding corners of a rectangle of given width and height
        optional parameters are to return a kite based diamond in which case the bottom would typically be longer
        than the top and finally if you need to tilt the shape then you can specify the angle to rotate the points
        by in degrees with 0 meaning no tilt and others rotating all points.
     >>> get_corners(30,40,10,20)
-    ((25.0, 30.0), (25.0, 50.0), (35.0, 50.0), (35.0, 30.0))
+    ((25, 30), (25, 50), (35, 50), (35, 30))
     >>> get_corners(30,40,20,10,'kite',30)
-    ((20.0, 40), (30, 50), (40.0, 40), (30, 10))
-    >>> get_corners(30,40,10,20,'rectangle',0,30)
+    ((20, 40), (30, 50), (40, 40), (30, 10))
+    >>> get_corners(30,40,10,20, 'rectangle', 0,30)
     ((20.669872981077805, 33.83974596215562), (30.669872981077805, 51.16025403784439), (39.33012701892219, 46.16025403784439), (29.330127018922198, 28.83974596215561))
     >>>
     '''
@@ -244,7 +247,7 @@ def get_corners(x,y,width,height,shape='rectangle',bottom=0, angle=0):
         corners = ((x-(width/2),y-(height/2)),(x-(width/2),y+(height/2)),(x+(width/2),y+(height/2)),(x+(width/2),y-(height/2)))
     elif shape == 'kite':
         #kite shape
-        print(x,y,width,height)
+        #print(x,y,width,height)
         corners = ((x-(width/2),y),(x,y+height),(x+(width/2),y),(x,y-bottom))
     if angle == 0:
         return corners
@@ -316,7 +319,7 @@ def conv_lin(a,b=1.0,c=0.0,inverse=False):
         will I think store parameters against each sensor then they are handy
         >>> conv_lin(4,2,3)
         11
-        >>> conv_lin(11,2,3,True)
+        >>> conv_lin(11,2,3.0,True)
         4.0
         >>>'''
     if inverse == False:
@@ -351,11 +354,13 @@ def get_plan_pos(p, h, t, s):
     mvmt = vector_mult(h,t*s)
     return vector_add(p,mvmt)
 
-    
 def _test():
     import doctest
     doctest.testmod()
     
+def _test():
+    import doctest
+    doctest.testmod()
 
     
 if __name__ == '__main__':

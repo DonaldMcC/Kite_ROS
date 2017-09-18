@@ -2,11 +2,18 @@
 # from http://www.pyimagesearch.com/2016/03/21/ordering-coordinates-clockwise-with-python-and-opencv/
 from scipy.spatial import distance as dist
 import numpy as np
-import cv2
 
 
 def order_points(pts):
     # sort the points based on their x-coordinates
+    """
+    >>> order_points(np.array([(4,4),(2,4),(2,2),(4,2)]))
+    array([[2, 2],
+           [4, 2],
+           [4, 4],
+           [2, 4]], dtype=uint8)
+    """
+
     xSorted = pts[np.argsort(pts[:, 0]), :]
 
     # grab the left-most and right-most points from the sorted
@@ -30,4 +37,14 @@ def order_points(pts):
 
     # return the coordinates in top-left, top-right,
     # bottom-right, and bottom-left order
-    return np.array([tl, tr, br, bl], dtype="uint8")
+    return np.array([tl, tr, br, bl], dtype="int16")
+
+
+def _test():
+    import doctest
+    doctest.testmod()
+
+
+if __name__ == '__main__':
+    'Can run with -v option if you want to confirm tests were run'
+    _test()

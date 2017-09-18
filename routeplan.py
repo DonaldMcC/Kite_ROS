@@ -58,7 +58,7 @@ def get_angle(box):
     #(1, array([743, 310], dtype=int64))
     #(2, array([802, 230], dtype=int64))
     #(3, array([868, 279], dtype=int64))
-
+    pass
 
 def _test():
     import doctest
