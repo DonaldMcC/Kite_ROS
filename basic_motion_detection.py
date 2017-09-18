@@ -114,6 +114,9 @@ while (True):
             box = cv2.boxPoints(rect)  # cv2.boxPoints(rect) for OpenCV 3.x
             box = np.int0(box)
             kiteangle = get_angle(box)
+            cv2.putText(frame, str(int(kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX,
+                        0.65, (0, 0, 255), 3)
+
             if counter % 100 == 0:
                 for i, item in enumerate(box):
                     print(i, item)
