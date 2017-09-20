@@ -29,21 +29,30 @@ def distance(xyz1,xyz2):
 
 def get_angle(box, prevangle=0):
     # orderbox is sorted tl, tr, br, bl
-    """returns a unit vector for the heading from vector1 to vector2
-       >>> get_angle(np.array([[2, 2], [8, 2],[8, 4],[2, 4]]))
-       (0.0)
-       >>>
+    """returns the angle of the kite right side lower is -ve and 0 is a parked kite
+       this is perhaps confusing but stems from opencv having y axis 0 at the top
+
+        >>> get_angle(np.array([[2, 2], [8, 2],[8, 4],[2, 4]]))
+        -0.0
+        >>> get_angle(np.array([[3, 1], [1, 3],[5, 5],[7, 3]]))
+        -45.0
+        >>> get_angle(np.array([[3, 1], [5, 2],[4, 7],[2, 6]]))
+        63.43494882292201
        """
 
     orderbox = order_points(box)
     # we want the angle of the short side of the rectangle
+    #print distance(orderbox[3], orderbox[0])
+    #print distance(orderbox[1], orderbox[0])
+
     if distance(orderbox[3], orderbox[0]) > distance(orderbox[1], orderbox[0]):
         unitvect = heading(orderbox[1], orderbox[0])
     else:
         unitvect = heading(orderbox[3], orderbox[0])
-    print unitvect
-    angle = get_heading(unitvect[1], unitvect[0])
-    # TODO will bring in prevangle to get this right but starting approaxch assumes right way up
+    #print unitvect
+    angle = get_heading(unitvect[0], unitvect[1])
+    # TODO will bring in prevangle to get this right but starting approach assumes right way up and will
+    # only retrun between -90 and +90 degrees
 
     return angle
 
@@ -141,15 +150,16 @@ def get_heading(x, y):
        >>> get_heading(-30, 15)
        -63.43494882292201
        >>> get_heading(1, -1)
-       135.0
+       -45.0
        >>>
        """
     if y < 0:
-        return 180 + math.degrees(math.atan(x/y))
+        return math.degrees(math.atan(x/y))
     elif y != 0:
         return math.degrees(math.atan(x/y))
     else:
         return 0
+
 
 def get_coord(x, y, anglechange):
     #This calculates, probably badly, the angle of a unit vector in degrees
