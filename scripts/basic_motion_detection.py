@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import cv2
 import numpy as np
+import time
 import routeplan
 from collections import deque
 from move_func import get_angle
@@ -182,6 +183,7 @@ while (True):
         #print(direction)
     # cv2.imshow("dif", diff)
     # keys should be Left, Right, Up, Down, Widen and Narrow, Extend and Contract which should set all routes
+    # Pause should hold for 5 secs
     # TODO add remaining key controls
     key = cv2.waitKey(1000 / 12) & 0xff
     if key == ord("l"):
@@ -190,6 +192,8 @@ while (True):
     elif key == ord("r"):
         centrex += 1
         routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
+    elif key == ord("p"):
+        time.sleep(5)
     elif key == ord("q"):
         break
     # if \cv2.waitKey(1000 / 12) & 0xff == ord("q"):
