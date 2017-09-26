@@ -114,13 +114,8 @@ while (True):
             rect = cv2.minAreaRect(c)
             box = cv2.boxPoints(rect)  # cv2.boxPoints(rect) for OpenCV 3.x
             box = np.int0(box)
-            kiteangle, pointx, pointy = get_angle(box)
-            pointx_trans = (pointx[0], pointx[1] + 50)
-            pointy_trans = (pointy[0], pointy[1] + 50)
-            cv2.line(frame, pointx_trans, pointy_trans, (0, 255, 0), 4)
-            cv2.putText(frame, str(int(kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX,
-                        0.65, (0, 0, 255), 3)
 
+           # periodic crude logging
             if counter % 100 == 0:
                 for i, item in enumerate(box):
                     print(i, item)
@@ -171,7 +166,17 @@ while (True):
                         (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX,
                         0.35, (0, 0, 255), 1)
                     continue
+
+                kiteangle, pointx, pointy = get_angle(box, dX, dY)
+                pointx_trans = (pointx[0], pointx[1] + 50)
+                pointy_trans = (pointy[0], pointy[1] + 50)
+                cv2.line(frame, pointx_trans, pointy_trans, (0, 255, 0), 4)
+                cv2.putText(frame, str(int(kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX,
+                            0.65, (0, 0, 255), 3)
+
             continue
+
+
 
     drawroute(routepoints)
     #cv2.imshow("roi", finalframe)
@@ -196,7 +201,7 @@ while (True):
         centrex += 1
         routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
     elif key == ord("p"):
-        time.sleep(5)
+        time.sleep(10)
     elif key == ord("q"):
         break
     # if \cv2.waitKey(1000 / 12) & 0xff == ord("q"):

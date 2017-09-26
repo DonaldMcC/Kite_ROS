@@ -27,7 +27,7 @@ def distance(xyz1,xyz2):
     else:
         return math.hypot((xyz1[0]-xyz2[0]), (xyz1[1]-xyz2[1]))
 
-def get_angle(box, prevangle=0):
+def get_angle(box, dX=0, dY=0):
     # orderbox is sorted tl, tr, br, bl
     """returns the angle of the kite right side lower is -ve and 0 is a parked kite
        this is perhaps confusing but stems from opencv having y axis 0 at the top
@@ -56,6 +56,8 @@ def get_angle(box, prevangle=0):
     angle = get_heading(unitvect[0], unitvect[1])
     # TODO will bring in prevangle to get this right but starting approach assumes right way up and will
     # only retrun between -90 and +90 degrees
+
+
 
     return angle, orderbox[n], orderbox[0]
 
