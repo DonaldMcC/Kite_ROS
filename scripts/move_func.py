@@ -33,9 +33,9 @@ def get_angle(box, prevangle=0):
        this is perhaps confusing but stems from opencv having y axis 0 at the top
 
         >>> get_angle(np.array([[2, 2], [8, 2],[8, 4],[2, 4]]))
-        -0.0
+        180.0
         >>> get_angle(np.array([[3, 1], [1, 3],[5, 5],[7, 3]]))
-        -45.0
+        135.0
         >>> get_angle(np.array([[3, 1], [5, 2],[4, 7],[2, 6]]))
         63.43494882292201
        """
@@ -46,15 +46,18 @@ def get_angle(box, prevangle=0):
     #print distance(orderbox[1], orderbox[0])
 
     if distance(orderbox[3], orderbox[0]) > distance(orderbox[1], orderbox[0]):
+        # this is supposed to be the short side
         unitvect = heading(orderbox[1], orderbox[0])
+        n=1
     else:
-        unitvect = heading(orderbox[3], orderbox[0])
+        unitvect = heading(orderbox[0], orderbox[3])
+        n=3
     #print unitvect
     angle = get_heading(unitvect[0], unitvect[1])
     # TODO will bring in prevangle to get this right but starting approach assumes right way up and will
     # only retrun between -90 and +90 degrees
 
-    return angle
+    return angle, orderbox[n], orderbox[0]
 
 
 def speed(d,t):
@@ -150,15 +153,11 @@ def get_heading(x, y):
        >>> get_heading(-30, 15)
        -63.43494882292201
        >>> get_heading(1, -1)
-       -45.0
+       135.0
        >>>
        """
-    if y < 0:
-        return math.degrees(math.atan(x/y))
-    elif y != 0:
-        return math.degrees(math.atan(x/y))
-    else:
-        return 0
+    return math.degrees(math.atan2(x,y))
+
 
 
 def get_coord(x, y, anglechange):

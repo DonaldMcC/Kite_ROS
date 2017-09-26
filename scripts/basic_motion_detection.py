@@ -114,7 +114,10 @@ while (True):
             rect = cv2.minAreaRect(c)
             box = cv2.boxPoints(rect)  # cv2.boxPoints(rect) for OpenCV 3.x
             box = np.int0(box)
-            kiteangle = get_angle(box)
+            kiteangle, pointx, pointy = get_angle(box)
+            pointx_trans = (pointx[0], pointx[1] + 50)
+            pointy_trans = (pointy[0], pointy[1] + 50)
+            cv2.line(frame, pointx_trans, pointy_trans, (0, 255, 0), 4)
             cv2.putText(frame, str(int(kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX,
                         0.65, (0, 0, 255), 3)
 
