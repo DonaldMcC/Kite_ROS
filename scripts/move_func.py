@@ -27,17 +27,29 @@ def distance(xyz1,xyz2):
     else:
         return math.hypot((xyz1[0]-xyz2[0]), (xyz1[1]-xyz2[1]))
 
-def get_angle(box, dX=0, dY=0):
+def get_angle(box, dx=0, dy=0, mindist=20, ):
     # orderbox is sorted tl, tr, br, bl
     """returns the angle of the kite right side lower is -ve and 0 is a parked kite
        this is perhaps confusing but stems from opencv having y axis 0 at the top
 
-        >>> get_angle(np.array([[2, 2], [8, 2],[8, 4],[2, 4]]))
-        180.0
-        >>> get_angle(np.array([[3, 1], [1, 3],[5, 5],[7, 3]]))
-        135.0
-        >>> get_angle(np.array([[3, 1], [5, 2],[4, 7],[2, 6]]))
-        63.43494882292201
+        Parked kite
+        >>> get_angle(np.array([[11,9],[11,6],[15,6],[15,9]]),0, -20)
+        (0.0, 0.0)
+        >>> get_angle(np.array([[11,9],[11,5],[14,5],[14,9]]),10,0)
+        (-90.0, -90.0)
+        >>> get_angle(np.array([[11,9],[11,5],[14,5],[14,9]]),-10,0)
+        (-90.0, 90.0)
+        >>> get_angle(np.array([[11,9],[11,5],[14,5],[14,9]]),-100,0)
+        (90.0, 90.0)
+        >>> get_angle(np.array([[11,8],[12,6],[15,8],[14,10]]),10,-30)
+        (-26.56505117707799, -18.43494882292201)
+        >>> get_angle(np.array([[11,8],[12,6],[15,8],[14,10]]),-5, 30)
+        (153.43494882292202, 170.53767779197437)
+        >>> get_angle(np.array([[8,9],[6,8],[8,5],[10,6]]),-30, -10)
+        (63.43494882292201, 71.56505117707799)
+        >>> get_angle(np.array([[8,9],[6,8],[8,5],[10,6]]), 30, 10)
+        (-116.56505117707799, -108.43494882292202)
+
        """
 
     orderbox = order_points(box)
@@ -46,7 +58,7 @@ def get_angle(box, dX=0, dY=0):
     #print distance(orderbox[1], orderbox[0])
 
     if distance(orderbox[3], orderbox[0]) > distance(orderbox[1], orderbox[0]):
-        # this is supposed to be the short side
+        # build unitvect for short side of the rectangle
         unitvect = heading(orderbox[1], orderbox[0])
         n=1
     else:
@@ -54,12 +66,20 @@ def get_angle(box, dX=0, dY=0):
         n=3
     #print unitvect
     angle = get_heading(unitvect[0], unitvect[1])
-    # TODO will bring in prevangle to get this right but starting approach assumes right way up and will
-    # only retrun between -90 and +90 degrees
+    heading_angle = get_heading(-dx, -dy)
 
+    if math.sqrt(dx*dx + dy*dy) > mindist:
+        # if moving significantly then assume not going backwards as this is hard to do
+        if abs(angle-heading_angle) > 90:
+            if angle > 0:
+                angle -= 180
+            else:
+                angle += 180
 
-
-    return angle, orderbox[n], orderbox[0]
+    if __name__ == '__main__':
+        return angle, heading_angle
+    else:
+        return angle
 
 
 def speed(d,t):

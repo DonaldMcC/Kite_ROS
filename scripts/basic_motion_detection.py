@@ -167,10 +167,10 @@ while (True):
                         0.35, (0, 0, 255), 1)
                     continue
 
-                kiteangle, pointx, pointy = get_angle(box, dX, dY)
-                pointx_trans = (pointx[0], pointx[1] + 50)
-                pointy_trans = (pointy[0], pointy[1] + 50)
-                cv2.line(frame, pointx_trans, pointy_trans, (0, 255, 0), 4)
+                kiteangle = get_angle(box, dX, dY)
+                #pointx_trans = (pointx[0], pointx[1] + 50)
+                #pointy_trans = (pointy[0], pointy[1] + 50)
+                #cv2.line(frame, pointx_trans, pointy_trans, (0, 255, 0), 4)
                 cv2.putText(frame, str(int(kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX,
                             0.65, (0, 0, 255), 3)
 
