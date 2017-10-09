@@ -37,8 +37,8 @@ def kite_pos(posx, posy, kiteangle, dirx, diry, routepoints, priorpos):
 
 
 if __name__ == '__main__':
-    talker()
-    #try:
-    #    talker()
-    #except rospy.ROSInterruptException:
-    #    pass
+    #talker()
+    try:
+        kite_pos(100,200,45,1,0)
+    except rospy.ROSInterruptException:
+        pass

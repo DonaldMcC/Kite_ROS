@@ -5,6 +5,7 @@ import time
 import routeplan
 from collections import deque
 from move_func import get_angle
+from talker import kite_pos
 
 #camera = cv2.VideoCapture(0)
 #camera=cv2.VideoCapture('IMG_0464.MOV')
@@ -183,6 +184,7 @@ while (True):
     #cv2.imshow("mask", mask)
     cv2.imshow("contours", frame)
     counter += 1
+    kite_pos(100, 200, 45, 1, 0)
     if counter % 100 == 0:
         pass
         #print(center)
