@@ -31,40 +31,42 @@ def calc_route(mode='park', centrex=400, centrey=300, halfwidth=200, radius=100)
         pt4 = (rightx + radius, centrey)
         pt5 = (rightx, centrey - radius)
 
-        return [pt0,pt1,pt2,pt3,pt4,pt5]
+        return [pt0, pt1, pt2, pt3, pt4, pt5]
 
-    else: #park
+    else:  # park
         pt0 = (centrex + radius, centrey + radius)
         pt1 = (centrex + radius, centrey - radius)
         pt2 = (centrex - radius, centrey - radius)
         pt3 = (centrex - radius, centrey + radius)
 
-        return [pt0,pt1,pt2,pt3]
+        return [pt0, pt1, pt2, pt3]
 
-    #cv2.Line(img, pt1, pt2, color, thickness=1, lineType=8, shift=0)
+    # cv2.Line(img, pt1, pt2, color, thickness=1, lineType=8, shift=0)
 
 
-def get_phase(x,y,width):
+def get_phase(x, y, width):
     """This might return the flight phase but not sure I need it
     should be easy enough and we then draw lines between each point and
     get the last point"""
     phase = 'left'
     return phase
 
-#flightpath = calc_route()
+# flightpath = calc_route()
+
 
 def get_angle(box):
-    #(0, array([809, 359], dtype=int64))
-    #(1, array([743, 310], dtype=int64))
-    #(2, array([802, 230], dtype=int64))
-    #(3, array([868, 279], dtype=int64))
+    # (0, array([809, 359], dtype=int64))
+    # (1, array([743, 310], dtype=int64))
+    # (2, array([802, 230], dtype=int64))
+    # (3, array([868, 279], dtype=int64))
     pass
+
 
 def _test():
     import doctest
     doctest.testmod()
 
+
 if __name__ == '__main__':
     # Can run with -v option if you want to confirm tests were run
     _test()
-

@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="f0f7e6d1-31a0-4264-9edc-98c9e3a44315" name="Default" comment="git root moved and msg folder added to project with kitepos working">
+    <list default="true" id="f0f7e6d1-31a0-4264-9edc-98c9e3a44315" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/alt_motion_detect.py" afterPath="$PROJECT_DIR$/alt_motion_detect.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/basic_motion_detection.py" afterPath="$PROJECT_DIR$/basic_motion_detection.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/listener.py" afterPath="$PROJECT_DIR$/listener.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/move_func.py" afterPath="$PROJECT_DIR$/move_func.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ros_image_out.py" afterPath="$PROJECT_DIR$/ros_image_out.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/routeplan.py" afterPath="$PROJECT_DIR$/routeplan.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/routeset.py" afterPath="$PROJECT_DIR$/routeset.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/talker.py" afterPath="$PROJECT_DIR$/talker.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -21,10 +20,22 @@
       <file leaf-file-name="talker.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/talker.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="233">
-              <caret line="38" column="26" lean-forward="false" selection-start-line="38" selection-start-column="26" selection-end-line="38" selection-end-column="26" />
+            <state relative-caret-position="350">
+              <caret line="41" column="6" lean-forward="false" selection-start-line="41" selection-start-column="6" selection-end-line="41" selection-end-column="6" />
               <folding>
                 <element signature="e#58#70#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="utils.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/utils.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="137">
+              <caret line="16" column="4" lean-forward="false" selection-start-line="16" selection-start-column="4" selection-end-line="16" selection-end-column="4" />
+              <folding>
+                <element signature="e#134#176#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -62,36 +73,6 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Kitepos.msg" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../msg/Kitepos.msg">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="13" lean-forward="false" selection-start-line="0" selection-start-column="13" selection-end-line="0" selection-end-column="13" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="package.xml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../package.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="735">
-              <caret line="49" column="2" lean-forward="false" selection-start-line="49" selection-start-column="2" selection-end-line="49" selection-end-column="2" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CMakeLists.txt" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../CMakeLists.txt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="795">
-              <caret line="53" column="0" lean-forward="false" selection-start-line="53" selection-start-column="0" selection-end-line="53" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="listener.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/listener.py">
           <provider selected="true" editor-type-id="text-editor">
@@ -104,7 +85,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="move_func.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="move_func.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/move_func.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="167">
@@ -112,6 +93,36 @@
               <folding>
                 <element signature="e#215#226#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ros_image_out.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/ros_image_out.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="137">
+              <caret line="16" column="6" lean-forward="false" selection-start-line="16" selection-start-column="6" selection-end-line="16" selection-end-column="6" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="routeplan.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/routeplan.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="137">
+              <caret line="35" column="10" lean-forward="false" selection-start-line="35" selection-start-column="10" selection-end-line="35" selection-end-column="10" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="routeset.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/routeset.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="105">
+              <caret line="7" column="0" lean-forward="false" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -127,12 +138,15 @@
         <option value="$PROJECT_DIR$/../msg/Kitepos" />
         <option value="$PROJECT_DIR$/../package.xml" />
         <option value="$PROJECT_DIR$/../CMakeLists.txt" />
-        <option value="$PROJECT_DIR$/talker.py" />
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/alt_motion_detect.py" />
         <option value="$PROJECT_DIR$/basic_motion_detection.py" />
         <option value="$PROJECT_DIR$/listener.py" />
         <option value="$PROJECT_DIR$/move_func.py" />
+        <option value="$PROJECT_DIR$/ros_image_out.py" />
+        <option value="$PROJECT_DIR$/routeplan.py" />
+        <option value="$PROJECT_DIR$/routeset.py" />
+        <option value="$PROJECT_DIR$/talker.py" />
       </list>
     </option>
   </component>
@@ -265,7 +279,14 @@
       <option name="project" value="LOCAL" />
       <updated>1506244291088</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="pep8 fixes part1">
+      <created>1508089011230</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1508089011230</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -302,7 +323,8 @@
     <MESSAGE value="now working following some strange header issue" />
     <MESSAGE value="start on custom message and about to move git root" />
     <MESSAGE value="git root moved and msg folder added to project with kitepos working" />
-    <option name="LAST_COMMIT_MESSAGE" value="git root moved and msg folder added to project with kitepos working" />
+    <MESSAGE value="pep8 fixes part1" />
+    <option name="LAST_COMMIT_MESSAGE" value="pep8 fixes part1" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -591,16 +613,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/talker.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="233">
-          <caret line="38" column="26" lean-forward="false" selection-start-line="38" selection-start-column="26" selection-end-line="38" selection-end-column="26" />
-          <folding>
-            <element signature="e#58#70#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
@@ -643,6 +655,50 @@
           <caret line="340" column="23" lean-forward="false" selection-start-line="340" selection-start-column="23" selection-end-line="340" selection-end-column="23" />
           <folding>
             <element signature="e#215#226#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ros_image_out.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="137">
+          <caret line="16" column="6" lean-forward="false" selection-start-line="16" selection-start-column="6" selection-end-line="16" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/routeplan.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="137">
+          <caret line="35" column="10" lean-forward="false" selection-start-line="35" selection-start-column="10" selection-end-line="35" selection-end-column="10" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/routeset.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" column="0" lean-forward="false" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/talker.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="350">
+          <caret line="41" column="6" lean-forward="false" selection-start-line="41" selection-start-column="6" selection-end-line="41" selection-end-column="6" />
+          <folding>
+            <element signature="e#58#70#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="137">
+          <caret line="16" column="4" lean-forward="false" selection-start-line="16" selection-start-column="4" selection-end-line="16" selection-end-column="4" />
+          <folding>
+            <element signature="e#134#176#0" expanded="true" />
           </folding>
         </state>
       </provider>

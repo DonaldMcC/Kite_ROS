@@ -4,6 +4,7 @@ import rospy
 from std_msgs.msg import String
 from kite_ros.msg import Kitepos
 
+
 def talker():
     pub = rospy.Publisher('chatter', String, queue_size=10)
     rospy.init_node('talker', anonymous=True)
@@ -37,7 +38,7 @@ def kite_pos(posx, posy, kiteangle, dirx, diry, routepoints, priorpos):
 
 
 if __name__ == '__main__':
-    #talker()
+    # talker()
     try:
         kite_pos(100,200,45,1,0)
     except rospy.ROSInterruptException:
