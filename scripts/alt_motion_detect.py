@@ -1,4 +1,6 @@
-# import the necessary packages -this came from pyimagesearch.com and will be compared to basic_motion_detction
+# import the necessary packages -this came from pyimagesearch.com and will be compared to
+# basic_motion_detction
+# not currently being used int this project
 from collections import deque
 import numpy as np
 import argparse
