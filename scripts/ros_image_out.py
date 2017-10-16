@@ -4,7 +4,6 @@
 # plan is to move to optionally call it to output images as ros messages
 
 import roslib
-
 roslib.load_manifest('my_package')
 import sys
 import rospy

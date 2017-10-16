@@ -74,13 +74,13 @@ routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
 
 
 # this is just for display flight decisions will be elsewhere
-def drawroute(routepoints):
-    for i, j in enumerate(routepoints):
-        if i < len(routepoints) - 1:
-            cv2.line(frame, (j[0], j[1]), (routepoints[i+1][0], routepoints[i+1][1]),
+def drawroute(route):
+    for i, j in enumerate(route):
+        if i < len(route) - 1:
+            cv2.line(frame, (j[0], j[1]), (route[i+1][0], route[i+1][1]),
                      (255, 0, 255), thickness=1, lineType=8, shift=0)
         else:
-            cv2.line(frame, (j[0], j[1]), (routepoints[0][0], routepoints[0][1]),
+            cv2.line(frame, (j[0], j[1]), (route[0][0], route[0][1]),
                      (255, 0, 255), thickness=1, lineType=8, shift=0)
     return
 
@@ -185,7 +185,7 @@ while True:
     # cv2.imshow("mask", mask)
     cv2.imshow("contours", frame)
     counter += 1
-    kite_pos(100, 200, 45, 1, 0)
+    kite_pos(100, 200, 45, 1, 0, 0, 0)
     if counter % 100 == 0:
         pass
         # print(center)
