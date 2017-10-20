@@ -33,6 +33,8 @@ pts = deque(maxlen=16)
 counter = 0
 (dX, dY) = (0, 0)
 direction = ""
+step = 8  # value for amount routing adjusted per keystroke
+kiteangle = 0
 
 # http://www.pyimagesearch.com/2014/08/04/opencv-python-color-detection/
 # define the list of boundaries
@@ -69,7 +71,7 @@ except NameError:
     halfwidth = 200
     radius = 100
 except KeyError:
-    mode = 'park'
+    mode = 'fig8' # this is default setup without message from ros
     centrex = 400
     centrey = 300
     halfwidth = 200
@@ -80,6 +82,7 @@ routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
 
 # this is just for display flight decisions will be elsewhere
 def drawroute(route):
+    global frame
     for i, j in enumerate(route):
         if i < len(route) - 1:
             cv2.line(frame, (j[0], j[1]), (route[i+1][0], route[i+1][1]),
@@ -189,9 +192,9 @@ while True:
             continue
 
     drawroute(routepoints)
-    kite_pos(100, 200, 45, 1, 0, 0, 0)
-    #cv2.imshow("roi", finalframe)
-    #cv2.imshow("mask", mask)
+    kite_pos(centrex, centrey, kiteangle, dX, dY, 0, 0)
+    # cv2.imshow("roi", finalframe)
+    # cv2.imshow("mask", mask)
     cv2.imshow("contours", frame)
     counter += 1
 
@@ -207,28 +210,28 @@ while True:
     # Pause should hold for 5 secs
     key = cv2.waitKey(8) & 0xff
     if key == ord("l"):
-        centrex -= 1
+        centrex -= step
         routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
     elif key == ord("r"):
-        centrex += 1
+        centrex += step
         routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
     elif key == ord("u"):
-        centrey -= 1
+        centrey -= step
         routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
     elif key == ord("d"):
-        centrey += 1
+        centrey += step
         routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
     elif key == ord("w"):
-        halfwidth += 1
+        halfwidth += step
         routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
     elif key == ord("n"):
         halfwidth -= 1
         routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
     elif key == ord("e"):
-        radius += 1
+        radius += step
         routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
     elif key == ord("c"):
-        radius -= 1
+        radius -= step
         routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
     elif key == ord("p"):
         time.sleep(10)
