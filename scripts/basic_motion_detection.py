@@ -61,9 +61,14 @@ try:  # this will fail on windows but don't need yet
     centrey = rospy.get_param('centrey')
     halfwidth = rospy.get_param('halfwidth')
     radius = rospy.get_param('radius')
-
 except NameError:
     #  mode='fig8'
+    mode = 'park'
+    centrex = 400
+    centrey = 300
+    halfwidth = 200
+    radius = 100
+except KeyError:
     mode = 'park'
     centrex = 400
     centrey = 300
@@ -85,6 +90,8 @@ def drawroute(route):
     return
 
 
+cv2.startWindowThread()
+cv2.namedWindow('contours')
 while True:
     ret, frame = camera.read()
     if background is None:
@@ -122,7 +129,8 @@ while True:
             # periodic crude logging
             if counter % 100 == 0:
                 for i, item in enumerate(box):
-                    print(i, item)
+                    #print(i, item)
+                    pass
             cv2.drawContours(frame, [box], 0, (0, 0, 255), 2)
 
             for i in np.arange(1, len(pts)):
@@ -181,11 +189,12 @@ while True:
             continue
 
     drawroute(routepoints)
-    # cv2.imshow("roi", finalframe)
-    # cv2.imshow("mask", mask)
+    kite_pos(100, 200, 45, 1, 0, 0, 0)
+    #cv2.imshow("roi", finalframe)
+    #cv2.imshow("mask", mask)
     cv2.imshow("contours", frame)
     counter += 1
-    kite_pos(100, 200, 45, 1, 0, 0, 0)
+
     if counter % 100 == 0:
         pass
         # print(center)
@@ -193,15 +202,33 @@ while True:
         # print(dX, dY)
         # print(direction)
     # cv2.imshow("dif", diff)
-    # keys should be Left, Right, Up, Down, Widen and Narrow, Extend and Contract which should set all routes
+    # keys should be Left, Right, Up, Down, Widen and Narrow, Extend and Contract which
+    # should set all routes
     # Pause should hold for 5 secs
-    # TODO add remaining key controls
-    key = cv2.waitKey(1000 / 12) & 0xff
+    key = cv2.waitKey(8) & 0xff
     if key == ord("l"):
         centrex -= 1
         routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
     elif key == ord("r"):
         centrex += 1
+        routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
+    elif key == ord("u"):
+        centrey -= 1
+        routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
+    elif key == ord("d"):
+        centrey += 1
+        routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
+    elif key == ord("w"):
+        halfwidth += 1
+        routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
+    elif key == ord("n"):
+        halfwidth -= 1
+        routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
+    elif key == ord("e"):
+        radius += 1
+        routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
+    elif key == ord("c"):
+        radius -= 1
         routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
     elif key == ord("p"):
         time.sleep(10)

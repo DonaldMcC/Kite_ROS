@@ -28,12 +28,14 @@ def kite_pos(posx, posy, kiteangle, dirx, diry, routepoints, priorpos):
     msg.kiteangle = kiteangle
     msg.dirx = dirx
     msg.diry = diry
+    rospy.loginfo(msg)
+    pub.publish(msg)
 
-    while not rospy.is_shutdown():
-        hello_str = "hello world %s" % rospy.get_time()
-        rospy.loginfo(msg)
-        pub.publish(msg)
-        rate.sleep()
+    #while not rospy.is_shutdown():
+    #    hello_str = "hello world %s" % rospy.get_time()
+    #    rospy.loginfo(msg)
+    #    pub.publish(msg)
+    #    rate.sleep()
     return
 
 
