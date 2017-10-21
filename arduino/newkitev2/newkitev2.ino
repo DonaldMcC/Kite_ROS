@@ -9,6 +9,7 @@
 #include <Wire.h>
 #include <math.h>
 #include <ros.h>
+#include <std_msgs/String.h>
 
 // include the library code:
 #include <SerialLCD.h>
