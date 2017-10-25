@@ -3,13 +3,15 @@
  NOw being scaled back to remove the datalogger and see if we can get the 3 resistors and perhaps the lcd display - but may well take that out again soon too
 
  Newkitev2 - will add ros librarie and see if we can publish data to a ROS node
+ Newkitev3 - ROS needs serial so remove this from the sketch - will try and keep SerialLCD for now
  */
 
 
 #include <Wire.h>
 #include <math.h>
 #include <ros.h>
-#include <std_msgs/String.h>
+#include <ros/time.h>
+#include <kite_arduino/kite_arduino.h>
 
 // include the library code:
 #include <SerialLCD.h>
@@ -22,15 +24,11 @@ SerialLCD slcd(8,9);//this is a must, assign soft serial pins
 //initiate ROS
 ros::NodeHandle nh;
 
+kite_arduino::kite_arduino kite_arduino_msg;
+ros::Publisher p("kite_arduino", &kite_arduino_msg);
 
-
-void callback ( const std_msgs::String& msg{
-str_msg.data=msg.data;
-chatter.publish( &str_msg );
-}
-
-//std_msgs::String str_msg;
-ros::Publisher chatter("chatter", &str_msg)
+char hello[13] = "hello world!";
+char var2[6] = "mored";
 
 #define ACCELE_SCALE 2  // accelerometer full-scale, should be 2, 4, or 8
 
@@ -98,16 +96,10 @@ void setup()
   slcd.begin(); 
   Wire.begin();
   
- // Open serial communications and wait for port to open:
-  Serial.begin(9600);
-   while (!Serial) {
-    ; // wait for serial port to connect. Needed for Leonardo only
-
- //initialise ros
+   //initialise ros
  nh.initNode();
- nh.advertise(chatter);
-  }
-  
+ nh.advertise(p);
+   
   initLSM303(ACCELE_SCALE);  // Initialize the LSM303, using a SCALE full-scale range
 
 }
@@ -121,12 +113,12 @@ getLSM303_accel(accel);  // get the acceleration values and store them in the ac
     ;  // wait for the magnetometer readings to be ready
   getLSM303_mag(mag);  // get the magnetometer values, store them in mag
   //printValues(mag, accel);  // print the raw accel and mag values, good debugging
-  Serial.println("Acceleration of X,Y,Z is");
+  //Serial.println("Acceleration of X,Y,Z is");
   for (int i=0; i<3; i++)
   {
     realAccel[i] = accel[i] / pow(2, 15) * ACCELE_SCALE;  // calculate real acceleration values, in units of g
-	Serial.print(realAccel[i]);
-	Serial.println("g");
+	//Serial.print(realAccel[i]);
+	//Serial.println("g");
   }
   /* print both the level, and tilt-compensated headings below to compare */
   /*  Serial.println("The clockwise angle between the magnetic north and x-axis: ");
@@ -145,18 +137,28 @@ getLSM303_accel(accel);  // get the acceleration values and store them in the ac
  
   slcd.setCursor(0, 1);
   slcd.print("A"); 
-  slcd.print(analogRead(0),DEC);
+  slcd.print(analogRead(2),DEC);
   
   slcd.setCursor(5, 1);
   slcd.print("B"); 
-  slcd.print(analogRead(2),DEC);
+  slcd.print(analogRead(0),DEC);
     
   slcd.setCursor(10, 1);
   slcd.print("C"); 
   slcd.print(analogRead(3),DEC);
   
-  Serial.print(getTiltHeading(mag, realAccel), 3);  // see how awesome tilt compensation is?!
+  //Serial.print(getTiltHeading(mag, realAccel), 3);  // see how awesome tilt compensation is?!
   /*Serial.println(" degrees");*/
+
+  kite_arduino_msg.header.stamp = nh.now();
+  kite_arduino_msg.rleft = analogRead(2);
+  kite_arduino_msg.rcent = analogRead(0);
+  kite_arduino_msg.rright = analogRead(3);
+  kite_arduino_msg.heading = head;
+  kite_arduino_msg.varx = mag[X]+800;
+  kite_arduino_msg.vary = yval;
+  kite_arduino_msg.varz = mag[Z]+800;
+  p.publish( &kite_arduino_msg );
 
   nh.spinOnce();
   delay(500);
