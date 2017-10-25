@@ -11,22 +11,25 @@ import numpy as np
 import time
 import routeplan
 from collections import deque
+
 try:
     import rospy
 except ImportError:
     pass
 
 from move_func import get_angle
-from talker import kite_pos
+from talker import kite_pos, kiteimage
 
-camera = cv2.VideoCapture(0)
+#camera = cv2.VideoCapture(0)
 # camera=cv2.VideoCapture('IMG_0464.MOV')
-# camera = cv2.VideoCapture('choppedkite_horizshort.mp4')
+camera = cv2.VideoCapture('choppedkite_horizshort.mp4')
 
 
 es = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
 kernel = np.ones((5, 5), np.uint8)
 background = None
+imagemessage = kiteimage()
+
 
 # initialize the list of tracked points, the frame counter,
 # and the coordinate deltas
@@ -197,6 +200,7 @@ while True:
     # cv2.imshow("roi", finalframe)
     # cv2.imshow("mask", mask)
     cv2.imshow("contours", frame)
+    kiteimage.pubimage(imagemessage, frame)
     counter += 1
 
     if counter % 100 == 0:

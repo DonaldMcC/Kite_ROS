@@ -3,6 +3,8 @@
 import rospy
 from std_msgs.msg import String
 from kite_ros.msg import Kitepos
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge, CvBridgeError
 
 
 def talker():
@@ -37,6 +39,19 @@ def kite_pos(posx, posy, kiteangle, dirx, diry, routepoints, priorpos):
     #    pub.publish(msg)
     #    rate.sleep()
     return
+
+
+class kiteimage:
+
+    def __init__(self):
+        self.image_pub = rospy.Publisher('kite_chatter', Image)
+        self.bridge = CvBridge()
+
+    def pubimage(self, cv_image):
+        try:
+            self.image_pub.publish(self.bridge.cv2_to_imgmsg(cv_image, "bgr8"))
+        except CvBridgeError as e:
+            print(e)
 
 
 if __name__ == '__main__':

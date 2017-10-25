@@ -3,6 +3,7 @@
 # http://wiki.ros.org/cv_bridge/Tutorials/ConvertingBetweenROSImagesAndOpenCVImagesPython
 # plan is to move to optionally call it to output images as ros messages
 
+from __future__ import print_function
 import roslib
 roslib.load_manifest('kite_ros')
 import sys
@@ -11,6 +12,7 @@ import cv2
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
+
 
 
 class image_converter:
