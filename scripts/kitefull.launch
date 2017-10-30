@@ -1,0 +1,3 @@
+<launch>
+  <node name="kite_pos" pkg="kite_ros" type="talker" />
+</launch>
