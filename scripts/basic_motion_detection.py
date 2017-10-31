@@ -20,9 +20,9 @@ except ImportError:
 from move_func import get_angle
 from talker import kite_pos, kiteimage
 
-#camera = cv2.VideoCapture(0)
+camera = cv2.VideoCapture(0)
 # camera=cv2.VideoCapture('IMG_0464.MOV')
-camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
+#camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
 
 
 es = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
@@ -146,7 +146,7 @@ while True:
 
                 # check to see if enough points have been accumulated in
                 # the buffer
-                if counter >= 10 and i == 1 and pts[10] is not None:
+                if counter >= 10 and i == 1 and pts and len(pts) > 10 and pts[10] is not None:
                     # compute the difference between the x and y
                     # coordinates and re-initialize the direction
                     # text variables
