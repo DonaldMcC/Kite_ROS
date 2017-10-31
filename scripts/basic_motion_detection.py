@@ -22,7 +22,7 @@ from talker import kite_pos, kiteimage
 
 #camera = cv2.VideoCapture(0)
 # camera=cv2.VideoCapture('IMG_0464.MOV')
-camera = cv2.VideoCapture('choppedkite_horizshort.mp4')
+camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
 
 
 es = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
