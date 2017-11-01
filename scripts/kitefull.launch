@@ -1,3 +1,8 @@
+ <!-- a basic listener node ROS_HOME=`pwd` may help to direct things
+  if not bag files will be in  ~/.ros  -->
+
 <launch>
   <node name="kite_ros" pkg= 'kite_ros' type="basic_motion_detection.py" />
+    <node name="arduino" pkg= 'rosserial_python' type="serial_node.py" args="/dev/ttyUSB0"/>
+    <node pkg="rosbag" type="record" name="record" output="screen" args="-a"/>
 </launch>
