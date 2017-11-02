@@ -245,6 +245,9 @@ while True:
     # if \cv2.waitKey(1000 / 12) & 0xff == ord("q"):
     # break++
 
-
+# do a bit of cleanup
+print("[INFO] cleaning up...")
 cv2.destroyAllWindows()
 camera.release()
+vs.stop()
+writer.release()
