@@ -6,7 +6,7 @@ from __future__ import print_function
 import numpy as np
 import cv2
 
-fourcc = cv2.VideoWriter_fourcc(*args["codec"])
+fourcc = cv2.VideoWriter_fourcc("MJPG")
 writer = None
 (h, w) = (None, None)
 zeros = None
