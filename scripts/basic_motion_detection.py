@@ -111,8 +111,9 @@ while True:
         continue
 
     if writer is None:
-        h, w = frame.shape[:2]
-        writer = initwriter("record.avi", h, w, fps)
+        #h, w = frame.shape[:2]
+        height, width = 480, 640
+        writer = initwriter("record.avi", height, width, fps)
   
     gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     gray_frame = cv2.GaussianBlur(gray_frame, (21, 21), 0)
@@ -210,7 +211,7 @@ while True:
     cv2.imshow("contours", frame)
     kiteimage.pubimage(imagemessage, frame)
     counter += 1
-    writeframe(writer, frame, h, w)
+    writeframe(writer, frame, height, width)
 
     if counter % 100 == 0:
         pass
