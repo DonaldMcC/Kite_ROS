@@ -19,6 +19,8 @@ except ImportError:
 
 from move_func import get_angle
 from talker import kite_pos, kiteimage
+from cvwriter import initwriter, writeframe
+
 
 camera = cv2.VideoCapture(0)
 # camera=cv2.VideoCapture('IMG_0464.MOV')
@@ -95,16 +97,23 @@ def drawroute(route):
             cv2.line(frame, (j[0], j[1]), (route[0][0], route[0][1]),
                      (255, 0, 255), thickness=1, lineType=8, shift=0)
     return
-
+writer = None
 
 cv2.startWindowThread()
 cv2.namedWindow('contours')
+fps=15
+
 while True:
     ret, frame = camera.read()
     if background is None:
         background = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         background = cv2.GaussianBlur(background, (21, 21), 0)
         continue
+
+    if writer is None:
+        #h, w = frame.shape[:2]
+        height, width = 480, 640
+        writer = initwriter("record.avi", height, width, fps)
   
     gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     gray_frame = cv2.GaussianBlur(gray_frame, (21, 21), 0)
@@ -202,6 +211,7 @@ while True:
     cv2.imshow("contours", frame)
     kiteimage.pubimage(imagemessage, frame)
     counter += 1
+    writeframe(writer, frame, height, width)
 
     if counter % 100 == 0:
         pass
@@ -245,6 +255,9 @@ while True:
     # if \cv2.waitKey(1000 / 12) & 0xff == ord("q"):
     # break++
 
-
+# do a bit of cleanup
+print("[INFO] cleaning up...")
 cv2.destroyAllWindows()
 camera.release()
+vs.stop()
+writer.release()
