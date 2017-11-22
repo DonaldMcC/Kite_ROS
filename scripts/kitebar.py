@@ -15,11 +15,14 @@ def kitebar(source):
     # anonymous=True flag means that rospy will choose a unique
     # name for our 'listener' node so that multiple listeners can
     # run simultaneously.
-    rospy.init_node('listener', anonymous=True)
+    rospy.init_node('kitebar')
+
 
     if source == 'arduino':
         rospy.Subscriber("chatter", String, callback)
-        # get params
+        # get params - may not call this all the time
+        leftmax, leftmin, centremin, centremax, rightmax, rightmin = get_params()
+
         # calc angles
         # publish converted results
     elif source == 'kite_infer':
@@ -46,9 +49,19 @@ def startnode(source='arduino'):
     # as parameters which are used to convert the resistance readings into the angle of the bar
     # and the rough tension on the kitelines
 
-
+    #retrieve the source from param server or set it to the source if not set
+    source = rospy.get_param('source', source)
     kitebar(source)
 
+
+def get_params():
+    leftmax = rospy.get_param('leftmax', 1000)
+    leftmin = rospy.get_param('leftmin', 0)
+    centremax = rospy.get_param('centremax', 1000)
+    centremin = rospy.get_param('centremin', 0)
+    rightmax = rospy.get_param('rightmax', 1000)
+    rightmin = rospy.get_param('rightmin', 0)
+    return leftmax, leftmin, centremax, centremin, rightmax, rightmin
 
 if __name__ == '__main__':
     startnode()
