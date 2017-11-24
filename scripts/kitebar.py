@@ -3,10 +3,42 @@
 # kitebar will pick up
 import rospy
 from std_msgs.msg import String
+from kite_ros.msg import Kitepos
 
 
-def callback(data):
-    rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
+def callarduino(data):
+    rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.name)
+    msgname = data.name
+    msgposx = data.posx
+    msgposy = data.posy
+    msgkiteangle = data.kiteangle
+    msgdirx = data.dirx
+    msgdiry = data.diry
+
+
+    # get params - may not call this all the time
+    leftmax, leftmin, centremin, centremax, rightmax, rightmin = get_params()
+
+
+    # calc angles
+    # publish converted results
+
+def callkite_infer(data):
+    rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.name)
+    msgname = data.name
+    msgposx = data.posx
+    msgposy = data.posy
+    msgkiteangle = data.kiteangle
+    msgdirx = data.dirx
+    msgdiry = data.diry
+    # no params for kite_infer - just need to work out from position??
+
+
+get_params()
+
+
+    # calc angles
+    # publish converted results
 
 
 def kitebar(source):
@@ -19,17 +51,15 @@ def kitebar(source):
 
 
     if source == 'arduino':
-        rospy.Subscriber("chatter", String, callback)
-        # get params - may not call this all the time
-        leftmax, leftmin, centremin, centremax, rightmax, rightmin = get_params()
+        rospy.Subscriber("kite_arduino", Kitepos, callarduino)
+        # think everything else can happen in kitepos after the
 
-        # calc angles
-        # publish converted results
     elif source == 'kite_infer':
-        pass
+        rospy.Subscriber("kite_arduino", Kitepos, callkite_infer)
         # get kitepos
         # calc angles from kitepos
         # publish converted results
+
     elif source == 'manual':
         pass
         # get previous angle or 0
