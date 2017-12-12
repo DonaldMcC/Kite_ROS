@@ -34,6 +34,16 @@ def callkite_infer(data):
     # no params for kite_infer - just need to work out from position??
 
 
+def get_params():
+    leftmax = rospy.get_param('leftmax', 1000)
+    leftmin = rospy.get_param('leftmin', 0)
+    centremax = rospy.get_param('centremax', 1000)
+    centremin = rospy.get_param('centremin', 0)
+    rightmax = rospy.get_param('rightmax', 1000)
+    rightmin = rospy.get_param('rightmin', 0)
+    return leftmax, leftmin, centremax, centremin, rightmax, rightmin
+
+
 get_params()
 
 
@@ -84,14 +94,7 @@ def startnode(source='arduino'):
     kitebar(source)
 
 
-def get_params():
-    leftmax = rospy.get_param('leftmax', 1000)
-    leftmin = rospy.get_param('leftmin', 0)
-    centremax = rospy.get_param('centremax', 1000)
-    centremin = rospy.get_param('centremin', 0)
-    rightmax = rospy.get_param('rightmax', 1000)
-    rightmin = rospy.get_param('rightmin', 0)
-    return leftmax, leftmin, centremax, centremin, rightmax, rightmin
+
 
 if __name__ == '__main__':
     startnode()
