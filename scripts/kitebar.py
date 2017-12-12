@@ -5,25 +5,24 @@ import rospy
 from std_msgs.msg import String
 from kite_ros.msg import Kitepos
 
-
+params = False
 def callarduino(data):
+    message={}
     rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.name)
-    msgname = data.name
-    msgposx = data.posx
+    message['msgname'] = data.name
+    message['msgposx'] = data.posx
     msgposy = data.posy
     msgkiteangle = data.kiteangle
     msgdirx = data.dirx
     msgdiry = data.diry
-
-
-    # get params - may not call this all the time
-    leftmax, leftmin, centremin, centremax, rightmax, rightmin = get_params()
+    return message
 
 
     # calc angles
     # publish converted results
 
 def callkite_infer(data):
+    message={}
     rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.name)
     msgname = data.name
     msgposx = data.posx
@@ -32,20 +31,23 @@ def callkite_infer(data):
     msgdirx = data.dirx
     msgdiry = data.diry
     # no params for kite_infer - just need to work out from position??
+    return message
 
 
 def get_params():
-    leftmax = rospy.get_param('leftmax', 1000)
-    leftmin = rospy.get_param('leftmin', 0)
-    centremax = rospy.get_param('centremax', 1000)
-    centremin = rospy.get_param('centremin', 0)
-    rightmax = rospy.get_param('rightmax', 1000)
-    rightmin = rospy.get_param('rightmin', 0)
-    return leftmax, leftmin, centremax, centremin, rightmax, rightmin
+    params={}
+    params['source'] = rospy.get_param('source', 'arduino')
+    params['leftmax'] = rospy.get_param('leftmax', 1000)
+    params['leftmin'] = rospy.get_param('leftmin', 0)
+    params['centremaxleft'] = rospy.get_param('centremaxleft', 1000)
+    params['centremiddle']= rospy.get_param('centremiddle', 500)
+    params['centremaxright'] = rospy.get_param('centremaxright', 0)
+    params['rightmax'] = rospy.get_param('rightmax', 1000)
+    params['rightmin'] = rospy.get_param('rightmin', 0)
+    return params
 
 
-get_params()
-
+def kite_pos(params,)
 
     # calc angles
     # publish converted results
@@ -90,10 +92,10 @@ def startnode(source='arduino'):
     # and the rough tension on the kitelines
 
     #retrieve the source from param server or set it to the source if not set
-    source = rospy.get_param('source', source)
-    kitebar(source)
-
-
+    global params
+    params = get_params()
+    kitebar(params['source'])
+    return
 
 
 if __name__ == '__main__':

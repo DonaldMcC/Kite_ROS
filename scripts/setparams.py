@@ -15,7 +15,11 @@ def set_kite_base():
     rospy.set_param('rightmin', 697)
 
 
+def set_source():
+    rospy.set_param('source', 'arduino')
+
 def set_params():
+    set_source()
     set_kite_base()
 
 
