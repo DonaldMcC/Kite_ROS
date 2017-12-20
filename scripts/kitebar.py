@@ -1,40 +1,25 @@
 #!/usr/bin/env python
-# from ros wiki for initial testing
-# kitebar will pick up
+# kitebar will be an entry point for routine to initially convert the values from
+# arduino resistors and publish the kitebar angles and force - in time it should however support other modes
+# where the kitebar angles are inferred from the kite or directly controlled by keyboard or other controls
+# there should always be some sort of input, some processing and publishing of output message with the angle and
+# estimeated forces on the bar
+
+# it is proposed to structure this over 4 mddules
+# kiteb_input will handle reading ROS messages and convert into dictionaries most likely to transfer to
+# kiteb_process which should do the conversion of the data to get the result
+# kiteb_ouput will publish the ROS message
+# this module will read parameters and establish the operating mode and then call relevant input, conversion and
+# output functions or classes
+
+
 import rospy
-from std_msgs.msg import String
 from kite_ros.msg import Kitepos
-
-params = False
-def callarduino(data):
-    message={}
-    rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.name)
-    message['msgname'] = data.name
-    message['msgposx'] = data.posx
-    msgposy = data.posy
-    msgkiteangle = data.kiteangle
-    msgdirx = data.dirx
-    msgdiry = data.diry
-    return message
-
-
-    # calc angles
-    # publish converted results
-
-def callkite_infer(data):
-    message={}
-    rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.name)
-    msgname = data.name
-    msgposx = data.posx
-    msgposy = data.posy
-    msgkiteangle = data.kiteangle
-    msgdirx = data.dirx
-    msgdiry = data.diry
-    # no params for kite_infer - just need to work out from position??
-    return message
-
+from kiteb_input import call_arduino
 
 def get_params():
+    """This will download all exepcted parameters from the ROS parameter server"""
+    #TODO look at identifying values not received for now this is setting default value but that may not be best
     params={}
     params['source'] = rospy.get_param('source', 'arduino')
     params['leftmax'] = rospy.get_param('leftmax', 1000)
@@ -47,12 +32,6 @@ def get_params():
     return params
 
 
-def kite_pos(params,)
-
-    # calc angles
-    # publish converted results
-
-
 def kitebar(source):
     # In ROS, nodes are uniquely named. If two nodes with the same
     # node are launched, the previous one is kicked off. The
@@ -61,9 +40,8 @@ def kitebar(source):
     # run simultaneously.
     rospy.init_node('kitebar')
 
-
     if source == 'arduino':
-        rospy.Subscriber("kite_arduino", Kitepos, callarduino)
+        rospy.Subscriber("kite_arduino", Kitepos, call_arduino)
         # think everything else can happen in kitepos after the
 
     elif source == 'kite_infer':
