@@ -4,29 +4,22 @@
 import rospy
 from std_msgs.msg import String
 from kite_ros.msg import Kitepos
+from message_converter import convert_ros_message_to_dictionary
+from kiteb_process import proc_arduino
+from kiteb_output import pub_base_msg
 
 
-def msg_to_dict(data):
-    message={}
-    message['msgname'] = data.name
-    message['msgposx'] = data.posx
-    message['msgposy'] = data.posy
-    message['msgkiteangle'] = data.kiteangle
-    message['msgdirx'] = data.dirx
-    message['msgdiry'] = data.diry
-    return message
-
-params = False
 def call_arduino(data):
     rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.name)
-    message = msg_to_dict(data)
+    message = convert_ros_message_to_dictionary(data)
 
     #will then call something in kiteb_process with message and should
     #return an answer as dictionary
+    answer=proc_arduino(message)
 
-    #that then calls kiteb_output
-    # calc angles
-    # publish converted results
+    pub_base_msg(answer)
+
+
 
 
 def call_kite_infer(data):
