@@ -19,10 +19,13 @@ def linearmap(value, minx, maxx, miny, maxy):
 
 
 def get_angle(rcent, centremaxleft, centremiddle, centremaxright, maxangleleft, maxangleright):
-    # need to establish if resistor is linear across range - probalby some graphing required and also what
+    # TODO need to establish if resistor is linear across range - probalby some graphing required and also what
     # are the max angle then we have a plot to work with
-    # TODO will need maxangle for this as well
 
+    """Transform resistance to angle in degrees
+        >>> get_angle(300, 100, 500, 900, -60, 60)
+        -30
+    """
 
     # allow resistor to operate either way +ve
     if centremaxleft < centremaxright:
@@ -50,5 +53,16 @@ def proc_arduino(message):
     answer = {}
     answer['forceleft'] = get_force(message.rleft, params.leftmin, params.leftmax)
     answer['forceright'] = get_force(message.rright, params.rightmin, params.rightmax)
-    answer['barangle'] = get_angle(message.rcent, params.centremaxleft, params.centremiddle, params.centremaxright)
+    answer['barangle'] = get_angle(message.rcent, params.centremaxleft, params.centremiddle,
+                                   params.centremaxright, params.maxangleleft, params.maxangleright)
     return answer
+
+
+def _test():
+    import doctest
+    doctest.testmod()
+
+
+if __name__ == '__main__':
+    'Can run with -v option if you want to confirm tests were run'
+    _test()

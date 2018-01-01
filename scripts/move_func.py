@@ -424,11 +424,7 @@ def _test():
     import doctest
     doctest.testmod()
     
-def _test():
-    import doctest
-    doctest.testmod()
 
-    
 if __name__ == '__main__':
     'Can run with -v option if you want to confirm tests were run'
     _test()

@@ -28,6 +28,8 @@ def get_params():
     params['centremaxleft'] = rospy.get_param('centremaxleft', 1000)
     params['centremiddle']= rospy.get_param('centremiddle', 500)
     params['centremaxright'] = rospy.get_param('centremaxright', 0)
+    params['maxangleleft'] = rospy.get_param('maxangleleft',-65)
+    params['maxangleright'] = rospy.get_param('maxangleright',60)
     params['rightmax'] = rospy.get_param('rightmax', 1000)
     params['rightmin'] = rospy.get_param('rightmin', 0)
     return params
