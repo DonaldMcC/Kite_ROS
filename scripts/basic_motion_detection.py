@@ -22,9 +22,9 @@ from talker import kite_pos, kiteimage
 from cvwriter import initwriter, writeframe
 
 
-camera = cv2.VideoCapture(0)
+#camera = cv2.VideoCapture(0)
 # camera=cv2.VideoCapture('IMG_0464.MOV')
-#camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
+camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
 
 
 es = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
@@ -211,7 +211,7 @@ while True:
     cv2.imshow("contours", frame)
     kiteimage.pubimage(imagemessage, frame)
     counter += 1
-    writeframe(writer, frame, height, width)
+    #writeframe(writer, frame, height, width)
 
     if counter % 100 == 0:
         pass

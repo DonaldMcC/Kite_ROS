@@ -8,9 +8,11 @@
 from kitebar import params
 
 
-def get_force(messageval, minohm, maxohm):
+def get_force(messageval, minohm, maxohm, minforce, maxforce):
     # think we need to figure out shape of force chart for this as well
-    force = 0
+    # this currently serves no purpose but will do once we understand springs
+
+    force = linearmap(messageval, minohm, maxohm, minforce, maxforce)
     return force
 
 
@@ -22,7 +24,6 @@ def linearmap(value, minx, maxx, miny, maxy):
         15.0
     """
     return miny + (value-minx)/(1.0 * maxx-minx) * (maxy-miny)
-    #return miny + (value-minx)/(maxx-minx) * (maxy-miny)
 
 
 def get_angle(rcent, centremaxleft, centremiddle, centremaxright, maxangleleft, maxangleright):
@@ -65,8 +66,10 @@ def get_angle(rcent, centremaxleft, centremiddle, centremaxright, maxangleleft, 
 def proc_arduino(message):
     """This will receive a dictionary and initially just convert the three resistors via a function"""
     answer = {}
-    answer['forceleft'] = get_force(message.rleft, params.leftmin, params.leftmax)
-    answer['forceright'] = get_force(message.rright, params.rightmin, params.rightmax)
+    answer['forceleft'] = get_force(message.rleft, params.leftmin, params.leftmax,
+                                    params.leftforcemin, params.leftforcemax)
+    answer['forceright'] = get_force(message.rright, params.rightmin, params.rightmax,
+                                     params.rightforcemin, params.rightforcemax)
     answer['barangle'] = get_angle(message.rcent, params.centremaxleft, params.centremiddle,
                                    params.centremaxright, params.maxangleleft, params.maxangleright)
     return answer
