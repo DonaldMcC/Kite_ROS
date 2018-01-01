@@ -16,11 +16,12 @@
 import rospy
 from kite_ros.msg import Kitepos
 from kiteb_input import call_arduino
-params={}
+params = {}
+
 
 def get_params():
     """This will download all exepcted parameters from the ROS parameter server"""
-    #TODO look at identifying values not received for now this is setting default value but that may not be best
+    # TODO look at identifying values not received for now this is setting default value but that may not be best
     global params
     params['source'] = rospy.get_param('source', 'arduino')
     params['leftmax'] = rospy.get_param('leftmax', 1000)
