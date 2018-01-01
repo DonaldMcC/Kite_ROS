@@ -15,7 +15,12 @@ def get_force(messageval, minohm, maxohm):
 
 
 def linearmap(value, minx, maxx, miny, maxy):
-    return miny + (value-minx)/(maxx-minx) * (maxy-miny)
+    """Transform resistance to angle in degrees
+        >>> linearmap(300, 100, 500, -60, 0)
+        -30.0
+    """
+    return miny + (value-minx)/(1.0 * maxx-minx) * (maxy-miny)
+    #return miny + (value-minx)/(maxx-minx) * (maxy-miny)
 
 
 def get_angle(rcent, centremaxleft, centremiddle, centremaxright, maxangleleft, maxangleright):
@@ -24,7 +29,9 @@ def get_angle(rcent, centremaxleft, centremiddle, centremaxright, maxangleleft, 
 
     """Transform resistance to angle in degrees
         >>> get_angle(300, 100, 500, 900, -60, 60)
-        -30
+        -30.0
+        >>> get_angle(600, 100, 500, 900, -60, 60)
+        15.0
     """
 
     # allow resistor to operate either way +ve
@@ -60,7 +67,7 @@ def proc_arduino(message):
 
 def _test():
     import doctest
-    doctest.testmod()
+    doctest.testmod(verbose=True)
 
 
 if __name__ == '__main__':
