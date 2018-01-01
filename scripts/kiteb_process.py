@@ -18,6 +18,8 @@ def linearmap(value, minx, maxx, miny, maxy):
     """Transform resistance to angle in degrees
         >>> linearmap(300, 100, 500, -60, 0)
         -30.0
+        >>> linearmap(400, 100, 500, 60, 0)
+        15.0
     """
     return miny + (value-minx)/(1.0 * maxx-minx) * (maxy-miny)
     #return miny + (value-minx)/(maxx-minx) * (maxy-miny)
@@ -32,6 +34,10 @@ def get_angle(rcent, centremaxleft, centremiddle, centremaxright, maxangleleft, 
         -30.0
         >>> get_angle(600, 100, 500, 900, -60, 60)
         15.0
+        >>> get_angle(600, 900, 500, 100, -60, 60)
+        -15.0
+        >>> get_angle(100, 900, 500, 100, -60, 90)
+        90.0
     """
 
     # allow resistor to operate either way +ve
@@ -44,12 +50,13 @@ def get_angle(rcent, centremaxleft, centremiddle, centremaxright, maxangleleft, 
         else:
             print('centre angle outwith permitted range')
     else:  # centremaxleft is +ve so we need to invert mapping
-        if rcent <= centremiddle and rcent >= centremaxright:
-            angle = linearmap(rcent, centremiddle, centremaxright, 0, maxangleright*-1)
-        elif rcent <= centremaxleft and rcent > centremiddle:
+        if rcent >= centremiddle and rcent <= centremaxleft:
+            angle = linearmap(rcent, centremiddle, centremaxright, 0, maxangleleft*-1)
+        elif rcent >= centremaxright and rcent < centremiddle:
             # this should return a -ve and maxangleleft should also be set as -ve
-            angle = linearmap(rcent, centremiddle, centremaxleft, 0, maxangleleft * -1)
+            angle = linearmap(rcent, centremiddle, centremaxleft, 0, maxangleright * -1)
         else:
+            angle = 0
             print('centre angle outwith permitted range')
 
     return angle
