@@ -53,10 +53,10 @@ def drawroute(route):
     return
 
 source =''
-while source not in {'f','c'}:
-    source = input('Key F or C for file or camera source')
+while source not in {1,2}:
+    source = input('Key 1 for camera or 2 for source')
 # should define source here
-if source == 'c':
+if source == 1:
     camera = cv2.VideoCapture(0)
 # camera=cv2.VideoCapture('IMG_0464.MOV')
 else:
