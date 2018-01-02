@@ -52,6 +52,8 @@ def drawroute(route):
                      (255, 0, 255), thickness=1, lineType=8, shift=0)
     return
 
+# this will need to not happen if arguments are passed
+
 source =''
 while source not in {1,2}:
     source = input('Key 1 for camera or 2 for source')
@@ -60,13 +62,16 @@ if source == 1:
     camera = cv2.VideoCapture(0)
 # camera=cv2.VideoCapture('IMG_0464.MOV')
 else:
+    #TODO at some point will change this to current directory and append file - not urnger
     camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
 
+
+
+#Initialisation steps
 es = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
 kernel = np.ones((5, 5), np.uint8)
 background = None
 imagemessage = kiteimage()
-
 
 # initialize the list of tracked points, the frame counter,
 # and the coordinate deltas
@@ -95,12 +100,12 @@ for (lower, upper) in boundaries:
     low = np.array(lower, dtype="uint8")
     upp = np.array(upper, dtype="uint8")
 
-try:  # this will fail on windows but don't need yet
-    mode = rospy.get_param('mode')
-    centrex = rospy.get_param('centrex')
-    centrey = rospy.get_param('centrey')
-    halfwidth = rospy.get_param('halfwidth')
-    radius = rospy.get_param('radius')
+try:  # this will fail on windows but don't need yet and not convinced I need to set parameters separately
+    mode = rospy.get_param('mode', 'park')
+    centrex = rospy.get_param('centrex', 400)
+    centrey = rospy.get_param('centrey', 300)
+    halfwidth = rospy.get_param('halfwidth', 200)
+    radius = rospy.get_param('radius', 100)
 except NameError:
     #  mode='fig8'
     mode = 'park'
