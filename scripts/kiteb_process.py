@@ -26,18 +26,18 @@ def linearmap(value, minx, maxx, miny, maxy):
     return miny + (value-minx)/(1.0 * maxx-minx) * (maxy-miny)
 
 
-def get_angle(rcent, centremaxleft, centremiddle, centremaxright, maxangleleft, maxangleright):
+def get_bar_angle(rcent, centremaxleft, centremiddle, centremaxright, maxangleleft, maxangleright):
     # TODO need to establish if resistor is linear across range - probalby some graphing required and also what
     # are the max angle then we have a plot to work with
 
     """Transform resistance to angle in degrees
-        >>> get_angle(300, 100, 500, 900, -60, 60)
+        >>> get_bar_angle(300, 100, 500, 900, -60, 60)
         -30.0
-        >>> get_angle(600, 100, 500, 900, -60, 60)
+        >>> get_bar_angle(600, 100, 500, 900, -60, 60)
         15.0
-        >>> get_angle(600, 900, 500, 100, -60, 60)
+        >>> get_bar_angle(600, 900, 500, 100, -60, 60)
         -15.0
-        >>> get_angle(100, 900, 500, 100, -60, 90)
+        >>> get_bar_angle(100, 900, 500, 100, -60, 90)
         90.0
     """
 
@@ -70,7 +70,7 @@ def proc_arduino(message):
                                     params.leftforcemin, params.leftforcemax)
     answer['forceright'] = get_force(message.rright, params.rightmin, params.rightmax,
                                      params.rightforcemin, params.rightforcemax)
-    answer['barangle'] = get_angle(message.rcent, params.centremaxleft, params.centremiddle,
+    answer['barangle'] = get_bar_angle(message.rcent, params.centremaxleft, params.centremiddle,
                                    params.centremaxright, params.maxangleleft, params.maxangleright)
     return answer
 

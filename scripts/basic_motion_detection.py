@@ -1,31 +1,62 @@
 #!/usr/bin/env python
-# this will be the main meth
-# od for seeing and reporting back on the position and angle of
+# this will be the main module for configuring the desired route and
+# for seeing and reporting back on the position and angle of
 # the kite - it will also be the only video output from the package and consequently
 # will display and also allow direct updating of the proposed route
 # however there will also be a separate ros node that will allow setting the route
 # and flying mode of the kit in due course and these will communicate via ROS messages
 
-import cv2
-import numpy as np
+# inputs
+# the module will support main input either input from a single webcam or from a video file initially - this may
+# extend to rosbag files in future
+#
+# outputs
+# the main output will be  a ROS message reporting the x and y coordinates of the kite and it should also be
+# possible to record the input if required
+#
+# initial configuration
+# file can be started with arguments and should then not prompt for input
+# if started without arguments it should ask if webcam or file to be loaded
+#
+# while in flow it should be possible to
+# 1 amend the flight mode
+# 2 switch from sending actual kite position to manually controlled one
+# 3 adjust the routing - it should default when the flight mode is changed
+# 4 on playback it should be possible to go into slow motion
+
+# standard library imports
 import time
-import routeplan
 from collections import deque
 
-try:
-    import rospy
-except ImportError:
-    pass
+# library imports
+import numpy as np
+import cv2
+import rospy
 
+# modules
+import routeplan
 from move_func import get_angle
 from talker import kite_pos, kiteimage
 from cvwriter import initwriter, writeframe
 
 
+# this is just for display flight decisions will be elsewhere
+def drawroute(route):
+    global frame
+    for i, j in enumerate(route):
+        if i < len(route) - 1:
+            cv2.line(frame, (j[0], j[1]), (route[i+1][0], route[i+1][1]),
+                     (255, 0, 255), thickness=1, lineType=8, shift=0)
+        else:
+            cv2.line(frame, (j[0], j[1]), (route[0][0], route[0][1]),
+                     (255, 0, 255), thickness=1, lineType=8, shift=0)
+    return
+
+
+# should define source here
 #camera = cv2.VideoCapture(0)
 # camera=cv2.VideoCapture('IMG_0464.MOV')
 camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
-
 
 es = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
 kernel = np.ones((5, 5), np.uint8)
@@ -44,12 +75,9 @@ kiteangle = 0
 
 # http://www.pyimagesearch.com/2014/08/04/opencv-python-color-detection/
 # define the list of boundaries
-
 # boundaries = [([0, 0, 0], [40, 40, 40])]
-
 # green
 # boundaries = [([10, 100, 10], [100, 255, 100])]
-
 # orange
 # boundaries = [([0, 50, 100], [100, 200, 255])]
 
@@ -86,24 +114,12 @@ except KeyError:
 routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
 
 
-# this is just for display flight decisions will be elsewhere
-def drawroute(route):
-    global frame
-    for i, j in enumerate(route):
-        if i < len(route) - 1:
-            cv2.line(frame, (j[0], j[1]), (route[i+1][0], route[i+1][1]),
-                     (255, 0, 255), thickness=1, lineType=8, shift=0)
-        else:
-            cv2.line(frame, (j[0], j[1]), (route[0][0], route[0][1]),
-                     (255, 0, 255), thickness=1, lineType=8, shift=0)
-    return
 writer = None
-
 cv2.startWindowThread()
 cv2.namedWindow('contours')
 fps=15
 
-while True:
+while True:  # Main module loop
     ret, frame = camera.read()
     if background is None:
         background = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -224,6 +240,9 @@ while True:
     # should set all routes
     # Pause should hold for 5 secs
     key = cv2.waitKey(8) & 0xff
+    # think there will be a mode option in here as well
+    # one key changes mode and we would show the possible keys somewhere 
+
     if key == ord("l"):
         centrex -= step
         routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
@@ -252,12 +271,10 @@ while True:
         time.sleep(10)
     elif key == ord("q"):
         break
-    # if \cv2.waitKey(1000 / 12) & 0xff == ord("q"):
-    # break++
 
 # do a bit of cleanup
 print("[INFO] cleaning up...")
 cv2.destroyAllWindows()
 camera.release()
-vs.stop()
+cv2.stop()
 writer.release()

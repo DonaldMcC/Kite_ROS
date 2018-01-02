@@ -1,5 +1,5 @@
 # This file contains functions mainly called by movingclass but possibly also by kitesimulate for
-# conversion of stuff - fairly classic functions I think and generally should now work with both
+# conversion of stuff - fairly std functions I think and generally should now work with both
 # 2 and 3D objects
 
 import math
