@@ -52,11 +52,15 @@ def drawroute(route):
                      (255, 0, 255), thickness=1, lineType=8, shift=0)
     return
 
-
+source =''
+while source not in {'f','c'}:
+    source = input('Key F or C for file or camera source')
 # should define source here
-#camera = cv2.VideoCapture(0)
+if source == 'c':
+    camera = cv2.VideoCapture(0)
 # camera=cv2.VideoCapture('IMG_0464.MOV')
-camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
+else:
+    camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
 
 es = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
 kernel = np.ones((5, 5), np.uint8)
@@ -241,7 +245,7 @@ while True:  # Main module loop
     # Pause should hold for 5 secs
     key = cv2.waitKey(8) & 0xff
     # think there will be a mode option in here as well
-    # one key changes mode and we would show the possible keys somewhere 
+    # one key changes mode and we would show the possible keys somewhere
 
     if key == ord("l"):
         centrex -= step
@@ -272,7 +276,7 @@ while True:  # Main module loop
     elif key == ord("q"):
         break
 
-# do a bit of cleanup
+
 print("[INFO] cleaning up...")
 cv2.destroyAllWindows()
 camera.release()
