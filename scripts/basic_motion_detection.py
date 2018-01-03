@@ -54,25 +54,50 @@ def drawroute(route):
 
 
 def keyhandler(key):
-    global centrex, centrey, halfwidth, radius
-    if key == ord("l"):
-        centrex -= step
-    elif key == ord("r"):
-        centrex += step
-    elif key == ord("u"):
-        centrey -= step
-    elif key == ord("d"):
-        centrey += step
-    elif key == ord("w"):
-        halfwidth += step
-    elif key == ord("n"):
-        halfwidth -= 1
-    elif key == ord("e"):
-        radius += step
-    elif key == ord("c"):
-        radius -= step
-    elif key == ord("p"):
-        time.sleep(10)
+    # this will now support a change of flight mode and operating mode so different keys will
+    # do different things depending on inputmode,
+    global centrex, centrey, halfwidth, radius, inputmode, mode
+    if inputmode == 0: # Standard
+        if key == ord("l"):  # left
+            centrex -= step
+        elif key == ord("r"): # right
+            centrex += step
+        elif key == ord("u"): # up
+            centrey -= step
+        elif key == ord("d"): # down
+            centrey += step
+        elif key == ord("w"): # wider
+            halfwidth += step
+        elif key == ord("n"): # narrower
+            halfwidth -= 1
+        elif key == ord("e"): # expamd
+            radius += step
+        elif key == ord("c"): # contract
+            radius -= step
+        elif key == ord("p"): # pause - this may apply in all moades
+            time.sleep(10)
+    elif inputmode == 1: # SetFlight
+        if key == ord("p"):  # park
+            mode = 'park'
+        elif key == ord("f"):  # fig8
+            mode = 'fig8'
+    elif inputmode == 2: # ManFlight - maybe switch to arrows
+        if key == ord("l"):  # left
+            centrex -= step - # this will change
+        elif key == ord("r"): # right
+            centrex += step
+        elif key == ord("u"): # up
+            centrey -= step
+        elif key == ord("d"): # down
+            centrey += step
+        elif key == ord("p"): # pause - this may apply in all moades
+            time.sleep(10)
+
+    if key == ord("m"):  # modechange
+        inputmode += 1
+        if inputmode == 3: #simple toggle around 3 modes
+            inputmode = 0
+
 
     routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
     return routepoints
@@ -93,27 +118,23 @@ else:
     camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
 
 
-# initialise the route
+# initialise the route and
 try:  # this will fail on windows but don't need yet and not convinced I need to set parameters separately
     mode = rospy.get_param('mode', 'park')
     centrex = rospy.get_param('centrex', 400)
     centrey = rospy.get_param('centrey', 300)
     halfwidth = rospy.get_param('halfwidth', 200)
     radius = rospy.get_param('radius', 100)
-except NameError:
+except (NameError, KeyError) as e:
     #  mode='fig8'
     mode = 'park'
     centrex = 400
     centrey = 300
     halfwidth = 200
     radius = 100
-except KeyError:
-    mode = 'fig8' # this is default setup without message from ros
-    centrex = 400
-    centrey = 300
-    halfwidth = 200
-    radius = 100
 
+inputmodes = ('Standard','SetFlight','ManFly')
+inputmode = inputmodes[0]  # Other possible values will be SetRoute and ManFly
 step = 8  # value for amount routing adjusted per keystroke
 routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
 
@@ -177,7 +198,8 @@ while True:  # Main module loop
     image, cnts, hierarchy = cv2.findContours(diff.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     # hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-    # Aim to identify they kite and print the direction and so forth
+    # Aim to identify the kite and print the direction and so forth - maybe we do let this run
+    # even when manual but we just output and draw position of manual x or whaetever
     for c in cnts:
         if cv2.contourArea(c) < 1500:
             continue
