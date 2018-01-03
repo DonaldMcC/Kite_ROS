@@ -52,6 +52,31 @@ def drawroute(route):
                      (255, 0, 255), thickness=1, lineType=8, shift=0)
     return
 
+
+def keyhandler(key):
+    global centrex, centrey, halfwidth, radius
+    if key == ord("l"):
+        centrex -= step
+    elif key == ord("r"):
+        centrex += step
+    elif key == ord("u"):
+        centrey -= step
+    elif key == ord("d"):
+        centrey += step
+    elif key == ord("w"):
+        halfwidth += step
+    elif key == ord("n"):
+        halfwidth -= 1
+    elif key == ord("e"):
+        radius += step
+    elif key == ord("c"):
+        radius -= step
+    elif key == ord("p"):
+        time.sleep(10)
+
+    routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
+    return routepoints
+
 # this will need to not happen if arguments are passed
 
 source =''
@@ -251,32 +276,14 @@ while True:  # Main module loop
     key = cv2.waitKey(8) & 0xff
     # think there will be a mode option in here as well
     # one key changes mode and we would show the possible keys somewhere
-
-    if key == ord("l"):
-        centrex -= step
-    elif key == ord("r"):
-        centrex += step
-    elif key == ord("u"):
-        centrey -= step
-    elif key == ord("d"):
-        centrey += step
-    elif key == ord("w"):
-        halfwidth += step
-    elif key == ord("n"):
-        halfwidth -= 1
-    elif key == ord("e"):
-        radius += step
-    elif key == ord("c"):
-        radius -= step
-    elif key == ord("p"):
-        time.sleep(10)
-    elif key == ord("q"):
+    if key == ord("q"):
         break
+    elif key != -1:
+        routepoints = keyhandler(key)
 
-    routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
 
 print("[INFO] cleaning up...")
 cv2.destroyAllWindows()
 camera.release()
-cv2.stop()
+#vs.stop() - no idea what this was
 writer.release()
