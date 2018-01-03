@@ -122,11 +122,11 @@ except KeyError:
 
 routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
 
-
 writer = None
 cv2.startWindowThread()
 cv2.namedWindow('contours')
 fps=15
+
 
 while True:  # Main module loop
     ret, frame = camera.read()
@@ -254,33 +254,26 @@ while True:  # Main module loop
 
     if key == ord("l"):
         centrex -= step
-        routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
     elif key == ord("r"):
         centrex += step
-        routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
     elif key == ord("u"):
         centrey -= step
-        routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
     elif key == ord("d"):
         centrey += step
-        routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
     elif key == ord("w"):
         halfwidth += step
-        routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
     elif key == ord("n"):
         halfwidth -= 1
-        routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
     elif key == ord("e"):
         radius += step
-        routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
     elif key == ord("c"):
         radius -= step
-        routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
     elif key == ord("p"):
         time.sleep(10)
     elif key == ord("q"):
         break
 
+    routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
 
 print("[INFO] cleaning up...")
 cv2.destroyAllWindows()
