@@ -77,54 +77,23 @@ def keyhandler(key):
     routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
     return routepoints
 
-# this will need to not happen if arguments are passed
 
-source =''
+# this will need to not happen if arguments are passed
+source = 0
 while source not in {1,2}:
     source = input('Key 1 for camera or 2 for source')
 # should define source here
 if source == 1:
     camera = cv2.VideoCapture(0)
+    logging = 1
 # camera=cv2.VideoCapture('IMG_0464.MOV')
 else:
+    logging = 0
     #TODO at some point will change this to current directory and append file - not urnger
     camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
 
 
-
-#Initialisation steps
-es = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
-kernel = np.ones((5, 5), np.uint8)
-background = None
-imagemessage = kiteimage()
-
-# initialize the list of tracked points, the frame counter,
-# and the coordinate deltas
-pts = deque(maxlen=16)
-counter = 0
-(dX, dY) = (0, 0)
-direction = ""
-step = 8  # value for amount routing adjusted per keystroke
-kiteangle = 0
-
-# http://www.pyimagesearch.com/2014/08/04/opencv-python-color-detection/
-# define the list of boundaries
-# boundaries = [([0, 0, 0], [40, 40, 40])]
-# green
-# boundaries = [([10, 100, 10], [100, 255, 100])]
-# orange
-# boundaries = [([0, 50, 100], [100, 200, 255])]
-
-boundaries = [([0, 0, 0], [40, 40, 40]),
-              ([10, 100, 10], [100, 255, 100]),
-              ([0, 50, 100], [100, 200, 255])
-              ]
-
-for (lower, upper) in boundaries:
-    # create NumPy arrays from the boundaries
-    low = np.array(lower, dtype="uint8")
-    upp = np.array(upper, dtype="uint8")
-
+# initialise the route
 try:  # this will fail on windows but don't need yet and not convinced I need to set parameters separately
     mode = rospy.get_param('mode', 'park')
     centrex = rospy.get_param('centrex', 400)
@@ -145,7 +114,41 @@ except KeyError:
     halfwidth = 200
     radius = 100
 
+step = 8  # value for amount routing adjusted per keystroke
 routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
+
+#Initialisation steps
+es = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
+kernel = np.ones((5, 5), np.uint8)
+background = None
+imagemessage = kiteimage()
+
+# initialize the list of tracked points, the frame counter,
+# and the coordinate deltas
+pts = deque(maxlen=16)
+counter = 0
+(dX, dY) = (0, 0)
+direction = ""
+kiteangle = 0
+
+# http://www.pyimagesearch.com/2014/08/04/opencv-python-color-detection/
+# define the list of boundaries
+# boundaries = [([0, 0, 0], [40, 40, 40])]
+# green
+# boundaries = [([10, 100, 10], [100, 255, 100])]
+# orange
+# boundaries = [([0, 50, 100], [100, 200, 255])]
+
+boundaries = [([0, 0, 0], [40, 40, 40]),
+              ([10, 100, 10], [100, 255, 100]),
+              ([0, 50, 100], [100, 200, 255])
+              ]
+
+for (lower, upper) in boundaries:
+    # create NumPy arrays from the boundaries
+    low = np.array(lower, dtype="uint8")
+    upp = np.array(upper, dtype="uint8")
+
 
 writer = None
 cv2.startWindowThread()
@@ -160,10 +163,11 @@ while True:  # Main module loop
         background = cv2.GaussianBlur(background, (21, 21), 0)
         continue
 
-    if writer is None:
+    if logging and writer is None:
         #h, w = frame.shape[:2]
         height, width = 480, 640
         writer = initwriter("record.avi", height, width, fps)
+
   
     gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     gray_frame = cv2.GaussianBlur(gray_frame, (21, 21), 0)
@@ -172,7 +176,8 @@ while True:  # Main module loop
     diff = cv2.dilate(diff, es, iterations=2)
     image, cnts, hierarchy = cv2.findContours(diff.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     # hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-  
+
+    # Aim to identify they kite and print the direction and so forth
     for c in cnts:
         if cv2.contourArea(c) < 1500:
             continue
@@ -192,34 +197,24 @@ while True:  # Main module loop
             box = cv2.boxPoints(rect)  # cv2.boxPoints(rect) for OpenCV 3.x
             box = np.int0(box)
 
-            # periodic crude logging
-            if counter % 100 == 0:
-                for i, item in enumerate(box):
-                    #print(i, item)
-                    pass
             cv2.drawContours(frame, [box], 0, (0, 0, 255), 2)
 
             for i in np.arange(1, len(pts)):
                 if pts[i] is None:
                     continue
-
-                # check to see if enough points have been accumulated in
-                # the buffer
+                # check to see if enough points have been accumulated in the buffer
                 if counter >= 10 and i == 1 and pts and len(pts) > 10 and pts[10] is not None:
-                    # compute the difference between the x and y
-                    # coordinates and re-initialize the direction
+                    # compute the difference between the x and  y  coordinates and re-initialize the direction
                     # text variables
                     dX = pts[i][0] - pts[-10][0]
                     dY = pts[i][1] - pts[-10][1]
                     (dirX, dirY) = ("", "")
 
-                    # ensure there is significant movement in the
-                    # x-direction
+                    # ensure there is significant movement in the x-direction
                     if np.abs(dX) > 20:
                         dirX = "East" if np.sign(dX) == 1 else "West"
 
-                    # ensure there is significant movement in the
-                    # y-direction
+                    # ensure there is significant movement in the y-direction
                     if np.abs(dY) > 20:
                         dirY = "South" if np.sign(dY) == 1 else "North"
 
@@ -231,26 +226,18 @@ while True:  # Main module loop
                     else:
                         direction = dirX if dirX != "" else dirY
 
-                    # otherwise, compute the thickness of the line and
-                    # draw the connecting lines
+                    # otherwise, compute the thickness of the line and draw the connecting lines
                     thickness = int(np.sqrt(32 / float(i + 1)) * 2.5)
                     cv2.line(frame, pts[i - 1], pts[i], (0, 0, 255), thickness)
 
-                    # show the movement deltas and the direction of movement on
-                    # the frame
-                    cv2.putText(frame, direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX,
-                                0.65, (0, 0, 255), 3)
+                    # show the movement deltas and the direction of movement on the frame
+                    cv2.putText(frame, direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
                     cv2.putText(frame, "dx: {}, dy: {}".format(dX, dY),
-                                (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX,
-                                0.35, (0, 0, 255), 1)
+                                (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
                     continue
 
                 kiteangle = get_angle(box, dX, dY)
-                # pointx_trans = (pointx[0], pointx[1] + 50)
-                # pointy_trans = (pointy[0], pointy[1] + 50)
-                # cv2.line(frame, pointx_trans, pointy_trans, (0, 255, 0), 4)
-                cv2.putText(frame, str(int(kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX,
-                            0.65, (0, 0, 255), 3)
+                cv2.putText(frame, str(int(kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
 
             continue
 
@@ -286,4 +273,5 @@ print("[INFO] cleaning up...")
 cv2.destroyAllWindows()
 camera.release()
 #vs.stop() - no idea what this was
-writer.release()
+if writer is not None:
+    writer.release()
