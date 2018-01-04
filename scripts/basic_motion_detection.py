@@ -52,6 +52,15 @@ def drawroute(route):
                      (255, 0, 255), thickness=1, lineType=8, shift=0)
     return
 
+def getmodestring(inputmode):
+    global modestring
+    if inputmode == 0: # Standard
+        modestring = 'STD: Left Right Up Down Wider Narrow Expand Contract Pause Mode Quit'
+    elif inputmode == 1:
+        modestring = 'SETFLIGHTMODE: Park Fig8 Mode Quit'
+    else:
+        modestring = 'MANFLIGHT: Left Right Up Down Pause Mode Quit'
+
 
 def keyhandler(key):
     # this will now support a change of flight mode and operating mode so different keys will
@@ -83,7 +92,7 @@ def keyhandler(key):
             mode = 'fig8'
     elif inputmode == 2: # ManFlight - maybe switch to arrows
         if key == ord("l"):  # left
-            centrex -= step - # this will change
+            centrex -= step # this will change
         elif key == ord("r"): # right
             centrex += step
         elif key == ord("u"): # up
@@ -95,8 +104,9 @@ def keyhandler(key):
 
     if key == ord("m"):  # modechange
         inputmode += 1
-        if inputmode == 3: #simple toggle around 3 modes
+        if inputmode == 3: #simple toggle around 3 modesf
             inputmode = 0
+        getmodestring(inputmode)
 
 
     routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
@@ -134,7 +144,8 @@ except (NameError, KeyError) as e:
     radius = 100
 
 inputmodes = ('Standard','SetFlight','ManFly')
-inputmode = inputmodes[0]  # Other possible values will be SetRoute and ManFly
+inputmode = 0  # This will now be an index on inputmodes
+getmodestring(0)
 step = 8  # value for amount routing adjusted per keystroke
 routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
 
@@ -264,6 +275,7 @@ while True:  # Main module loop
             continue
 
     drawroute(routepoints)
+    cv2.putText(frame, modestring, (200, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 1)
     kite_pos(centrex, centrey, kiteangle, dX, dY, 0, 0)
     # cv2.imshow("roi", finalframe)
     # cv2.imshow("mask", mask)
@@ -271,6 +283,8 @@ while True:  # Main module loop
     kiteimage.pubimage(imagemessage, frame)
     counter += 1
     #writeframe(writer, frame, height, width)
+
+
 
     if counter % 100 == 0:
         pass
