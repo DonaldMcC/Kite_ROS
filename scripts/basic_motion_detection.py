@@ -52,9 +52,10 @@ def drawroute(route):
                      (255, 0, 255), thickness=1, lineType=8, shift=0)
     return
 
+
 def getmodestring(inputmode):
     global modestring
-    if inputmode == 0: # Standard
+    if inputmode == 0:  # Standard
         modestring = 'STD: Left Right Up Down Wider Narrow Expand Contract Pause Mode Quit'
     elif inputmode == 1:
         modestring = 'SETFLIGHTMODE: Park Fig8 Mode Quit'
@@ -66,45 +67,45 @@ def keyhandler(key):
     # this will now support a change of flight mode and operating mode so different keys will
     # do different things depending on inputmode,
     global centrex, centrey, halfwidth, radius, inputmode, mode
-    if inputmode == 0: # Standard
+    if inputmode == 0:  # Standard
         if key == ord("l"):  # left
             centrex -= step
-        elif key == ord("r"): # right
+        elif key == ord("r"):  # right
             centrex += step
-        elif key == ord("u"): # up
+        elif key == ord("u"):  # up
             centrey -= step
-        elif key == ord("d"): # down
+        elif key == ord("d"):  # down
             centrey += step
-        elif key == ord("w"): # wider
+        elif key == ord("w"):  # wider
             halfwidth += step
-        elif key == ord("n"): # narrower
+        elif key == ord("n"):  # narrower
             halfwidth -= 1
-        elif key == ord("e"): # expamd
+        elif key == ord("e"):  # expamd
             radius += step
-        elif key == ord("c"): # contract
+        elif key == ord("c"):  # contract
             radius -= step
-        elif key == ord("p"): # pause - this may apply in all moades
+        elif key == ord("p"):  # pause - this may apply in all moades
             time.sleep(10)
-    elif inputmode == 1: # SetFlight
+    elif inputmode == 1:  # SetFlight
         if key == ord("p"):  # park
             mode = 'park'
         elif key == ord("f"):  # fig8
             mode = 'fig8'
-    elif inputmode == 2: # ManFlight - maybe switch to arrows
+    elif inputmode == 2:  # ManFlight - maybe switch to arrows
         if key == ord("l"):  # left
-            centrex -= step # this will change
-        elif key == ord("r"): # right
+            centrex -= step  # this will change
+        elif key == ord("r"):  # right
             centrex += step
-        elif key == ord("u"): # up
+        elif key == ord("u"):  # up
             centrey -= step
-        elif key == ord("d"): # down
+        elif key == ord("d"):  # down
             centrey += step
-        elif key == ord("p"): # pause - this may apply in all moades
+        elif key == ord("p"):  # pause - this may apply in all moades
             time.sleep(10)
 
     if key == ord("m"):  # modechange
         inputmode += 1
-        if inputmode == 3: #simple toggle around 3 modesf
+        if inputmode == 3:  # simple toggle around 3 modes
             inputmode = 0
         getmodestring(inputmode)
 
@@ -115,7 +116,7 @@ def keyhandler(key):
 
 # this will need to not happen if arguments are passed
 source = 0
-while source not in {1,2}:
+while source not in {1, 2}:
     source = input('Key 1 for camera or 2 for source')
 # should define source here
 if source == 1:
@@ -124,7 +125,7 @@ if source == 1:
 # camera=cv2.VideoCapture('IMG_0464.MOV')
 else:
     logging = 0
-    #TODO at some point will change this to current directory and append file - not urnger
+    # TODO at some point will change this to current directory and append file - not urnger
     camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
 
 
@@ -143,13 +144,13 @@ except (NameError, KeyError) as e:
     halfwidth = 200
     radius = 100
 
-inputmodes = ('Standard','SetFlight','ManFly')
+inputmodes = ('Standard', 'SetFlight', 'ManFly')
 inputmode = 0  # This will now be an index on inputmodes
 getmodestring(0)
 step = 8  # value for amount routing adjusted per keystroke
 routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
 
-#Initialisation steps
+# Initialisation steps
 es = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
 kernel = np.ones((5, 5), np.uint8)
 background = None
@@ -185,7 +186,7 @@ for (lower, upper) in boundaries:
 writer = None
 cv2.startWindowThread()
 cv2.namedWindow('contours')
-fps=15
+fps = 15
 
 
 while True:  # Main module loop
@@ -196,11 +197,10 @@ while True:  # Main module loop
         continue
 
     if logging and writer is None:
-        #h, w = frame.shape[:2]
+        # h, w = frame.shape[:2]
         height, width = 480, 640
         writer = initwriter("record.avi", height, width, fps)
 
-  
     gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     gray_frame = cv2.GaussianBlur(gray_frame, (21, 21), 0)
     diff = cv2.absdiff(background, gray_frame)
@@ -282,9 +282,7 @@ while True:  # Main module loop
     cv2.imshow("contours", frame)
     kiteimage.pubimage(imagemessage, frame)
     counter += 1
-    #writeframe(writer, frame, height, width)
-
-
+    # writeframe(writer, frame, height, width)
 
     if counter % 100 == 0:
         pass
@@ -308,6 +306,6 @@ while True:  # Main module loop
 print("[INFO] cleaning up...")
 cv2.destroyAllWindows()
 camera.release()
-#vs.stop() - no idea what this was
+# vs.stop() - no idea what this was
 if writer is not None:
     writer.release()
