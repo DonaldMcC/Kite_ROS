@@ -275,7 +275,7 @@ while True:  # Main module loop
             continue
 
     drawroute(routepoints)
-    cv2.putText(frame, modestring, (200, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 1)
+    cv2.putText(frame, modestring, (200, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
     kite_pos(centrex, centrey, kiteangle, dX, dY, 0, 0)
     # cv2.imshow("roi", finalframe)
     # cv2.imshow("mask", mask)
