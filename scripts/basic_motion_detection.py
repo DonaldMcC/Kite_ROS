@@ -53,6 +53,16 @@ def drawroute(route):
     return
 
 
+def get_phase(center, mode, routepoints, currtarget, currphase):
+    if mode == 'park':
+        # TODO this will change as even with park will need a strategy to get to the centre
+        target = (centrex, centrey)
+        phase = 'hold'
+    else:  #  fig8
+        target = (centrex, centrey)
+        phase = 'hold'
+    return(target, phase)
+
 def drawcross(centrex, centrey, manangle):
     global frame#
     # stuff below was to allow angle calculation of angle - which may well
@@ -308,6 +318,7 @@ while True:  # Main module loop
         cv2.putText(frame, str(int(kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
 # end of direction and analysis
 
+    phase, target = get_phase(center, mode, routepoints)
 
     drawroute(routepoints)
 
