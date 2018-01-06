@@ -53,6 +53,25 @@ def drawroute(route):
     return
 
 
+def drawcross(centrex, centrey, kiteangle):
+    global frame#
+    crosssize = 10
+    starthorx = centrex - crosssize
+    endhorx = centrex + crosssize
+    endhory = centrey
+    starthory = centrey
+    startvery = centrey - crosssize
+    endvery = centrey + crosssize
+    endverx = centrex
+    startverx = centrex
+    cv2.line(frame, (starthorx, starthory), (endhorx, endhory),
+                     (255, 0, 255), thickness=2, lineType=8, shift=0)
+    cv2.line(frame, (startverx, startvery), (endverx, endvery),
+                     (255, 0, 255), thickness=2, lineType=8, shift=0)
+
+    return
+
+
 def getmodestring(inputmode):
     global modestring
     if inputmode == 0:  # Standard
@@ -66,7 +85,7 @@ def getmodestring(inputmode):
 def keyhandler(key):
     # this will now support a change of flight mode and operating mode so different keys will
     # do different things depending on inputmode,
-    global centrex, centrey, halfwidth, radius, inputmode, mode
+    global centrex, centrey, halfwidth, radius, inputmode, mode, manx, many
     if inputmode == 0:  # Standard
         if key == ord("l"):  # left
             centrex -= step
@@ -93,13 +112,13 @@ def keyhandler(key):
             mode = 'fig8'
     elif inputmode == 2:  # ManFlight - maybe switch to arrows
         if key == ord("l"):  # left
-            centrex -= step  # this will change
+            manx -= step  # this will change
         elif key == ord("r"):  # right
-            centrex += step
+            manx += step
         elif key == ord("u"):  # up
-            centrey -= step
+            many -= step
         elif key == ord("d"):  # down
-            centrey += step
+            many += step
         elif key == ord("p"):  # pause - this may apply in all moades
             time.sleep(10)
 
@@ -115,7 +134,7 @@ def keyhandler(key):
 
 
 # this will need to not happen if arguments are passed
-source = 0
+source = 2 # change back to 1 to get prompt
 while source not in {1, 2}:
     source = input('Key 1 for camera or 2 for source')
 # should define source here
@@ -146,9 +165,12 @@ except (NameError, KeyError) as e:
 
 inputmodes = ('Standard', 'SetFlight', 'ManFly')
 inputmode = 0  # This will now be an index on inputmodes
+manx = centrex
+many = centrey
 getmodestring(0)
 step = 8  # value for amount routing adjusted per keystroke
 routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
+
 
 # Initialisation steps
 es = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
@@ -208,6 +230,10 @@ while True:  # Main module loop
     diff = cv2.dilate(diff, es, iterations=2)
     image, cnts, hierarchy = cv2.findContours(diff.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     # hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+    # lets draw and move cross for manual flying
+    if inputmodes[inputmode] == 'ManFly':
+        drawcross(manx, many, kiteangle)
 
     # Aim to identify the kite and print the direction and so forth - maybe we do let this run
     # even when manual but we just output and draw position of manual x or whaetever
@@ -275,6 +301,7 @@ while True:  # Main module loop
             continue
 
     drawroute(routepoints)
+
     cv2.putText(frame, modestring, (200, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
     kite_pos(centrex, centrey, kiteangle, dX, dY, 0, 0)
     # cv2.imshow("roi", finalframe)
