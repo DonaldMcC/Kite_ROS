@@ -252,7 +252,10 @@ while True:  # Main module loop
             cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 255, 0), 2)
             finalframe = frame[y:y+h, x:x+w]
             center = (x + (w//2), y + (h // 2))
-            pts.appendleft(center)
+            if inputmodes[inputmode] != 'ManFly':
+                pts.appendleft(center)
+            else:
+                pts.appendleft((manx, many))
 
             # Min Area seems reasonable to get angle of kite
             rect = cv2.minAreaRect(c)
