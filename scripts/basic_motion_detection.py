@@ -53,8 +53,10 @@ def drawroute(route):
     return
 
 
-def drawcross(centrex, centrey, kiteangle):
+def drawcross(centrex, centrey, manangle):
     global frame#
+    # stuff below was to allow angle calculation of angle - which may well
+    # do once we have got direction of travel unpicked
     crosssize = 10
     starthorx = centrex - crosssize
     endhorx = centrex + crosssize
@@ -85,7 +87,7 @@ def getmodestring(inputmode):
 def keyhandler(key):
     # this will now support a change of flight mode and operating mode so different keys will
     # do different things depending on inputmode,
-    global centrex, centrey, halfwidth, radius, inputmode, mode, manx, many
+    global centrex, centrey, halfwidth, radius, inputmode, mode, manx, many, manangle
     if inputmode == 0:  # Standard
         if key == ord("l"):  # left
             centrex -= step
@@ -99,7 +101,7 @@ def keyhandler(key):
             halfwidth += step
         elif key == ord("n"):  # narrower
             halfwidth -= 1
-        elif key == ord("e"):  # expamd
+        elif key == ord("e"):  # expand
             radius += step
         elif key == ord("c"):  # contract
             radius -= step
@@ -167,6 +169,7 @@ inputmodes = ('Standard', 'SetFlight', 'ManFly')
 inputmode = 0  # This will now be an index on inputmodes
 manx = centrex
 many = centrey
+manangle = 0
 getmodestring(0)
 step = 8  # value for amount routing adjusted per keystroke
 routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
@@ -233,10 +236,10 @@ while True:  # Main module loop
 
     # lets draw and move cross for manual flying
     if inputmodes[inputmode] == 'ManFly':
-        drawcross(manx, many, kiteangle)
+        drawcross(manx, many, manangle)
 
     # Aim to identify the kite and print the direction and so forth - maybe we do let this run
-    # even when manual but we just output and draw position of manual x or whaetever
+    # even when manual but we just output and draw position of manual x or whatever
     for c in cnts:
         if cv2.contourArea(c) < 1500:
             continue
@@ -251,54 +254,57 @@ while True:  # Main module loop
             center = (x + (w//2), y + (h // 2))
             pts.appendleft(center)
 
-            # Min Araa seems reasonable to get angle of kite
+            # Min Area seems reasonable to get angle of kite
             rect = cv2.minAreaRect(c)
             box = cv2.boxPoints(rect)  # cv2.boxPoints(rect) for OpenCV 3.x
             box = np.int0(box)
 
             cv2.drawContours(frame, [box], 0, (0, 0, 255), 2)
 
-            for i in np.arange(1, len(pts)):
-                if pts[i] is None:
-                    continue
-                # check to see if enough points have been accumulated in the buffer
-                if counter >= 10 and i == 1 and pts and len(pts) > 10 and pts[10] is not None:
-                    # compute the difference between the x and  y  coordinates and re-initialize the direction
-                    # text variables
-                    dX = pts[i][0] - pts[-10][0]
-                    dY = pts[i][1] - pts[-10][1]
-                    (dirX, dirY) = ("", "")
-
-                    # ensure there is significant movement in the x-direction
-                    if np.abs(dX) > 20:
-                        dirX = "East" if np.sign(dX) == 1 else "West"
-
-                    # ensure there is significant movement in the y-direction
-                    if np.abs(dY) > 20:
-                        dirY = "South" if np.sign(dY) == 1 else "North"
-
-                    # handle when both directions are non-empty
-                    if dirX != "" and dirY != "":
-                        direction = "{}-{}".format(dirY, dirX)
-
-                    # otherwise, only one direction is non-empty
-                    else:
-                        direction = dirX if dirX != "" else dirY
-
-                    # otherwise, compute the thickness of the line and draw the connecting lines
-                    thickness = int(np.sqrt(32 / float(i + 1)) * 2.5)
-                    cv2.line(frame, pts[i - 1], pts[i], (0, 0, 255), thickness)
-
-                    # show the movement deltas and the direction of movement on the frame
-                    cv2.putText(frame, direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
-                    cv2.putText(frame, "dx: {}, dy: {}".format(dX, dY),
-                                (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
-                    continue
-
-                kiteangle = get_angle(box, dX, dY)
-                cv2.putText(frame, str(int(kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
-
             continue
+
+# start direction and analysiss
+    for i in np.arange(1, len(pts)):
+        if pts[i] is None:
+            continue
+        # check to see if enough points have been accumulated in the buffer
+        if counter >= 10 and i == 1 and pts and len(pts) > 10 and pts[10] is not None:
+            # compute the difference between the x and  y  coordinates and re-initialize the direction
+            # text variables
+            dX = pts[i][0] - pts[-10][0]
+            dY = pts[i][1] - pts[-10][1]
+            (dirX, dirY) = ("", "")
+
+            # ensure there is significant movement in the x-direction
+            if np.abs(dX) > 20:
+                dirX = "East" if np.sign(dX) == 1 else "West"
+
+            # ensure there is significant movement in the y-direction
+            if np.abs(dY) > 20:
+                dirY = "South" if np.sign(dY) == 1 else "North"
+
+                # handle when both directions are non-empty
+            if dirX != "" and dirY != "":
+                direction = "{}-{}".format(dirY, dirX)
+
+                # otherwise, only one direction is non-empty
+            else:
+                direction = dirX if dirX != "" else dirY
+
+            # otherwise, compute the thickness of the line and draw the connecting lines
+            thickness = int(np.sqrt(32 / float(i + 1)) * 2.5)
+            cv2.line(frame, pts[i - 1], pts[i], (0, 0, 255), thickness)
+
+            # show the movement deltas and the direction of movement on the frame
+            cv2.putText(frame, direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
+            cv2.putText(frame, "dx: {}, dy: {}".format(dX, dY),
+                                (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
+            continue
+
+        kiteangle = get_angle(box, dX, dY)
+        cv2.putText(frame, str(int(kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
+# end of direction and analysis
+
 
     drawroute(routepoints)
 
