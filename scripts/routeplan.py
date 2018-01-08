@@ -5,7 +5,7 @@ This file should do the following things
 
     1   Calculate a default route for the kite based on settings or parameters applied
     2   Identify the flight zone which will be left, right or centre in fig8
-        and park_above, park_left, park_right, park_below
+        and park_left, park_right
     3   Do we have a current route - if so let's continue it for now unless zone changed
         probably need a safety check now
     4   If not what zone are we in - if park for now we will just go left or right and aim to stay above
@@ -55,6 +55,23 @@ def get_phase(center, mode, centrex, centrey,  routepoints, currtarget, currphas
         target = (centrex, centrey)
         phase = 'hold'
     return(target, phase)
+
+
+def get_zone(centre, mode, centrex, centrey, routepoints):
+    if mode == 'park':
+        if centre[0] <= centrex:
+            zone='Park Left'
+        else:
+            zone='Park Right'
+    else:  # fig8  either up turn or down
+        if centre[0] < routepoints[1][0]:
+            zone='Left'
+        elif centre[0] > routepoints[4][0]:
+            zone='Right'
+        else:
+            zone='Centre'
+    return zone
+
 
 # flightpath = calc_route()
 
