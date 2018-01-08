@@ -41,7 +41,7 @@ from cvwriter import initwriter, writeframe
 
 
 # this is just for display flight decisions will be elsewhere
-def drawroute(route):
+def drawroute(route, centrex, centrey):
     global frame
     for i, j in enumerate(route):
         if i < len(route) - 1:
@@ -50,6 +50,8 @@ def drawroute(route):
         else:
             cv2.line(frame, (j[0], j[1]), (route[0][0], route[0][1]),
                      (255, 0, 255), thickness=1, lineType=8, shift=0)
+    cv2.line(frame, (centrex, 0), (centrex, centrey * 2),
+             (255, 0, 0), thickness=2, lineType=8, shift=0)
     return
 
 
@@ -310,11 +312,11 @@ while True:  # Main module loop
         cv2.putText(frame, str(int(kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
 # end of direction and analysis
 
-    get_phase(center, mode, centrex, centrey, routepoints, currtarget, currphase):
+    #get_phase(center, mode, centrex, centrey, routepoints, currtarget, currphase):
 
-    phase, target = routeplan.get_phase(center, mode, routepoints)
+    phase, target = routeplan.get_phase(center, mode, centrex, centrey, routepoints, 0, 'park')
 
-    drawroute(routepoints)
+    drawroute(routepoints, centrex, centrey)
 
     cv2.putText(frame, modestring, (200, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
     kite_pos(centrex, centrey, kiteangle, dX, dY, 0, 0)
