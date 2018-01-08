@@ -4,8 +4,21 @@
 This file should do the following things
 
     1   Calculate a default route for the kite based on settings or parameters applied
-    2   When given the current position of the kite identify the target vector and current vector and
-        consequently whether to go left or right
+    2   Identify the flight zone which will be left, right or centre in fig8
+        and park_above, park_left, park_right, park_below
+    3   Do we have a current route - if so let's continue it for now unless zone changed
+        probably need a safety check now
+    4   If not what zone are we in - if park for now we will just go left or right and aim to stay above
+        the zone
+    5   Probably then go left a bit and right a bit - lets call that wiggle mode
+    6   Then move into fig 8 with upturns - let's always start left and should be aimed high - probably just need
+        to display a centre line and always draw fig 8 and resize manually for now - full automation of that can
+        be later
+    7   At some point we then flick from park to fig8 and it should then set off towards say bottom left of fig8
+    8   Once there we flick into upturn and measure turn radius for a few cycles - turn stops when kite is round 180deg
+    9   Then repeat to other side -
+    10  At some point we would switch to doing down turns but that can probably be well after upturns work reliably so
+    11  Upturns only for now
 """
 import numpy as np
 
@@ -44,12 +57,15 @@ def calc_route(mode='park', centrex=400, centrey=300, halfwidth=200, radius=100)
     # cv2.Line(img, pt1, pt2, color, thickness=1, lineType=8, shift=0)
 
 
-def get_phase(x, y, width):
-    """This might return the flight phase but not sure I need it
-    should be easy enough and we then draw lines between each point and
-    get the last point"""
-    phase = 'left'
-    return phase
+def get_phase(center, mode, centrex, centrey,  routepoints, currtarget, currphase):
+    if mode == 'park':
+        # TODO this will change as even with park will need a strategy to get to the centre
+        target = (centrex, centrey)
+        phase = 'hold'
+    else:  #  fig8
+        target = (centrex, centrey)
+        phase = 'hold'
+    return(target, phase)
 
 # flightpath = calc_route()
 
