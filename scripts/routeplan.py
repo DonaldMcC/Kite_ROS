@@ -22,15 +22,14 @@ This file should do the following things
 """
 import numpy as np
 
-def calc_route(mode='park', centrex=400, centrey=300, halfwidth=200, radius=100):
+def calc_route(centrex=400, centrey=300, halfwidth=200, radius=100):
     """This just calculates the 6 points in our basic figure of eight
     should be easy enough and we then draw lines between each point and
     get the last point
 
-    >>> calc_route('fig8up', 400, 300, 200, 100)
+    >>> calc_route(400, 300, 200, 100)
     [(200, 400), (100, 300), (200, 200), (600, 400), (700, 300), (600, 200)]
-    >>> calc_route('fig8down', 400, 300, 200, 100) # later
-    [(200, 400), (100, 300), (200, 200), (600, 400), (700, 300), (600, 200)]
+
     """
 
     leftx = centrex - halfwidth

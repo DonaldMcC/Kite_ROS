@@ -55,90 +55,123 @@ def drawroute(route, centrex, centrey):
     return
 
 
-
-
-def drawcross(centrex, centrey, manangle):
-    global frame#
+def drawcross(manx,many):
+    global frame  #
     # stuff below was to allow angle calculation of angle - which may well
     # do once we have got direction of travel unpicked
-    crosssize = 10
-    starthorx = centrex - crosssize
-    endhorx = centrex + crosssize
-    endhory = centrey
-    starthory = centrey
-    startvery = centrey - crosssize
-    endvery = centrey + crosssize
-    endverx = centrex
-    startverx = centrex
+    crosssize =10
+    starthorx = manx-crosssize
+    endhorx = manx + crosssize
+    endhory = many
+    starthory = many
+    startvery = many - crosssize
+    endvery = many + crosssize
+    endverx = manx
+    startverx = manx
     cv2.line(frame, (starthorx, starthory), (endhorx, endhory),
-                     (255, 0, 255), thickness=2, lineType=8, shift=0)
+                 (255, 0, 255), thickness=2, lineType=8, shift=0)
     cv2.line(frame, (startverx, startvery), (endverx, endvery),
-                     (255, 0, 255), thickness=2, lineType=8, shift=0)
+                 (255, 0, 255), thickness=2, lineType=8, shift=0)
 
     return
 
+class Kite:
 
-def getmodestring(inputmode):
-    global modestring
-    if inputmode == 0:  # Standard
-        modestring = 'STD: Left Right Up Down Wider Narrow Expand Contract Pause Mode Quit'
-    elif inputmode == 1:
-        modestring = 'SETFLIGHTMODE: Park Fig8 Mode Quit'
-    else:
-        modestring = 'MANFLIGHT: Left Right Up Down Pause Mode Quit'
+    def __init__(self,  manx=0, many=0, mode='Park', manangle=0):
+        self.mode = mode
+        self.manx = manx
+        self.many = many
+        self.manangle = manangle
 
 
-def keyhandler(key):
+class Base:
+
+    def __init__(self, barangle=0):
+        self.barangle = barangle
+
+
+class Controls:
+
+
+    def __init__(self, inputmode=0, step=8):
+        try:  # this will fail on windows but don't need yet and not convinced I need to set parameters separately
+            self.centrex = rospy.get_param('centrex', 400)
+            self.centrey = rospy.get_param('centrey', 300)
+            self.halfwidth = rospy.get_param('halfwidth', 200)
+            self.radius = rospy.get_param('radius', 100)
+        except (NameError, KeyError) as e:
+            #  mode='fig8'
+            self.centrex = 400
+            self.centrey = 300
+            self.halfwidth = 200
+            self.radius = 100
+        self.routepoints = routeplan.calc_route(self.centrex, self.centrey, self.halfwidth, self.radius)
+        self.inputmodes = ('Standard', 'SetFlight', 'ManFly')
+        self.inputmode = inputmode
+        self.step = step
+        self.modestring = self.getmodestring()
+
+
+    def getmodestring(self):
+        if self.inputmode == 0:  # Standard
+            return 'STD: Left Right Up Down Wider Narrow Expand Contract Pause Mode Quit'
+        elif self.inputmode == 1:
+            return 'SETFLIGHTMODE: Park Fig8 Mode Quit'
+        else:
+            return 'MANFLIGHT: Left Right Up Down Pause Mode Quit'
+
+
+    def keyhandler(self, key, kite):
     # this will now support a change of flight mode and operating mode so different keys will
     # do different things depending on inputmode,
-    global centrex, centrey, halfwidth, radius, inputmode, mode, manx, many, manangle
-    if inputmode == 0:  # Standard
-        if key == ord("l"):  # left
-            centrex -= step
-        elif key == ord("r"):  # right
-            centrex += step
-        elif key == ord("u"):  # up
-            centrey -= step
-        elif key == ord("d"):  # down
-            centrey += step
-        elif key == ord("w"):  # wider
-            halfwidth += step
-        elif key == ord("n"):  # narrower
-            halfwidth -= 1
-        elif key == ord("e"):  # expand
-            radius += step
-        elif key == ord("c"):  # contract
-            radius -= step
-        elif key == ord("p"):  # pause - this may apply in all moades
-            time.sleep(10)
-    elif inputmode == 1:  # SetFlight
-        if key == ord("p"):  # park
-            mode = 'park'
-        elif key == ord("f"):  # fig8
-            mode = 'fig8'
-    elif inputmode == 2:  # ManFlight - maybe switch to arrows
-        if key == ord("l"):  # left
-            manx -= step  # this will change
-        elif key == ord("r"):  # right
-            manx += step
-        elif key == ord("u"):  # up
-            many -= step
-        elif key == ord("d"):  # down
-            many += step
-        elif key == ord("p"):  # pause - this may apply in all moades
-            time.sleep(10)
 
-    if key == ord("m"):  # modechange
-        inputmode += 1
-        if inputmode == 3:  # simple toggle around 3 modes
-            inputmode = 0
-        getmodestring(inputmode)
+        if self.inputmode == 0:  # Standard
+            if key == ord("l"):  # left
+                self.centrex -= self.step
+            elif key == ord("r"):  # right
+                self.centrex += self.step
+            elif key == ord("u"):  # up
+                self.centrey -= self.step
+            elif key == ord("d"):  # down
+                self.centrey += self.step
+            elif key == ord("w"):  # wider
+                self.halfwidth += self.step
+            elif key == ord("n"):  # narrower
+                self.halfwidth -= 1
+            elif key == ord("e"):  # expand
+                self.radius += self.step
+            elif key == ord("c"):  # contract
+                self.radius -= self.step
+            elif key == ord("p"):  # pause - this may apply in all moades
+                time.sleep(10)
+        elif self.inputmode == 1:  # SetFlight
+            if key == ord("p"):  # park
+                self.mode = 'park'
+            elif key == ord("f"):  # fig8
+                self.mode = 'fig8'
+        elif self.inputmode == 2:  # ManFlight - maybe switch to arrows
+            if key == ord("l"):  # left
+                kite.manx -= self.step  # this will change
+            elif key == ord("r"):  # right
+                kite.manx += self.step
+            elif key == ord("u"):  # up
+                kite.many -= self.step
+            elif key == ord("d"):  # down
+                kite.many += self.step
+            elif key == ord("p"):  # pause - this may apply in all moades
+                time.sleep(10)
+
+        if key == ord("m"):  # modechange
+            self.inputmode += 1
+            if self.inputmode == 3:  # simple toggle around 3 modes
+                self.inputmode = 0
+            self.modestring=self.getmodestring()
+
+        self.routepoints = routeplan.calc_route(self.centrex, self.centrey, self.halfwidth, self.radius)
+        return
 
 
-    routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
-    return routepoints
-
-
+#Main routine start
 # this will need to not happen if arguments are passed
 source = 2 # change back to 1 to get prompt
 while source not in {1, 2}:
@@ -154,31 +187,10 @@ else:
     camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
 
 
-# initialise the route and
-try:  # this will fail on windows but don't need yet and not convinced I need to set parameters separately
-    mode = rospy.get_param('mode', 'park')
-    centrex = rospy.get_param('centrex', 400)
-    centrey = rospy.get_param('centrey', 300)
-    halfwidth = rospy.get_param('halfwidth', 200)
-    radius = rospy.get_param('radius', 100)
-except (NameError, KeyError) as e:
-    #  mode='fig8'
-    mode = 'park'
-    centrex = 400
-    centrey = 300
-    halfwidth = 200
-    radius = 100
-
-inputmodes = ('Standard', 'SetFlight', 'ManFly')
-inputmode = 0  # This will now be an index on inputmodes
-manx = centrex
-many = centrey
-manangle = 0
-getmodestring(0)
-step = 8  # value for amount routing adjusted per keystroke
-routepoints = routeplan.calc_route(mode, centrex, centrey, halfwidth, radius)
-
-
+#initiate class instances
+control=Controls()
+kite=Kite(control.centrex, control.centrey)
+base=Base()
 # Initialisation steps
 es = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
 kernel = np.ones((5, 5), np.uint8)
@@ -239,8 +251,8 @@ while True:  # Main module loop
     # hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
     # lets draw and move cross for manual flying
-    if inputmodes[inputmode] == 'ManFly':
-        drawcross(manx, many, manangle)
+    if control.inputmodes[control.inputmode] == 'ManFly':
+        drawcross(kite.manx, kite.many)
 
     # Aim to identify the kite and print the direction and so forth - maybe we do let this run
     # even when manual but we just output and draw position of manual x or whatever
@@ -256,10 +268,10 @@ while True:  # Main module loop
             cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 255, 0), 2)
             finalframe = frame[y:y+h, x:x+w]
             center = (x + (w//2), y + (h // 2))
-            if inputmodes[inputmode] != 'ManFly':
+            if control.inputmodes[control.inputmode] != 'ManFly':
                 pts.appendleft(center)
             else:
-                pts.appendleft((manx, many))
+                pts.appendleft((kite.manx, kite.many))
 
             # Min Area seems reasonable to get angle of kite
             rect = cv2.minAreaRect(c)
@@ -314,12 +326,12 @@ while True:  # Main module loop
 
     #get_phase(center, mode, centrex, centrey, routepoints, currtarget, currphase):
 
-    phase, target = routeplan.get_phase(center, mode, centrex, centrey, routepoints, 0, 'park')
+    phase, target = routeplan.get_phase(center, kite.mode, control.centrex, control.centrey, control.routepoints, 0, 'park')
 
-    drawroute(routepoints, centrex, centrey)
+    drawroute(control.routepoints, control.centrex, control.centrey)
 
-    cv2.putText(frame, modestring, (200, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
-    kite_pos(centrex, centrey, kiteangle, dX, dY, 0, 0)
+    cv2.putText(frame, control.modestring, (200, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
+    kite_pos(control.centrex, control.centrey, kiteangle, dX, dY, 0, 0)
     # cv2.imshow("roi", finalframe)
     # cv2.imshow("mask", mask)
     cv2.imshow("contours", frame)
@@ -343,7 +355,7 @@ while True:  # Main module loop
     if key == ord("q"):
         break
     elif key != -1:
-        routepoints = keyhandler(key)
+        routepoints = control.keyhandler(key, kite)
 
 
 print("[INFO] cleaning up...")
