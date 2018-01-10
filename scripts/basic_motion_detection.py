@@ -26,7 +26,6 @@
 
 # standard library imports
 import time
-from collections import deque
 
 # library imports
 import numpy as np
@@ -34,7 +33,7 @@ import cv2
 import rospy
 
 # modules
-import routeplan
+from routeplan import Kite, Base, Controls
 from move_func import get_angle
 from talker import kite_pos, kiteimage
 from cvwriter import initwriter, writeframe
@@ -75,124 +74,6 @@ def drawcross(manx,many):
 
     return
 
-class Kite:
-
-    def __init__(self, x=0, y=0, manx=0, many=0, mode='Park', manangle=0):
-        self.x = x
-        self.y = y
-        self.mode = mode
-        self.manx = manx
-        self.many = many
-        self.manangle = manangle
-        self.pts = deque(maxlen=16)
-        (self.dX, self.dY) = (0, 0)
-        self.direction = ""
-        self.kiteangle = 0
-        self.zone = ""
-
-
-    def get_zone(self, control):
-        if self.mode == 'Park':
-            if self.x <= control.centrex:
-                zone = 'Park Left'
-            else:
-                zone = 'Park Right'
-        else:  # fig8  either up turn or down
-            if self.x < control.routepoints[1][0]:
-                zone = 'Left'
-            elif self.x > control.routepoints[4][0]:
-                zone = 'Right'
-            else:
-                zone = 'Centre'
-        return zone
-
-
-
-class Base:
-
-    def __init__(self, barangle=0):
-        self.barangle = barangle
-
-
-class Controls:
-
-
-    def __init__(self, inputmode=0, step=8):
-        try:  # this will fail on windows but don't need yet and not convinced I need to set parameters separately
-            self.centrex = rospy.get_param('centrex', 400)
-            self.centrey = rospy.get_param('centrey', 300)
-            self.halfwidth = rospy.get_param('halfwidth', 200)
-            self.radius = rospy.get_param('radius', 100)
-        except (NameError, KeyError) as e:
-            #  mode='fig8'
-            self.centrex = 400
-            self.centrey = 300
-            self.halfwidth = 200
-            self.radius = 100
-        self.routepoints = routeplan.calc_route(self.centrex, self.centrey, self.halfwidth, self.radius)
-        self.inputmodes = ('Standard', 'SetFlight', 'ManFly')
-        self.inputmode = inputmode
-        self.step = step
-        self.modestring = self.getmodestring()
-
-
-    def getmodestring(self):
-        if self.inputmode == 0:  # Standard
-            return 'STD: Left Right Up Down Wider Narrow Expand Contract Pause Mode Quit'
-        elif self.inputmode == 1:
-            return 'SETFLIGHTMODE: Park Fig8 Mode Quit'
-        else:
-            return 'MANFLIGHT: Left Right Up Down Pause Mode Quit'
-
-
-    def keyhandler(self, key, kite):
-    # this will now support a change of flight mode and operating mode so different keys will
-    # do different things depending on inputmode,
-
-        if self.inputmode == 0:  # Standard
-            if key == ord("l"):  # left
-                self.centrex -= self.step
-            elif key == ord("r"):  # right
-                self.centrex += self.step
-            elif key == ord("u"):  # up
-                self.centrey -= self.step
-            elif key == ord("d"):  # down
-                self.centrey += self.step
-            elif key == ord("w"):  # wider
-                self.halfwidth += self.step
-            elif key == ord("n"):  # narrower
-                self.halfwidth -= 1
-            elif key == ord("e"):  # expand
-                self.radius += self.step
-            elif key == ord("c"):  # contract
-                self.radius -= self.step
-            elif key == ord("p"):  # pause - this may apply in all moades
-                time.sleep(10)
-        elif self.inputmode == 1:  # SetFlight
-            if key == ord("p"):  # park
-                self.mode = 'park'
-            elif key == ord("f"):  # fig8
-                self.mode = 'fig8'
-        elif self.inputmode == 2:  # ManFlight - maybe switch to arrows
-            if key == ord("l"):  # left
-                kite.manx -= self.step  # this will change
-            elif key == ord("r"):  # right
-                kite.manx += self.step
-            elif key == ord("u"):  # up
-                kite.many -= self.step
-            elif key == ord("d"):  # down
-                kite.many += self.step
-            elif key == ord("p"):  # pause - this may apply in all moades
-                time.sleep(10)
-
-        if key == ord("m"):  # modechange
-            self.inputmode += 1
-            if self.inputmode == 3:  # simple toggle around 3 modes
-                self.inputmode = 0
-            self.modestring=self.getmodestring()
-
-        self.routepoints = routeplan.calc_route(self.centrex, self.centrey, self.halfwidth, self.radius)
-        return
 
 
 #Main routine start
@@ -350,8 +231,7 @@ while True:  # Main module loop
 
     #get_phase(center, mode, centrex, centrey, routepoints, currtarget, currphase):
 
-    phase, target = routeplan.get_phase(center, kite.mode, control.centrex, control.centrey,
-                                        control.routepoints, 0, 'park')
+    kite.phase, kite.target = kite.get_phase(control)
 
     drawroute(control.routepoints, control.centrex, control.centrey)
 
