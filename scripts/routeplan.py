@@ -56,23 +56,7 @@ def get_phase(center, mode, centrex, centrey,  routepoints, currtarget, currphas
     return(target, phase)
 
 
-def get_zone(centre, mode, centrex, centrey, routepoints):
-    if mode == 'park':
-        if centre[0] <= centrex:
-            zone='Park Left'
-        else:
-            zone='Park Right'
-    else:  # fig8  either up turn or down
-        if centre[0] < routepoints[1][0]:
-            zone='Left'
-        elif centre[0] > routepoints[4][0]:
-            zone='Right'
-        else:
-            zone='Centre'
-    return zone
 
-
-# flightpath = calc_route()
 
 
 def get_angle(box):

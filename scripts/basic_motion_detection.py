@@ -77,11 +77,35 @@ def drawcross(manx,many):
 
 class Kite:
 
-    def __init__(self,  manx=0, many=0, mode='Park', manangle=0):
+    def __init__(self, x=0, y=0, manx=0, many=0, mode='Park', manangle=0):
+        self.x = x
+        self.y = y
         self.mode = mode
         self.manx = manx
         self.many = many
         self.manangle = manangle
+        self.pts = deque(maxlen=16)
+        (self.dX, self.dY) = (0, 0)
+        self.direction = ""
+        self.kiteangle = 0
+        self.zone = ""
+
+
+    def get_zone(self, control):
+        if self.mode == 'Park':
+            if self.x <= control.centrex:
+                zone = 'Park Left'
+            else:
+                zone = 'Park Right'
+        else:  # fig8  either up turn or down
+            if self.x < control.routepoints[1][0]:
+                zone = 'Left'
+            elif self.x > control.routepoints[4][0]:
+                zone = 'Right'
+            else:
+                zone = 'Centre'
+        return zone
+
 
 
 class Base:
@@ -199,11 +223,7 @@ imagemessage = kiteimage()
 
 # initialize the list of tracked points, the frame counter,
 # and the coordinate deltas
-pts = deque(maxlen=16)
 counter = 0
-(dX, dY) = (0, 0)
-direction = ""
-kiteangle = 0
 
 # http://www.pyimagesearch.com/2014/08/04/opencv-python-color-detection/
 # define the list of boundaries
@@ -269,9 +289,11 @@ while True:  # Main module loop
             finalframe = frame[y:y+h, x:x+w]
             center = (x + (w//2), y + (h // 2))
             if control.inputmodes[control.inputmode] != 'ManFly':
-                pts.appendleft(center)
+                kite.pts.appendleft(center)
+                kite.x = center[0]
+                kite.y = center[1]
             else:
-                pts.appendleft((kite.manx, kite.many))
+                kite.pts.appendleft((kite.manx, kite.many))
 
             # Min Area seems reasonable to get angle of kite
             rect = cv2.minAreaRect(c)
@@ -283,55 +305,58 @@ while True:  # Main module loop
             continue
 
 # start direction and analysiss
-    for i in np.arange(1, len(pts)):
-        if pts[i] is None:
+    for i in np.arange(1, len(kite.pts)):
+        if kite.pts[i] is None:
             continue
         # check to see if enough points have been accumulated in the buffer
-        if counter >= 10 and i == 1 and pts and len(pts) > 10 and pts[10] is not None:
+        if counter >= 10 and i == 1 and kite.pts and len(kite.pts) > 10 and kite.pts[10] is not None:
             # compute the difference between the x and  y  coordinates and re-initialize the direction
             # text variables
-            dX = pts[i][0] - pts[-10][0]
-            dY = pts[i][1] - pts[-10][1]
+            kite.dX = kite.pts[i][0] - kite.pts[-10][0]
+            kite.dY = kite.pts[i][1] - kite.pts[-10][1]
             (dirX, dirY) = ("", "")
 
             # ensure there is significant movement in the x-direction
-            if np.abs(dX) > 20:
-                dirX = "East" if np.sign(dX) == 1 else "West"
+            if np.abs(kite.dX) > 20:
+                dirX = "East" if np.sign(kite.dX) == 1 else "West"
 
             # ensure there is significant movement in the y-direction
-            if np.abs(dY) > 20:
-                dirY = "South" if np.sign(dY) == 1 else "North"
+            if np.abs(kite.dY) > 20:
+                dirY = "South" if np.sign(kite.dY) == 1 else "North"
 
                 # handle when both directions are non-empty
             if dirX != "" and dirY != "":
-                direction = "{}-{}".format(dirY, dirX)
+                kite.direction = "{}-{}".format(dirY, dirX)
 
                 # otherwise, only one direction is non-empty
             else:
-                direction = dirX if dirX != "" else dirY
+                kite.direction = dirX if dirX != "" else dirY
 
             # otherwise, compute the thickness of the line and draw the connecting lines
             thickness = int(np.sqrt(32 / float(i + 1)) * 2.5)
-            cv2.line(frame, pts[i - 1], pts[i], (0, 0, 255), thickness)
+            cv2.line(frame, kite.pts[i - 1], kite.pts[i], (0, 0, 255), thickness)
 
             # show the movement deltas and the direction of movement on the frame
-            cv2.putText(frame, direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
-            cv2.putText(frame, "dx: {}, dy: {}".format(dX, dY),
+            cv2.putText(frame, kite.direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
+            cv2.putText(frame, "dx: {}, dy: {}".format(kite.dX, kite.dY),
                                 (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
             continue
 
-        kiteangle = get_angle(box, dX, dY)
-        cv2.putText(frame, str(int(kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
-# end of direction and analysis
+        kite.kiteangle = get_angle(box, kite.dX, kite.dY)
+        kite.zone = kite.get_zone(control)
+        cv2.putText(frame, str(int(kite.kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
+        cv2.putText(frame, kite.zone, (200, 200), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
+# end of directiocv2.putText(frame, str(int(kite.kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)n and analysis
 
     #get_phase(center, mode, centrex, centrey, routepoints, currtarget, currphase):
 
-    phase, target = routeplan.get_phase(center, kite.mode, control.centrex, control.centrey, control.routepoints, 0, 'park')
+    phase, target = routeplan.get_phase(center, kite.mode, control.centrex, control.centrey,
+                                        control.routepoints, 0, 'park')
 
     drawroute(control.routepoints, control.centrex, control.centrey)
 
     cv2.putText(frame, control.modestring, (200, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
-    kite_pos(control.centrex, control.centrey, kiteangle, dX, dY, 0, 0)
+    kite_pos(control.centrex, control.centrey, kite.kiteangle, kite.dX, kite.dY, 0, 0)
     # cv2.imshow("roi", finalframe)
     # cv2.imshow("mask", mask)
     cv2.imshow("contours", frame)
@@ -342,9 +367,9 @@ while True:  # Main module loop
     if counter % 100 == 0:
         pass
         # print(center)
-        # print(pts[10][0],pts[10][1])
-        # print(dX, dY)
-        # print(direction)
+        # print(kite.pts[10][0],kite.pts[10][1])
+        # print(kite.dX, kite.dY)
+        # print(kite.direction)
     # cv2.imshow("dif", diff)
     # keys should be Left, Right, Up, Down, Widen and Narrow, Extend and Contract which
     # should set all routes
