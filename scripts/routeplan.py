@@ -7,18 +7,17 @@ This file should do the following things
     2   Identify the flight zone which will be left, right or centre in fig8
         and park_left, park_right - done
     3   Do we have a current route - if so let's continue it for now unless zone changed
-        probably need a safety check now
+        probably need a safety check now - if park mode then we will target kiteangle primarily
     4   If not what zone are we in - if park for now we will just go left or right and expect to go up - which will
         bring all the off-camera issues
-    5   Probably then go left a bit and right a bit - lets call that wiggle mode
+    5   Probably then go left a bit and right a bit - lets call that wiggle mode - but we align first
     6   Then move into fig 8 with upturns - let's always start left and should be aimed high - probably just need
         to display a centre line and always draw fig 8 and resize manually for now - full automation of that can
-        be later
-    7   At some point we then flick from park to fig8 and it should then set off towards say bottom left of fig8
-    8   Once there we flick into upturn and measure turn radius for a few cycles - turn stops when kite is round 180deg
-    9   Then repeat to other side -
-    10  At some point we would switch to doing down turns but that can probably be well after upturns work reliably so
-    11  Upturns only for now
+        be later - this will be set in motion manually
+    7   Once there we flick into upturn and measure turn radius for a few cycles - turn stops when kite is round 180deg
+    8   Then repeat to other side -
+    9   At some point we would switch to doing down turns but that can probably be well after upturns work reliably so
+    10  Upturns only for now
 """
 
 from collections import deque
@@ -41,13 +40,15 @@ class Kite:
         self.direction = ""
         self.kiteangle = 0
         self.zone = ""
+        self.targetdict= {'mode': 'Park', 'phase': '', 'targettype': 'Angle',
+                          'targetangle': 0, 'targetx': 0, 'targety': 0}
         self.phase = ""
         self.targetx = 0
         self.targety = 0
 
 
     def get_zone(self, control):
-        if self.mode == 'Park':
+        if self.targetdict['mode'] == 'Park':
             if self.x <= control.centrex:
                 zone = 'Park Left'
             else:
@@ -62,15 +63,35 @@ class Kite:
         return zone
 
 
-    def get_phase(self, control):
-        if self.mode == 'Park':
-            # TODO this will change as even with park will need a strategy to get to the centre
-            target = (control.centrex, control.centrey)
-            phase = 'Hold'
-        else:  # fig8
-            target = (control.centrex, control.centrey)
-            phase = 'Hold'
-        return (target, phase)
+    def calc_phase(self, control):
+        if self.targetdict['mode'] == 'Park':
+            # For park this is now OK we want to get kiteangle to zero
+            self.targetdict['targettype'] = 'Angle'
+            self.targetdict['phase']  = 'Hold'
+            self.targetdict['targetangle'] = 0
+            self.targetdict['targetx'] = control.centrex
+            self.targetdict['targety'] = control.centrey
+        elif self.targetdict['mode'] == 'Wiggle':
+
+            self.targetdict['targettype'] = 'Angle'
+            self.targetdict['targetangle'] = 0
+            self.targetdict['targetx'] = control.centrex
+            self.targetdict['targety'] = control.centrey
+            self.targetdict['phase'] = 'Hold'
+        else:  # fig8 - assumed
+            if self.zone=='Centre':
+                self.targetdict['targettype'] = 'Point'
+                self.targetdict['targetx'] = control.centrex
+                self.targetdict['targety'] = control.centrey
+                self.targetdict['targetangle'] = 0
+                self.targetdict['phase'] = 'Xwind'
+            else:
+                self.targetdict['targettype'] = 'Angle'
+                self.targetdict['targetx'] = control.centrex
+                self.targetdict['targety'] = control.centrey
+                self.targetdict['targetangle'] = 0
+                self.targetdict['phase'] = 'Turn'
+        return
 
 
 

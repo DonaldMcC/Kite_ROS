@@ -224,14 +224,13 @@ while True:  # Main module loop
             continue
 
         kite.kiteangle = get_angle(box, kite.dX, kite.dY)
-        kite.zone = kite.get_zone(control)
+        kite.targetdict['zone'] = kite.get_zone(control)
         cv2.putText(frame, str(int(kite.kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
-        cv2.putText(frame, kite.zone, (200, 200), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
+        cv2.putText(frame, kite.targetdict['zone'], (200, 200), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
 # end of directiocv2.putText(frame, str(int(kite.kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)n and analysis
 
-    #get_phase(center, mode, centrex, centrey, routepoints, currtarget, currphase):
 
-    kite.phase, kite.target = kite.get_phase(control)
+    kite.calc_phase(control)
 
     drawroute(control.routepoints, control.centrex, control.centrey)
 
