@@ -20,15 +20,13 @@ This file should do the following things
     10  Upturns only for now
 """
 
+import time
 from collections import deque
-
-import numpy as np
-
 
 
 class Kite(object):
 
-    def __init__(self, x=0, y=0, manx=0, many=0, mode='Park',phase='Park', manangle=0):
+    def __init__(self, x=0, y=0, manx=300, many=400, mode='Park',phase='Park', manangle=0):
         self.x = x
         self.y = y
         self.mode = mode

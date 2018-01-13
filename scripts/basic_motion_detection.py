@@ -158,13 +158,15 @@ while True:  # Main module loop
     image, cnts, hierarchy = cv2.findContours(diff.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     # hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
+    kite.found = False
     # lets draw and move cross for manual flying
     if control.inputmodes[control.inputmode] == 'ManFly':
         drawcross(kite.manx, kite.many)
+        kite.found=True
 
     # Aim to identify the kite and print the direction and so forth - maybe we do let this run
     # even when manual but we just output and draw position of manual x or whatever
-    kite.found = False
+
     for c in cnts:
         if cv2.contourArea(c) < 1500:
             continue
@@ -184,6 +186,8 @@ while True:  # Main module loop
                 kite.y = center[1]
             else:
                 kite.pts.appendleft((kite.manx, kite.many))
+                kite.x = kite.manx
+                kite.y = kite.many
 
             # Min Area seems reasonable to get angle of kite
             rect = cv2.minAreaRect(c)
