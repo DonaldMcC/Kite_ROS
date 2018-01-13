@@ -106,9 +106,8 @@ class Kite(object):
         if self.phase <> currentphase:
             self.changephase = True
 
-
-    def update_target(self, leftx,lefty, centrex, centrey, rightx, righty ):
-        #this gets called when mode, zone or phase changes
+    def update_target(self, leftx,lefty, centrex, centrey, rightx, righty):
+        # this gets called when mode, zone or phase changes
         if self.mode == 'Park':
             # For park this is now OK we want to get kiteangle to zero
             self.targettype = 'Angle'
@@ -256,7 +255,7 @@ def calc_route(centrex=400, centrey=300, halfwidth=200, radius=100):
     pt5 = (rightx, centrey - radius)
 
     return [pt0, pt1, pt2, pt3, pt4, pt5]
-
+    want pt0,0 pt0,1, pt3,0 and 1
 
 
 def get_angle(box):
