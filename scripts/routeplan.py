@@ -87,8 +87,10 @@ class Kite(object):
         else:  # fig8 - assumed
             if zone == 'Centre':
                 phase = 'Xwind'
+            elif zone == 'Left':
+                phase = 'TurnRight'
             else:
-                phase = 'Turn'
+                phase = 'Turnleft'
         return phase
 
     def update_zone(self, control):
@@ -119,21 +121,28 @@ class Kite(object):
             self.targetx = centrex
             self.targety = centrey
         else:  # fig8 - by definition
-            if self.zone=='Centre' and self.changezone:
-                #we have just left the right or left turnzone so if nearest
+            if self.zone=='Centre':
+                # Either we have just left the right or left turnzone so if nearest
                 # left we go right and if nearest right we go left
+                # or we have changed from park or wiggle to xwind which will be presumed to happen
+                # with kite upwards and seems reasonable to just go for the longer xwind distance
                 self.targettype = 'Point'
-                if abs(self.x -)
-                self.targetx = leftx
-                self.targetdict['targety'] = control.centrey
-                self.targetdict['targetangle'] = 0
-                self.targetdict['phase'] = 'Xwind'
+                if abs(self.x - leftx) > abs(self.x-rightx):
+                    self.targetx = leftx
+                    self.targety = lefty
+                    # TODO - will comput targetangle at some point
+                else:
+                    self.targetx = rightx
+                    self.targety = righty
+            elif self.changezone:
+                self.targettype = self.phase
+                self.targetangle = 90
+                # TODO - may compute the target location
             else:
-                self.targetdict['targettype'] = 'Angle'
-                self.targetdict['targetx'] = control.centrex
-                self.targetdict['targety'] = control.centrey
-                self.targetdict['targetangle'] = 0
-                self.targetdict['phase'] = 'Turn'
+                print ('End of update_target reached without cover expected cases most likely ')
+                # TODO ensure change of flight mode is barred unless in the centre zone - seems sensible and should
+                # mena changemode and changephase generally only triggered in centre zone
+
         return
 
 
