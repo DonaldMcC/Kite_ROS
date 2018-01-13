@@ -6,10 +6,10 @@ This file should do the following things
     1   Calculate a default route for the kite based on settings or parameters applied - done
     2   Identify the flight zone which will be left, right or centre in fig8
         and park_left, park_right - done
-    3   Do we have a current route - if so let's continue it for now unless zone changed
-        probably need a safety check now - if park mode then we will target kiteangle primarily
-    4   If not what zone are we in - if park for now we will just go left or right and expect to go up - which will
-        bring all the off-camera issues
+    3   Identify the flight mode - currently proposing park wiggle and fig8up we always start with park
+    4   Has phase change or zone changed or are we starting
+    3   Set route - otherwise we know the preferred route
+    4   Staring point will always be park and the target for that is kite angle of zero and to be at top of centre line
     5   Probably then go left a bit and right a bit - lets call that wiggle mode - but we align first
     6   Then move into fig 8 with upturns - let's always start left and should be aimed high - probably just need
         to display a centre line and always draw fig 8 and resize manually for now - full automation of that can
@@ -26,12 +26,13 @@ import numpy as np
 
 
 
-class Kite:
+class Kite(object):
 
-    def __init__(self, x=0, y=0, manx=0, many=0, mode='Park', manangle=0):
+    def __init__(self, x=0, y=0, manx=0, many=0, mode='Park',phase='Park', manangle=0):
         self.x = x
         self.y = y
         self.mode = mode
+        self.phase = phase
         self.manx = manx
         self.many = many
         self.manangle = manangle
@@ -40,30 +41,61 @@ class Kite:
         self.direction = ""
         self.kiteangle = 0
         self.zone = ""
-        self.targetdict= {'mode': 'Park', 'phase': '', 'targettype': 'Angle',
+        self.targetdict=  {'targettype': 'Angle',
                           'targetangle': 0, 'targetx': 0, 'targety': 0}
-        self.phase = ""
         self.targetx = 0
         self.targety = 0
+        self.changezone = False
+        self.changepahse = False
 
 
-    def get_zone(self, control):
-        if self.targetdict['mode'] == 'Park':
-            if self.x <= control.centrex:
+    def get_zone(self, leftx, centrex, rightx):
+        """
+        >>> k.get_zone(0,300,600)
+        'Park Left'
+
+        >>> l=Kite(400)
+        >>> l.get_zone(0,300,600)
+        'Park Right'
+
+        :param leftx:
+        :param centrex:
+        :param rightx:
+        :return:
+        """
+        if self.mode == 'Park':
+            if self.x <= centrex:
                 zone = 'Park Left'
             else:
                 zone = 'Park Right'
         else:  # fig8  either up turn or down
-            if self.x < control.routepoints[1][0]:
+            if self.x < leftx:
                 zone = 'Left'
-            elif self.x > control.routepoints[4][0]:
+            elif self.x > rightx:
                 zone = 'Right'
             else:
                 zone = 'Centre'
         return zone
 
 
-    def calc_phase(self, control):
+    def get_phase(self, zone, mode):
+        if mode == 'Park':
+            # For park this is now OK we want to get kiteangle to zero
+            phase  = 'Hold'
+        elif mode == 'Wiggle':
+            phase = 'Wiggle'
+        else:  # fig8 - assumed
+            if zone == 'Centre':
+                phase = 'Xwind'
+            else:
+                phase = 'Turn'
+        return phase
+
+    def set_target(self, control):
+        currentzone = self.zone
+        self.zone = self.get_zone(control.leftx, control.centrex, control.rightx)
+        if self.zone <> currentzone:
+            self.changezone = True
         if self.targetdict['mode'] == 'Park':
             # For park this is now OK we want to get kiteangle to zero
             self.targetdict['targettype'] = 'Angle'
@@ -94,14 +126,13 @@ class Kite:
         return
 
 
-
-class Base:
+class Base(object):
 
     def __init__(self, barangle=0):
         self.barangle = barangle
 
 
-class Controls:
+class Controls(object):
 
 
     def __init__(self, inputmode=0, step=8):
@@ -218,7 +249,9 @@ def get_angle(box):
 
 def _test():
     import doctest
-    doctest.testmod()
+    doctest.testmod(extraglobs={'k':Kite()})
+
+
 
 
 if __name__ == '__main__':
