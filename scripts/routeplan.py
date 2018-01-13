@@ -41,12 +41,12 @@ class Kite(object):
         self.direction = ""
         self.kiteangle = 0
         self.zone = ""
-        self.targetdict=  {'targettype': 'Angle',
-                          'targetangle': 0, 'targetx': 0, 'targety': 0}
+        self.targettype = 'Angle'
+        self.targetangle=0
         self.targetx = 0
         self.targety = 0
         self.changezone = False
-        self.changepahse = False
+        self.changephase = False
 
 
     def get_zone(self, leftx, centrex, rightx):
@@ -97,6 +97,7 @@ class Kite(object):
         if self.zone <> currentzone:
             self.changezone = True
 
+
     def update_phase(self):
         currentphase = self.phase
         self.phase = self.get_phase(self.zone, self.mode)
@@ -104,24 +105,26 @@ class Kite(object):
             self.changephase = True
 
 
-        if self.targetdict['mode'] == 'Park':
+    def update_target(self, leftx,lefty, centrex, centrey, rightx, righty ):
+        #this gets called when mode, zone or phase changes
+        if self.mode == 'Park':
             # For park this is now OK we want to get kiteangle to zero
-            self.targetdict['targettype'] = 'Angle'
-            self.targetdict['phase']  = 'Hold'
-            self.targetdict['targetangle'] = 0
-            self.targetdict['targetx'] = control.centrex
-            self.targetdict['targety'] = control.centrey
-        elif self.targetdict['mode'] == 'Wiggle':
-
-            self.targetdict['targettype'] = 'Angle'
-            self.targetdict['targetangle'] = 0
-            self.targetdict['targetx'] = control.centrex
-            self.targetdict['targety'] = control.centrey
-            self.targetdict['phase'] = 'Hold'
-        else:  # fig8 - assumed
-            if self.zone=='Centre':
-                self.targetdict['targettype'] = 'Point'
-                self.targetdict['targetx'] = control.centrex
+            self.targettype = 'Angle'
+            self.targetangle = 0
+            self.targetx = centrex
+            self.targety = centrey
+        elif self.mode == 'Wiggle':
+            self.targettype = 'Angle'
+            self.targetangle = get_wiggle_angle()
+            self.targetx = centrex
+            self.targety = centrey
+        else:  # fig8 - by definition
+            if self.zone=='Centre' and self.changezone:
+                #we have just left the right or left turnzone so if nearest
+                # left we go right and if nearest right we go left
+                self.targettype = 'Point'
+                if abs(self.x -)
+                self.targetx = leftx
                 self.targetdict['targety'] = control.centrey
                 self.targetdict['targetangle'] = 0
                 self.targetdict['phase'] = 'Xwind'
