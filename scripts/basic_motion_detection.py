@@ -54,11 +54,18 @@ def drawroute(route, centrex, centrey):
     return
 
 
-def drawcross(manx,many):
+def drawcross(manx,many, crosstype='Man'):
     global frame  #
     # stuff below was to allow angle calculation of angle - which may well
     # do once we have got direction of travel unpicked
-    crosssize =10
+    if crosstype == 'Man':
+        crosssize = 10
+        thickness = 2
+        colour = (255, 0, 255)
+    else:  # Target for now
+        crosssize = 6
+        thickness = 4
+        colour = (0, 0, 0)
     starthorx = manx-crosssize
     endhorx = manx + crosssize
     endhory = many
@@ -68,9 +75,9 @@ def drawcross(manx,many):
     endverx = manx
     startverx = manx
     cv2.line(frame, (starthorx, starthory), (endhorx, endhory),
-                 (255, 0, 255), thickness=2, lineType=8, shift=0)
+                 colour, thickness=thickness, lineType=8, shift=0)
     cv2.line(frame, (startverx, startvery), (endverx, endvery),
-                 (255, 0, 255), thickness=2, lineType=8, shift=0)
+                 colour, thickness=thickness, lineType=8, shift=0)
 
     return
 
@@ -224,7 +231,6 @@ while True:  # Main module loop
             continue
 
         kite.kiteangle = get_angle(box, kite.dX, kite.dY)
-        kite.zone = kite.get_zone(control)
         cv2.putText(frame, str(int(kite.kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
 
 
@@ -240,9 +246,10 @@ while True:  # Main module loop
     # end of directiocv2.putText(frame, str(int(kite.kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)n and analysis
 
     drawroute(control.routepoints, control.centrex, control.centrey)
+    drawcross(kite.targetx, kite.targety, 'Target')
 
     cv2.putText(frame, control.modestring, (200, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
-    kite_pos(kite.centrex, kite.centrey, kite.kiteangle, kite.dX, kite.dY, 0, 0)
+    kite_pos(kite.x, kite.y, kite.kiteangle, kite.dX, kite.dY, 0, 0)
     # cv2.imshow("roi", finalframe)
     # cv2.imshow("mask", mask)
     cv2.imshow("contours", frame)

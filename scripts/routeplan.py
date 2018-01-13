@@ -95,7 +95,7 @@ class Kite(object):
 
     def update_zone(self, control):
         currentzone = self.zone
-        self.zone = self.get_zone(control.leftx, control.centrex, control.rightx)
+        self.zone = self.get_zone(control.routepoints[0][1], control.centrex, control.routepoints[3][0])
         if self.zone <> currentzone:
             self.changezone = True
 
@@ -172,6 +172,7 @@ class Controls(object):
         self.step = step
         self.modestring = self.getmodestring()
         self.route = False
+        self.maxy = 20  # this should be for top of centre line and sets they y target point for park mode
 
 
     def getmodestring(self):
@@ -255,7 +256,6 @@ def calc_route(centrex=400, centrey=300, halfwidth=200, radius=100):
     pt5 = (rightx, centrey - radius)
 
     return [pt0, pt1, pt2, pt3, pt4, pt5]
-    want pt0,0 pt0,1, pt3,0 and 1
 
 
 def get_angle(box):
