@@ -164,6 +164,7 @@ while True:  # Main module loop
 
     # Aim to identify the kite and print the direction and so forth - maybe we do let this run
     # even when manual but we just output and draw position of manual x or whatever
+    kite.found = False
     for c in cnts:
         if cv2.contourArea(c) < 1500:
             continue
@@ -173,6 +174,7 @@ while True:  # Main module loop
         mask = cv2.inRange(roi, low, upp)
         if np.sum(mask) > 1000:
             # outputframe = cv2.bitwise_and(roi, mask, mask=mask)
+            kite.found = True
             cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 255, 0), 2)
             finalframe = frame[y:y+h, x:x+w]
             center = (x + (w//2), y + (h // 2))
@@ -241,8 +243,13 @@ while True:  # Main module loop
         kite.update_target(control.routepoints[0][0],control.routepoints[0][1], control.centrex, control.maxy,
                            control.routepoints[0][0], control.routepoints[0][1])
 
-    cv2.putText(frame, 'Zone:' + kite.zone, (200, 200), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
-    cv2.putText(frame, 'Mode:' + kite.mode, (200, 180), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
+    cv2.putText(frame, 'Zone:' + kite.zone, (800, 200), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
+    cv2.putText(frame, 'Mode:' + kite.mode, (800, 180), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
+    if kite.found:
+        tempstr = "Found: Yes"
+    else:
+        tempstr = "Found: No"
+    cv2.putText(frame, tempstr, (800, 160), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
     # end of directiocv2.putText(frame, str(int(kite.kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)n and analysis
 
     drawroute(control.routepoints, control.centrex, control.centrey)

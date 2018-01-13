@@ -47,34 +47,30 @@ class Kite(object):
         self.targety = 0
         self.changezone = False
         self.changephase = False
+        self.found = False
 
 
-    def get_zone(self, leftx, centrex, rightx):
+    def get_zone(self, leftx, rightx):
         """
-        >>> k.get_zone(0,300,600)
-        'Park Left'
+        >>> k.get_zone(100,600)
+        'Left'
 
         >>> l=Kite(400)
-        >>> l.get_zone(0,300,600)
-        'Park Right'
+        >>> l.get_zone(300,600)
+        'Centre'
 
         :param leftx:
         :param centrex:
         :param rightx:
         :return:
         """
-        if self.mode == 'Park':
-            if self.x <= centrex:
-                zone = 'Park Left'
-            else:
-                zone = 'Park Right'
-        else:  # fig8  either up turn or down
-            if self.x < leftx:
-                zone = 'Left'
-            elif self.x > rightx:
-                zone = 'Right'
-            else:
-                zone = 'Centre'
+
+        if self.x < leftx:
+            zone = 'Left'
+        elif self.x > rightx:
+            zone = 'Right'
+        else:
+            zone = 'Centre'
         return zone
 
 
@@ -95,7 +91,7 @@ class Kite(object):
 
     def update_zone(self, control):
         currentzone = self.zone
-        self.zone = self.get_zone(control.routepoints[0][1], control.centrex, control.routepoints[3][0])
+        self.zone = self.get_zone(control.routepoints[0][0], control.routepoints[3][0])
         if self.zone <> currentzone:
             self.changezone = True
 
@@ -209,9 +205,11 @@ class Controls(object):
                 time.sleep(10)
         elif self.inputmode == 1:  # SetFlight
             if key == ord("p"):  # park
-                self.mode = 'park'
-            elif key == ord("f"):  # fig8
-                self.mode = 'fig8'
+                self.mode = 'Park'
+            elif key == ord("w") and kite.zone == 'Centre':  # must be in central zone to change mode
+                self.mode = 'Wiggle'
+            elif key == ord("f") and kite.zone == 'Centre':  # must be in central zone to change mode
+                self.mode = 'Fig8'
         elif self.inputmode == 2:  # ManFlight - maybe switch to arrows
             if key == ord("l"):  # left
                 kite.manx -= self.step  # this will change
@@ -232,7 +230,6 @@ class Controls(object):
 
         self.routepoints = calc_route(self.centrex, self.centrey, self.halfwidth, self.radius)
         return
-
 
 
 def calc_route(centrex=400, centrey=300, halfwidth=200, radius=100):
