@@ -241,15 +241,19 @@ while True:  # Main module loop
 
     if kite.changezone or kite.changephase:
         kite.update_target(control.routepoints[0][0],control.routepoints[0][1], control.centrex, control.maxy,
-                           control.routepoints[0][0], control.routepoints[0][1])
+                           control.routepoints[3][0], control.routepoints[3][1])
 
-    cv2.putText(frame, 'Zone:' + kite.zone, (800, 200), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
-    cv2.putText(frame, 'Mode:' + kite.mode, (800, 180), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
+    cv2.putText(frame, 'Zone:' + kite.zone, (800, 140), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
+
     if kite.found:
         tempstr = "Found: Yes"
     else:
         tempstr = "Found: No"
     cv2.putText(frame, tempstr, (800, 160), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
+
+    cv2.putText(frame, 'Mode:' + kite.mode, (800, 180), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
+    cv2.putText(frame, 'Phase:' + kite.phase, (800, 200), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
+
     # end of directiocv2.putText(frame, str(int(kite.kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)n and analysis
 
     drawroute(control.routepoints, control.centrex, control.centrey)

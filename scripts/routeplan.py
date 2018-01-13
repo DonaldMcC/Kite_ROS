@@ -94,6 +94,8 @@ class Kite(object):
         self.zone = self.get_zone(control.routepoints[0][0], control.routepoints[3][0])
         if self.zone <> currentzone:
             self.changezone = True
+        else:
+            self.changezone = False
 
 
     def update_phase(self):
@@ -101,8 +103,10 @@ class Kite(object):
         self.phase = self.get_phase(self.zone, self.mode)
         if self.phase <> currentphase:
             self.changephase = True
+        else:
+            self.changephase = False
 
-    def update_target(self, leftx,lefty, centrex, centrey, rightx, righty):
+    def update_target(self, leftx, lefty, centrex, centrey, rightx, righty):
         # this gets called when mode, zone or phase changes
         if self.mode == 'Park':
             # For park this is now OK we want to get kiteangle to zero
@@ -143,8 +147,9 @@ class Kite(object):
 
 class Base(object):
 
-    def __init__(self, barangle=0):
+    def __init__(self, barangle=0, parkangle=0):
         self.barangle = barangle
+        self.parkangle = parkangle
 
 
 class Controls(object):
@@ -205,11 +210,11 @@ class Controls(object):
                 time.sleep(10)
         elif self.inputmode == 1:  # SetFlight
             if key == ord("p"):  # park
-                self.mode = 'Park'
+                kite.mode = 'Park'
             elif key == ord("w") and kite.zone == 'Centre':  # must be in central zone to change mode
-                self.mode = 'Wiggle'
+                kite.mode = 'Wiggle'
             elif key == ord("f") and kite.zone == 'Centre':  # must be in central zone to change mode
-                self.mode = 'Fig8'
+                kite.mode = 'Fig8'
         elif self.inputmode == 2:  # ManFlight - maybe switch to arrows
             if key == ord("l"):  # left
                 kite.manx -= self.step  # this will change
