@@ -91,11 +91,19 @@ class Kite(object):
                 phase = 'Turn'
         return phase
 
-    def set_target(self, control):
+    def update_zone(self, control):
         currentzone = self.zone
         self.zone = self.get_zone(control.leftx, control.centrex, control.rightx)
         if self.zone <> currentzone:
             self.changezone = True
+
+    def update_phase(self):
+        currentphase = self.phase
+        self.phase = self.get_phase(self.zone, self.mode)
+        if self.phase <> currentphase:
+            self.changephase = True
+
+
         if self.targetdict['mode'] == 'Park':
             # For park this is now OK we want to get kiteangle to zero
             self.targetdict['targettype'] = 'Angle'

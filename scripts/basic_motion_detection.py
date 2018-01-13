@@ -230,7 +230,12 @@ while True:  # Main module loop
 # end of directiocv2.putText(frame, str(int(kite.kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)n and analysis
 
 
-    kite.calc_phase(control)
+    #ite.calc_phase(control)
+    kite.update_zone()
+    kite.update_phase()
+    #then if phase or zone changed we
+    kite.update_target and we have an objecttive and type
+    then we need to review current situation and decide what to do
 
     drawroute(control.routepoints, control.centrex, control.centrey)
 
