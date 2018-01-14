@@ -228,7 +228,7 @@ def get_angled_corners(x, y, anglechange, centx=0, centy=0):
     :param centy:
     :return:
 
-    This calculates the new co-ordinates of a point on a circel with centre centx, centy
+    This calculates the new co-ordinates of a point on a circle with centre centx, centy
     when rotated through anglechange degrees
     This was stuff for points on a circlex = 30
     y = 40

@@ -258,13 +258,6 @@ def calc_route(centrex=400, centrey=300, halfwidth=200, radius=100):
     return [pt0, pt1, pt2, pt3, pt4, pt5]
 
 
-def get_angle(box):
-    # (0, array([809, 359], dtype=int64))
-    # (1, array([743, 310], dtype=int64))
-    # (2, array([802, 230], dtype=int64))
-    # (3, array([868, 279], dtype=int64))
-    pass
-
 
 def _test():
     import doctest
