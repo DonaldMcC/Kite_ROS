@@ -143,11 +143,7 @@ class Kite(object):
         return
 
 
-class Base(object):
 
-    def __init__(self, barangle=0, parkangle=0):
-        self.barangle = barangle
-        self.parkangle = parkangle
 
 
 class Controls(object):
