@@ -10,7 +10,7 @@
 #   5 once we are nearing end of turn we should switch to angle setting again
 #     if kite not found we will need to look at best plan - if high then we would aim to park and there should be
 #     a value of the base that has been calculated and lets us do this - if left or right then we should be in a
-#     turn phase but recovery will be tricky - if low we probalby just need to go to base angle and hope for the best
+#     turn phase but recovery will be tricky - if low we probably just need to go to base angle and hope for the best
 #
 #  so inputs will be phase, kitefound, position, targetangle, target point and we will somehow need to establish
 #  when coming out of a turn - let's assume we don't need PID style control yet as wind is dynamic and there is no real
@@ -18,15 +18,26 @@
 #  system to cope with that then it will fail - we probably need to project and anticipate at the start and end
 #  but also if possible learn the likely 
 
+from collections import deque
 
 class Base(object):
 
-    def __init__(self, barangle=0, parkangle=0, maxright=45, maxleft=-45, lag=1):
+    def __init__(self, barangle=0, parkangle=0, maxright=45, maxleft=-45, lag=1
+                    targetbarangle=0):
         self.barangle = barangle
         self.parkangle = parkangle
         self.maxright = maxright
         self.maxleft = maxleft
         self.lag = lag
+        self.barangles = deque(maxlen=16)
+        self.targetbarangle = targetbarangle
 
-    def calcbarangle(self,mode):
-        if mode == 'Park' or mode == 'Wiggle'
+
+def calcbarangle(kite, base, controls):
+    """This should just basically set the target bar angle based on the mode phase
+    and zone we are in when in park or wiggle mode """
+    if kite.mode == "Park" or kite.mode == "Wiggle":
+        setanglepark(kite, base, controls)
+    elif kite.phase == "TurnR" or kite.phase == "TurnL":
+        setangleturn(kite, base, controls)
+    else setanglexwind(kite, base, controls)

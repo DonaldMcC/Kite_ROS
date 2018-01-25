@@ -35,6 +35,8 @@ class Kite(object):
         self.many = many
         self.manangle = manangle
         self.pts = deque(maxlen=16)
+        self.kiteangles = deque(maxlen=16)
+        self.timestamps = deque(maxlen=16)
         (self.dX, self.dY) = (0, 0)
         self.direction = ""
         self.kiteangle = 0
