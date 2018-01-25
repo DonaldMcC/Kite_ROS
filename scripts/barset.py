@@ -2,7 +2,7 @@
 #   their will be a number of situations
 #   1 park mode - aim is just to keep the kiteangle to zero so we adjust bar angle accordingly
 #   2 wiggle mode - aim will I think be to get kiteangle to specified value and once there we change so
-#     esentially a variation of 1 with targetangle not being zero - when we hit the target angle we trigger
+#     essentially a variation of 1 with targetangle not being zero - when we hit the target angle we trigger
 #     change phase
 #   3 xwind phase - here there are some options as to how best to proceed - if we have clear direction may use that
 #     if no direction then we could calculate and use targetangle - but this seems a fairly different approach
@@ -21,8 +21,12 @@
 
 class Base(object):
 
-    def __init__(self, barangle=0, parkangle=0):
+    def __init__(self, barangle=0, parkangle=0, maxright=45, maxleft=-45, lag=1):
         self.barangle = barangle
         self.parkangle = parkangle
+        self.maxright = maxright
+        self.maxleft = maxleft
+        self.lag = lag
 
-    def calcbarangle(self):
+    def calcbarangle(self,mode):
+        if mode == 'Park' or mode == 'Wiggle'
