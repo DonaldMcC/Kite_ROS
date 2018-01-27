@@ -22,7 +22,7 @@ from collections import deque
 
 class Base(object):
 
-    def __init__(self, barangle=0, parkangle=0, maxright=45, maxleft=-45, lag=1
+    def __init__(self, barangle=0, parkangle=0, maxright=45, maxleft=-45, lag=1,
                     targetbarangle=0):
         self.barangle = barangle
         self.parkangle = parkangle
@@ -37,7 +37,20 @@ def calcbarangle(kite, base, controls):
     """This should just basically set the target bar angle based on the mode phase
     and zone we are in when in park or wiggle mode """
     if kite.mode == "Park" or kite.mode == "Wiggle":
-        setanglepark(kite, base, controls)
+        pass
+    #setanglepark(kite, base, controls)
     elif kite.phase == "TurnR" or kite.phase == "TurnL":
-        setangleturn(kite, base, controls)
-    else setanglexwind(kite, base, controls)
+        pass
+        #setangleturn(kite, base, controls)
+    else: 
+        pass
+        #setanglexwind(kite, base, controls)
+    
+def _test():
+    import doctest
+    doctest.testmod(verbose=True)
+
+
+if __name__ == '__main__':
+    'Can run with -v option if you want to confirm tests were run'
+    _test()  
