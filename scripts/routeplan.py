@@ -129,11 +129,11 @@ class Kite(object):
                 if abs(self.x - leftx) > abs(self.x-rightx):
                     self.targetx = leftx
                     self.targety = lefty
-                    # TODO - will comput targetangle at some point
                 else:
                     self.targetx = rightx
                     self.targety = righty
-            elif self.changezone:
+                self.targetangle = get_angle(self.x,self.y, self.targetx, self.targety)
+            elif self.changezone:  # think we should still set this roughly in the turn phase
                 self.targettype = self.phase
                 self.targetangle = 90
                 # TODO - may compute the target location
@@ -143,6 +143,7 @@ class Kite(object):
                 # mena changemode and changephase generally only triggered in centre zone
 
         return
+        
 
 
 
