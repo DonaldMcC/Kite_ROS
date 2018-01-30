@@ -25,15 +25,17 @@
 # 4 on playback it should be possible to go into slow motion
 
 # standard library imports
-import time
 
 # library imports
 import numpy as np
 import cv2
+from move_func import get_heading, rotate90
+
 import rospy
 
 # modules
-from routeplan import Kite, Base, Controls
+from routeplan import Kite, Controls
+from barset import Base
 from move_func import get_angle
 from talker import kite_pos, kiteimage
 from cvwriter import initwriter, writeframe
@@ -44,7 +46,7 @@ def drawroute(route, centrex, centrey):
     global frame
     for i, j in enumerate(route):
         if i < len(route) - 1:
-            cv2.line(frame, (j[0], j[1]), (route[i+1][0], route[i+1][1]),
+            cv2.line(frame, (j[0], j[1]), (route[i + 1][0], route[i + 1][1]),
                      (255, 0, 255), thickness=1, lineType=8, shift=0)
         else:
             cv2.line(frame, (j[0], j[1]), (route[0][0], route[0][1]),
@@ -54,7 +56,7 @@ def drawroute(route, centrex, centrey):
     return
 
 
-def drawcross(manx,many, crosstype='Man'):
+def drawcross(manx, many, crosstype='Man'):
     global frame  #
     # stuff below was to allow angle calculation of angle - which may well
     # do once we have got direction of travel unpicked
@@ -66,7 +68,7 @@ def drawcross(manx,many, crosstype='Man'):
         crosssize = 6
         thickness = 4
         colour = (0, 0, 0)
-    starthorx = manx-crosssize
+    starthorx = manx - crosssize
     endhorx = manx + crosssize
     endhory = many
     starthory = many
@@ -75,17 +77,15 @@ def drawcross(manx,many, crosstype='Man'):
     endverx = manx
     startverx = manx
     cv2.line(frame, (starthorx, starthory), (endhorx, endhory),
-                 colour, thickness=thickness, lineType=8, shift=0)
+             colour, thickness=thickness, lineType=8, shift=0)
     cv2.line(frame, (startverx, startvery), (endverx, endvery),
-                 colour, thickness=thickness, lineType=8, shift=0)
-
+             colour, thickness=thickness, lineType=8, shift=0)
     return
 
 
-
-#Main routine start
+# Main routine start
 # this will need to not happen if arguments are passed
-source = 2 # change back to 1 to get prompt
+source = 2  # change back to 1 to get prompt
 while source not in {1, 2}:
     source = input('Key 1 for camera or 2 for source')
 # should define source here
@@ -98,11 +98,10 @@ else:
     # TODO at some point will change this to current directory and append file - not urnger
     camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
 
-
-#initiate class instances
-control=Controls()
-kite=Kite(control.centrex, control.centrey)
-base=Base()
+# initiate class instances
+control = Controls()
+kite = Kite(control.centrex, control.centrey)
+base = Base()
 # Initialisation steps
 es = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
 kernel = np.ones((5, 5), np.uint8)
@@ -131,12 +130,10 @@ for (lower, upper) in boundaries:
     low = np.array(lower, dtype="uint8")
     upp = np.array(upper, dtype="uint8")
 
-
 writer = None
 cv2.startWindowThread()
 cv2.namedWindow('contours')
 fps = 15
-
 
 while True:  # Main module loop
     ret, frame = camera.read()
@@ -162,7 +159,7 @@ while True:  # Main module loop
     # lets draw and move cross for manual flying
     if control.inputmodes[control.inputmode] == 'ManFly':
         drawcross(kite.manx, kite.many)
-        kite.found=True
+        kite.found = True
 
     # Aim to identify the kite and print the direction and so forth - maybe we do let this run
     # even when manual but we just output and draw position of manual x or whatever
@@ -171,15 +168,15 @@ while True:  # Main module loop
         if cv2.contourArea(c) < 1500:
             continue
         (x, y, w, h) = cv2.boundingRect(c)
-        roi = frame[y:y+h, x:x+w]
+        roi = frame[y:y + h, x:x + w]
         # loop over the boundaries
         mask = cv2.inRange(roi, low, upp)
         if np.sum(mask) > 1000:
             # outputframe = cv2.bitwise_and(roi, mask, mask=mask)
             kite.found = True
             cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 255, 0), 2)
-            finalframe = frame[y:y+h, x:x+w]
-            center = (x + (w//2), y + (h // 2))
+            finalframe = frame[y:y + h, x:x + w]
+            center = (x + (w // 2), y + (h // 2))
             if control.inputmodes[control.inputmode] != 'ManFly':
                 kite.pts.appendleft(center)
                 kite.x = center[0]
@@ -198,7 +195,7 @@ while True:  # Main module loop
 
             continue
 
-# start direction and analysiss
+    # start direction and analysiss
     for i in np.arange(1, len(kite.pts)):
         if kite.pts[i] is None:
             continue
@@ -233,18 +230,23 @@ while True:  # Main module loop
             # show the movement deltas and the direction of movement on the frame
             cv2.putText(frame, kite.direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
             cv2.putText(frame, "dx: {}, dy: {}".format(kite.dX, kite.dY),
-                                (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
+                        (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
             continue
 
         kite.kiteangle = get_angle(box, kite.dX, kite.dY)
         cv2.putText(frame, str(int(kite.kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
-
+        kite.targetheading = get_heading((kite.x, kite.y), (kite.targetx, kite.targety))
+        if kite.dX < 0:
+            # TODO check this logic works and angles calc correctly
+            kite.targetangle = rotate90(kite.targetheading)
+        else:
+            kite.targetangle = rotate90(kite.targetheading, "Anti")
 
     kite.update_zone(control)
     kite.update_phase()
 
     if kite.changezone or kite.changephase:
-        kite.update_target(control.routepoints[0][0],control.routepoints[0][1], control.centrex, control.maxy,
+        kite.update_target(control.routepoints[0][0], control.routepoints[0][1], control.centrex, control.maxy,
                            control.routepoints[3][0], control.routepoints[3][1])
 
     cv2.putText(frame, 'Zone:' + kite.zone, (800, 140), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
@@ -258,7 +260,8 @@ while True:  # Main module loop
     cv2.putText(frame, 'Mode:' + kite.mode, (800, 180), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
     cv2.putText(frame, 'Phase:' + kite.phase, (800, 200), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
 
-    # end of directiocv2.putText(frame, str(int(kite.kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)n and analysis
+    # end of directiocv2.putText(frame, str(int(kite.kiteangle)), (10, 50),
+    # cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)n and analysis
 
     drawroute(control.routepoints, control.centrex, control.centrey)
     drawcross(kite.targetx, kite.targety, 'Target')
@@ -289,7 +292,6 @@ while True:  # Main module loop
         break
     elif key != -1:
         routepoints = control.keyhandler(key, kite)
-
 
 print("[INFO] cleaning up...")
 cv2.destroyAllWindows()

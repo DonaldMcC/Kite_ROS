@@ -61,10 +61,8 @@ def get_angle(box, dx=0, dy=0, mindist=20, ):
     if distance(orderbox[3], orderbox[0]) > distance(orderbox[1], orderbox[0]):
         # build unitvect for short side of the rectangle
         unitvect = heading(orderbox[1], orderbox[0])
-        n = 1
     else:
         unitvect = heading(orderbox[0], orderbox[3])
-        n = 3
     # print unitvect
     angle = get_heading(unitvect[0], unitvect[1])
     heading_angle = get_heading(-dx, -dy)
@@ -152,7 +150,7 @@ def rotate90(x, y, dir='Clockwise'):
        >>>
     """
 
-    if dir=='Clockwise':
+    if dir == 'Clockwise':
         return y, -x
     else:
         return -y, x
@@ -198,9 +196,9 @@ def get_coord(x, y, anglechange):
 
     if x >= 0 and y >= 0:
         angle = math.degrees(math.asin(y))
-    elif x >= 0 and y < 0:
+    elif x >= 0 > y:
         angle = 360 + math.degrees(math.asin(y))
-    elif x < 0 and y >= 0:
+    elif x < 0 <= y:
         angle = math.degrees(math.acos(x))
     else:  
         angle = 360 - math.degrees(math.acos(x))
@@ -258,9 +256,9 @@ def get_angled_corners(x, y, anglechange, centx=0, centy=0):
 
     if x >= 0 and y >= 0:
         angle = math.asin(x/radius)
-    elif x >= 0 and y < 0:
+    elif x >= 0 > y:
         angle = 0.5 * math.pi + math.acos(x / radius)
-    elif x < 0 and y >= 0:
+    elif x < 0 <= y:
         angle = 0 + math.asin(x/radius)
     else:  # x<0 and y<0
         angle = math.pi + math.asin(-x / radius)
@@ -302,8 +300,8 @@ def get_corners(x, y, width, height, shape='rectangle', bottom=0, angle=0):
     if angle == 0:
         return corners
     else:
-        #need to do some sort of mapping to return - probably just use GetCoord
-        angledcorners = tuple([get_angled_corners(pt[0],pt[1],angle,x,y) for pt in corners])
+        # need to do some sort of mapping to return - probably just use GetCoord
+        angledcorners = tuple([get_angled_corners(pt[0], pt[1], angle, x, y) for pt in corners])
         return angledcorners
 
 
@@ -351,7 +349,7 @@ def get_long_lat(x, y, z):
        
     """
 
-    r = math.sqrt( x ** 2 + y ** 2 + z ** 2)
+    r = math.sqrt(x ** 2 + y ** 2 + z ** 2)
     try:
         lat = math.degrees(math.asin(y / r))
         long = math.degrees(math.atan2(x, z))
@@ -361,24 +359,25 @@ def get_long_lat(x, y, z):
         long = 0
         lat = 0
 
-    return (long,lat,r)
+    return long, lat, r
 
 
 
 def conv_lin(a,b=1.0,c=0.0,inverse=False):
-    '''Simple linear transform
+    """Simple linear transform
         will I think store parameters against each sensor then they are handy
         >>> conv_lin(4,2,3)
         11
         >>> conv_lin(11,2,3.0,True)
         4.0
-        >>>'''
-    if inverse == False:
+        >>>"""
+    if inverse is False:
         return a * b + c
     else:
         return (a - c) / b
 
-def adjust_line_length(x,y,z,r):
+
+def adjust_line_length(x, y, z, r):
     """
 
     :param x:
@@ -400,8 +399,8 @@ def adjust_line_length(x,y,z,r):
        (5.050762722761054, 8.081220356417685, 3.0304576336566322)
     """
 
-    unitv = heading((0,0,0),(x,y,z))
-    finalv = vector_mult(unitv,r)
+    unitv = heading((0, 0, 0), (x, y, z))
+    finalv = vector_mult(unitv, r)
     return finalv[0], finalv[1], finalv[2]
 
     
@@ -417,8 +416,9 @@ def get_plan_pos(p, h, t, s):
        >>> get_plan_pos((1,2,3),(0,0.707,0.707),1,5)
        (1, 5.535, 6.535)
     """
-    mvmt = vector_mult(h,t*s)
-    return vector_add(p,mvmt)
+    mvmt = vector_mult(h, t*s)
+    return vector_add(p, mvmt)
+
 
 def _test():
     import doctest

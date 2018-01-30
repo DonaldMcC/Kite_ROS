@@ -27,10 +27,10 @@ def get_params():
     params['leftmax'] = rospy.get_param('leftmax', 1000)
     params['leftmin'] = rospy.get_param('leftmin', 0)
     params['centremaxleft'] = rospy.get_param('centremaxleft', 1000)
-    params['centremiddle']= rospy.get_param('centremiddle', 500)
+    params['centremiddle'] = rospy.get_param('centremiddle', 500)
     params['centremaxright'] = rospy.get_param('centremaxright', 0)
-    params['maxangleleft'] = rospy.get_param('maxangleleft',-65)
-    params['maxangleright'] = rospy.get_param('maxangleright',60)
+    params['maxangleleft'] = rospy.get_param('maxangleleft', -65)
+    params['maxangleright'] = rospy.get_param('maxangleright', 60)
     params['rightmax'] = rospy.get_param('rightmax', 1000)
     params['rightmin'] = rospy.get_param('rightmin', 0)
     return params
@@ -60,7 +60,6 @@ def kitebar(source):
         # process keyboard or joystick input source
         # publish updated results
 
-
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
 
@@ -73,7 +72,7 @@ def startnode(source='arduino'):
     # as parameters which are used to convert the resistance readings into the angle of the bar
     # and the rough tension on the kitelines
 
-    #retrieve the source from param server or set it to the source if not set
+    # retrieve the source from param server or set it to the source if not set
     global params
     params = get_params()
     kitebar(params['source'])

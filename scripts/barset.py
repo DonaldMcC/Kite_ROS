@@ -20,10 +20,11 @@
 
 from collections import deque
 
+
 class Base(object):
 
     def __init__(self, barangle=0, parkangle=0, maxright=45, maxleft=-45, lag=1,
-                    targetbarangle=0, kitebarratio=0):
+                 targetbarangle=0, kitebarratio=0):
         self.barangle = barangle
         self.parkangle = parkangle
         self.maxright = maxright
@@ -31,16 +32,16 @@ class Base(object):
         self.lag = lag
         self.barangles = deque(maxlen=16)
         self.targetbarangle = targetbarangle
-        self.kitebarratio = kitebarratio # this will be the rate of change of barangle to kite angle
+        self.kitebarratio = kitebarratio  # this will be the rate of change of barangle to kite angle
     
 
 def calcbarangle(kite, base, controls):
     """This should just basically set the target bar angle based on the mode phase
     and zone we are in when in park or wiggle mode """
     if kite.phase == "TurnR" or kite.phase == "TurnL":
-        targetbarangle = setangleturn(kite, base, controls)
-    else: 
-        targetbarangle = setangle(kite, base, controls)
+        return setangleturn(kite, base, controls)
+    else:
+        return setangle(kite, base, controls)
 
 
 def setangle(kite, base, controls):
@@ -56,29 +57,23 @@ def setangle(kite, base, controls):
 
 
 def setangleturn(kite, base, controls):
-    """This should be a simpler function as we will always aim to turn as fast as poss
-    issue will be identifying the point to ease off from max turn which may need to be a
-    good bit before depending on the lag we have"""
-    if kite.phase = "TurnR":
+    """This should be a simple function as we will always aim to turn as fast as poss
+    identifying the point to ease off from max turn should be done as part of phase setting and not here """
+    if kite.phase == "TurnR":
         targetbarangle = base.maxright
     else:
         targetbarangle = base.maxleft
-    #TODO potentially call setangle if we are sufficiently through turn - however that
-    #will depend on having kiteangle set to go to the correct xwind point
     return targetbarangle    
 
                 
-def checklimits(angle, maxleft, maxright)
+def checklimits(angle, maxleft, maxright):
     if angle < maxleft:
-        angle=maxleft
-    elif angle > maxright
+        angle = maxleft
+    elif angle > maxright:
         angle = maxright
     return angle
-    
-                                                                              
-    
-        
-                
+
+
 def _test():
     import doctest
     doctest.testmod(verbose=True)

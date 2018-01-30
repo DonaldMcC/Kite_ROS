@@ -26,7 +26,7 @@ from collections import deque
 
 class Kite(object):
 
-    def __init__(self, x=0, y=0, manx=300, many=400, mode='Park',phase='Park', manangle=0):
+    def __init__(self, x=0, y=0, manx=300, many=400, mode='Park', phase='Park', manangle=0, targetheading=0):
         self.x = x
         self.y = y
         self.mode = mode
@@ -42,13 +42,13 @@ class Kite(object):
         self.kiteangle = 0
         self.zone = ""
         self.targettype = 'Angle'
-        self.targetangle=0
+        self.targetangle = 0
         self.targetx = 0
         self.targety = 0
         self.changezone = False
         self.changephase = False
         self.found = False
-
+        self.targetheading = 0
 
     def get_zone(self, leftx, rightx):
         """
@@ -73,11 +73,10 @@ class Kite(object):
             zone = 'Centre'
         return zone
 
-
     def get_phase(self, zone, mode):
         if mode == 'Park':
             # For park this is now OK we want to get kiteangle to zero
-            phase  = 'Hold'
+            phase = 'Hold'
         elif mode == 'Wiggle':
             phase = 'Wiggle'
         else:  # fig8 - assumed
@@ -92,16 +91,15 @@ class Kite(object):
     def update_zone(self, control):
         currentzone = self.zone
         self.zone = self.get_zone(control.routepoints[0][0], control.routepoints[3][0])
-        if self.zone <> currentzone:
+        if self.zone != currentzone:
             self.changezone = True
         else:
             self.changezone = False
 
-
     def update_phase(self):
         currentphase = self.phase
         self.phase = self.get_phase(self.zone, self.mode)
-        if self.phase <> currentphase:
+        if self.phase != currentphase:
             self.changephase = True
         else:
             self.changephase = False
@@ -120,7 +118,7 @@ class Kite(object):
             self.targetx = centrex
             self.targety = centrey
         else:  # fig8 - by definition
-            if self.zone=='Centre':
+            if self.zone == 'Centre':
                 # Either we have just left the right or left turnzone so if nearest
                 # left we go right and if nearest right we go left
                 # or we have changed from park or wiggle to xwind which will be presumed to happen
@@ -132,7 +130,7 @@ class Kite(object):
                 else:
                     self.targetx = rightx
                     self.targety = righty
-                self.targetangle = get_angle(self.x,self.y, self.targetx, self.targety)
+                self.targetangle = get_angle(self.x, self.y, self.targetx, self.targety)
             elif self.changezone:  # think we should still set this roughly in the turn phase
                 self.targettype = self.phase
                 self.targetangle = 90
@@ -143,14 +141,9 @@ class Kite(object):
                 # mena changemode and changephase generally only triggered in centre zone
 
         return
-        
-
-
-
 
 
 class Controls(object):
-
 
     def __init__(self, inputmode=0, step=8):
         try:  # this will fail on windows but don't need yet and not convinced I need to set parameters separately
@@ -172,7 +165,6 @@ class Controls(object):
         self.route = False
         self.maxy = 20  # this should be for top of centre line and sets they y target point for park mode
 
-
     def getmodestring(self):
         if self.inputmode == 0:  # Standard
             return 'STD: Left Right Up Down Wider Narrow Expand Contract Pause Mode Quit'
@@ -181,10 +173,9 @@ class Controls(object):
         else:
             return 'MANFLIGHT: Left Right Up Down Pause Mode Quit'
 
-
     def keyhandler(self, key, kite):
-    # this will now support a change of flight mode and operating mode so different keys will
-    # do different things depending on inputmode,
+        # this will now support a change of flight mode and operating mode so different keys will
+        # do different things depending on inputmode,
 
         if self.inputmode == 0:  # Standard
             if key == ord("l"):  # left
@@ -228,7 +219,7 @@ class Controls(object):
             self.inputmode += 1
             if self.inputmode == 3:  # simple toggle around 3 modes
                 self.inputmode = 0
-            self.modestring=self.getmodestring()
+            self.modestring = self.getmodestring()
 
         self.routepoints = calc_route(self.centrex, self.centrey, self.halfwidth, self.radius)
         return
@@ -257,12 +248,9 @@ def calc_route(centrex=400, centrey=300, halfwidth=200, radius=100):
     return [pt0, pt1, pt2, pt3, pt4, pt5]
 
 
-
 def _test():
     import doctest
-    doctest.testmod(extraglobs={'k':Kite()})
-
-
+    doctest.testmod(extraglobs={'k': Kite()})
 
 
 if __name__ == '__main__':
