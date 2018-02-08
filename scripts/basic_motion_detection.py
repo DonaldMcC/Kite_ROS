@@ -29,7 +29,7 @@
 # library imports
 import numpy as np
 import cv2
-from move_func import get_heading, rotate90
+from move_func import get_heading_points, rotate90
 
 import rospy
 
@@ -235,7 +235,7 @@ while True:  # Main module loop
 
         kite.kiteangle = get_angle(box, kite.dX, kite.dY)
         cv2.putText(frame, str(int(kite.kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
-        kite.targetheading = get_heading((kite.x, kite.y), (kite.targetx, kite.targety))
+        kite.targetheading = get_heading_points((kite.x, kite.y), (kite.targetx, kite.targety))
         if kite.dX < 0:
             # TODO check this logic works and angles calc correctly
             kite.targetangle = rotate90(kite.targetheading)

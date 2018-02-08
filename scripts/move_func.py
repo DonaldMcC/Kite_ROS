@@ -186,6 +186,10 @@ def get_heading(x, y):
        >>>
        """
     return math.degrees(math.atan2(x, y))
+    
+def get_heading_points(pt1,pt2)
+    """Calcs the angle between 2 points"""
+    return get_heading(heading(pt1,pt2))
 
 
 def get_coord(x, y, anglechange):
