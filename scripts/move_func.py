@@ -2,8 +2,12 @@
 # conversion of stuff - fairly std functions I think and generally should now work with both
 # 2 and 3D objects
 
+#note these functions were originally written to work with pygame coordinates with origin at
+# bottom left - this setup is now using opencv where origin is top left and I want 0 degrees
+# to be straight up and 90 degrees being 3 o clock so some checking of this is required
+
 import math
-from utils import order_points
+#from utils import order_points
 import numpy as np
 
 # set up the colors
@@ -187,9 +191,13 @@ def get_heading(x, y):
        """
     return math.degrees(math.atan2(x, y))
     
-def get_heading_points(pt1,pt2)
-    """Calcs the angle between 2 points"""
-    return get_heading(heading(pt1,pt2))
+def get_heading_points(pt1, pt2):
+    """Calcs the angle between 2 points
+    >>> get_heading_points((3,3),(4,2))
+    45
+    """
+    x,y = heading(pt1, pt2)
+    return get_heading(x, y)
 
 
 def get_coord(x, y, anglechange):
