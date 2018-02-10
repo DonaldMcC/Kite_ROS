@@ -5,10 +5,13 @@
 #note these functions were originally written to work with pygame coordinates with origin at
 # bottom left - this setup is now using opencv where origin is top left and I want 0 degrees
 # to be straight up and 90 degrees being 3 o clock so some checking of this is required
+# opencv_coords introduced to support this
 
 import math
-#from utils import order_points
+from utils import order_points
 import numpy as np
+
+opencv_coords = True
 
 # set up the colors
 # BLACK = (0, 0, 0)
@@ -179,22 +182,26 @@ def rotate3d(point, angle, axis='y'):
 
 def get_heading(x, y):
     """Calcs angle in degrees based on single point and origin
-       >>> get_heading(0, 1)
+       >>> get_heading(0, -1)
        0.0
-       >>> get_heading(1.0, 2.0)
+       >>> get_heading(1.0, -2.0)
        26.56505117707799
-       >>> get_heading(-30, 15)
+       >>> get_heading(-30, -15)
        -63.43494882292201
        >>> get_heading(1, -1)
-       135.0
+       45.0
        >>>
        """
-    return math.degrees(math.atan2(x, y))
+    if opencv_coords:
+        return math.degrees(math.atan2(x, -y))
+    else:
+        return math.degrees(math.atan2(x, y))
+
     
 def get_heading_points(pt1, pt2):
     """Calcs the angle between 2 points
     >>> get_heading_points((3,3),(4,2))
-    45
+    45.0
     """
     x,y = heading(pt1, pt2)
     return get_heading(x, y)
@@ -256,7 +263,7 @@ def get_angled_corners(x, y, anglechange, centx=0, centy=0):
     >>> get_angled_corners(-3,4,180)
     (3.0, -4.0)
     >>> get_angled_corners(-3,-4,180)
-    (2.9999999999999982, 4.000000000000002)
+    (2.9999999999999987, 4.000000000000002)
     >>>
     """
     x = x - centx

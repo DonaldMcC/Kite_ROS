@@ -238,9 +238,9 @@ while True:  # Main module loop
         kite.targetheading = get_heading_points((kite.x, kite.y), (kite.targetx, kite.targety))
         if kite.dX < 0:
             # TODO check this logic works and angles calc correctly
-            kite.targetangle = rotate90(kite.targetheading)
+            kite.targetangle = kite.targetheading - 90
         else:
-            kite.targetangle = rotate90(kite.targetheading, "Anti")
+            kite.targetangle = kite.targetheading + 90
 
     kite.update_zone(control)
     kite.update_phase()
