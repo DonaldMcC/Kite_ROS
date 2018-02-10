@@ -23,6 +23,7 @@ This file should do the following things
 import time
 from collections import deque
 
+from move_func import get_heading_points
 
 class Kite(object):
 
@@ -130,7 +131,7 @@ class Kite(object):
                 else:
                     self.targetx = rightx
                     self.targety = righty
-                self.targetangle = get_angle(self.x, self.y, self.targetx, self.targety)
+                self.targetangle = get_heading_points((self.x, self.y), (self.targetx, self.targety))
             elif self.changezone:  # think we should still set this roughly in the turn phase
                 self.targettype = self.phase
                 self.targetangle = 90
