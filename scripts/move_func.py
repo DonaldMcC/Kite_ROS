@@ -35,28 +35,28 @@ def distance(xyz1, xyz2):
         return math.hypot((xyz1[0]-xyz2[0]), (xyz1[1]-xyz2[1]))
 
 
-def get_angle(box, dx=0, dy=0, mindist=20, ):
+def get_angle(box, dx=0, dy=0, mindist=2):
     # orderbox is sorted tl, tr, br, bl
-    """returns the angle of the kite right side lower is -ve and 0 is a parked kite
+    """returns the angle of the kite right side lower is +ve and 0 is a parked kite
        this is perhaps confusing but stems from opencv having y axis 0 at the top
 
         Parked kite
-        >>> get_angle(np.array([[11,9],[11,6],[15,6],[15,9]]),0, -20)
+        >>> get_angle(np.array([[11,9],[11,6],[15,6],[15,9]]),0,-20)
         (0.0, 0.0)
-        >>> get_angle(np.array([[11,9],[11,5],[14,5],[14,9]]),10,0)
-        (-90.0, -90.0)
-        >>> get_angle(np.array([[11,9],[11,5],[14,5],[14,9]]),-10,0)
-        (-90.0, 90.0)
-        >>> get_angle(np.array([[11,9],[11,5],[14,5],[14,9]]),-100,0)
+        >>> get_angle(np.array([[11,9],[11,5],[14,5],[14,9]]),10, 0)
         (90.0, 90.0)
-        >>> get_angle(np.array([[11,8],[12,6],[15,8],[14,10]]),10,-30)
-        (-26.56505117707799, -18.43494882292201)
+        >>> get_angle(np.array([[11,9],[11,5],[14,5],[14,9]]),-10, 0)
+        (-90.0, -90.0)
+        >>> get_angle(np.array([[11,9],[11,5],[14,5],[14,9]]),-100, 0)
+        (-90.0, -90.0)
+        >>> get_angle(np.array([[11,8],[12,6],[15,8],[14,10]]),10, -30)
+        (26.56505117707799, 18.43494882292201)
         >>> get_angle(np.array([[11,8],[12,6],[15,8],[14,10]]),-5, 30)
-        (153.43494882292202, 170.53767779197437)
+        (-153.43494882292202, -170.53767779197437)
         >>> get_angle(np.array([[8,9],[6,8],[8,5],[10,6]]),-30, -10)
-        (63.43494882292201, 71.56505117707799)
+        (-63.43494882292201, -71.56505117707799)
         >>> get_angle(np.array([[8,9],[6,8],[8,5],[10,6]]), 30, 10)
-        (-116.56505117707799, -108.43494882292202)
+        (116.56505117707799, 108.43494882292202)
 
        """
 
@@ -65,14 +65,14 @@ def get_angle(box, dx=0, dy=0, mindist=20, ):
     # print distance(orderbox[3], orderbox[0])
     # print distance(orderbox[1], orderbox[0])
 
-    if distance(orderbox[3], orderbox[0]) > distance(orderbox[1], orderbox[0]):
+    if distance(orderbox[0], orderbox[1]) < distance(orderbox[1], orderbox[2]):
         # build unitvect for short side of the rectangle
-        unitvect = heading(orderbox[1], orderbox[0])
+        unitvect = heading(orderbox[0], orderbox[1])
     else:
-        unitvect = heading(orderbox[0], orderbox[3])
+        unitvect = heading(orderbox[3], orderbox[0])
     # print unitvect
     angle = get_heading(unitvect[0], unitvect[1])
-    heading_angle = get_heading(-dx, -dy)
+    heading_angle = get_heading(dx, dy)
 
     if math.sqrt(dx*dx + dy*dy) > mindist:
         # if moving significantly then assume not going backwards as this is hard to do

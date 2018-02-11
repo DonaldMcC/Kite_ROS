@@ -234,14 +234,16 @@ while True:  # Main module loop
             continue
 
         kite.kiteangle = get_angle(box, kite.dX, kite.dY)
-        cv2.putText(frame, str(int(kite.kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
+        cv2.putText(frame, "Act Angle:" + str(int(kite.kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
         kite.targetheading = get_heading_points((kite.x, kite.y), (kite.targetx, kite.targety))
         if kite.dX < 0:
             # TODO check this logic works and angles calc correctly
             kite.targetangle = kite.targetheading - 90
         else:
             kite.targetangle = kite.targetheading + 90
-
+        cv2.putText(frame, "Tgt Angle:" + str(int(kite.targetangle)), (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
+        cv2.putText(frame, "Tgt Heading:" + str(int(kite.targetheading)), (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255),
+                3)
     kite.update_zone(control)
     kite.update_phase()
 
@@ -249,24 +251,32 @@ while True:  # Main module loop
         kite.update_target(control.routepoints[0][0], control.routepoints[0][1], control.centrex, control.maxy,
                            control.routepoints[3][0], control.routepoints[3][1])
 
-    cv2.putText(frame, 'Zone:' + kite.zone, (800, 140), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
-
-    if kite.found:
-        tempstr = "Found: Yes"
-    else:
-        tempstr = "Found: No"
-    cv2.putText(frame, tempstr, (800, 160), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
-
-    cv2.putText(frame, 'Mode:' + kite.mode, (800, 180), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
-    cv2.putText(frame, 'Phase:' + kite.phase, (800, 200), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
-
     # end of directiocv2.putText(frame, str(int(kite.kiteangle)), (10, 50),
     # cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)n and analysis
 
     drawroute(control.routepoints, control.centrex, control.centrey)
     drawcross(kite.targetx, kite.targety, 'Target')
 
+    if kite.found:
+        tempstr = "Found: Yes"
+    else:
+        tempstr = "Found: No"
+
+    # output flight values
+    cv2.putText(frame, 'Zone:' + kite.zone, (800, 140), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
+    cv2.putText(frame, tempstr, (800, 160), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
+    cv2.putText(frame, 'Mode:' + kite.mode, (800, 180), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
+    cv2.putText(frame, 'Phase:' + kite.phase, (800, 200), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
     cv2.putText(frame, control.modestring, (200, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
+
+    # output bar values
+    cv2.putText(frame, 'Base', (800, 500), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
+    cv2.putText(frame, 'Act:' + str(base.barangle), (800, 520), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
+    cv2.putText(frame, 'Tgt:' + str(base.targetbarangle), (800, 540), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
+
+
+
+
     kite_pos(kite.x, kite.y, kite.kiteangle, kite.dX, kite.dY, 0, 0)
     # cv2.imshow("roi", finalframe)
     # cv2.imshow("mask", mask)
