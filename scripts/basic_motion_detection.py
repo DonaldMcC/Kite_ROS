@@ -195,7 +195,7 @@ while True:  # Main module loop
 
             continue
 
-    # start direction and analysiss
+    # start direction and analysis
     for i in np.arange(1, len(kite.pts)):
         if kite.pts[i] is None:
             continue
@@ -230,17 +230,14 @@ while True:  # Main module loop
             # show the movement deltas and the direction of movement on the frame
             cv2.putText(frame, kite.direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
             cv2.putText(frame, "dx: {}, dy: {}".format(kite.dX, kite.dY),
-                        (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
+                        (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 1)
             continue
 
         kite.kiteangle = get_angle(box, kite.dX, kite.dY)
         cv2.putText(frame, "Act Angle:" + str(int(kite.kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
         kite.targetheading = get_heading_points((kite.x, kite.y), (kite.targetx, kite.targety))
-        if kite.dX < 0:
-            # TODO check this logic works and angles calc correctly
-            kite.targetangle = kite.targetheading - 90
-        else:
-            kite.targetangle = kite.targetheading + 90
+
+        kite.targetangle = kite.targetheading
         cv2.putText(frame, "Tgt Angle:" + str(int(kite.targetangle)), (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
         cv2.putText(frame, "Tgt Heading:" + str(int(kite.targetheading)), (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255),
                 3)
@@ -273,9 +270,6 @@ while True:  # Main module loop
     cv2.putText(frame, 'Base', (800, 500), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
     cv2.putText(frame, 'Act:' + str(base.barangle), (800, 520), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
     cv2.putText(frame, 'Tgt:' + str(base.targetbarangle), (800, 540), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
-
-
-
 
     kite_pos(kite.x, kite.y, kite.kiteangle, kite.dX, kite.dY, 0, 0)
     # cv2.imshow("roi", finalframe)
