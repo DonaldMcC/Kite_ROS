@@ -24,7 +24,7 @@ from collections import deque
 class Base(object):
 
     def __init__(self, barangle=0, parkangle=0, maxright=45, maxleft=-45, lag=1,
-                 targetbarangle=0, kitebarratio=0):
+                 targetbarangle=0, kitebarratio=1):
         self.barangle = barangle
         self.parkangle = parkangle
         self.maxright = maxright

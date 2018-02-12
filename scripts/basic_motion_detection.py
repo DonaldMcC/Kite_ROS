@@ -36,7 +36,7 @@ from move_func import get_heading_points, rotate90
 
 # modules
 from routeplan import Kite, Controls
-from barset import Base
+from barset import Base, calcbarangle
 from move_func import get_angle
 from talker import kite_pos, kiteimage
 from cvwriter import initwriter, writeframe
@@ -254,6 +254,9 @@ while True:  # Main module loop
 
     drawroute(control.routepoints, control.centrex, control.centrey)
     drawcross(kite.targetx, kite.targety, 'Target')
+
+
+    base.targetbarangle = calcbarangle(kite, base, control)
 
     if kite.found:
         tempstr = "Found: Yes"
