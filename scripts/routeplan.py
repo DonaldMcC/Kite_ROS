@@ -165,6 +165,7 @@ class Controls(object):
         self.modestring = self.getmodestring()
         self.route = False
         self.maxy = 20  # this should be for top of centre line and sets they y target point for park mode
+        self.slow = 0.0
 
     def getmodestring(self):
         if self.inputmode == 0:  # Standard
@@ -195,7 +196,11 @@ class Controls(object):
                 self.radius += self.step
             elif key == ord("c"):  # contract
                 self.radius -= self.step
-            elif key == ord("p"):  # pause - this may apply in all moades
+            elif key == ord("s"):  # slow
+                self.slow += 0.1
+            elif key == ord("f"):  # slow
+                self.slow = 0.0
+            elif key == ord("p"):  # pause - this may apply in all modes
                 time.sleep(10)
         elif self.inputmode == 1:  # SetFlight
             if key == ord("p"):  # park

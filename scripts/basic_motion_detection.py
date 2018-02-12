@@ -28,10 +28,11 @@
 
 # library imports
 import numpy as np
+import time
 import cv2
 from move_func import get_heading_points, rotate90
 
-import rospy
+#import rospy
 
 # modules
 from routeplan import Kite, Controls
@@ -296,6 +297,7 @@ while True:  # Main module loop
         break
     elif key != -1:
         routepoints = control.keyhandler(key, kite)
+    time.sleep(control.slow)
 
 print("[INFO] cleaning up...")
 cv2.destroyAllWindows()
