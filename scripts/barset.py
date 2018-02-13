@@ -19,6 +19,7 @@
 #  but also if possible learn the likely 
 
 from collections import deque
+from routeplan import Kite, Controls
 
 
 class Base(object):
@@ -37,9 +38,22 @@ class Base(object):
 
 def calcbarangle(kite, base, controls):
     """This should just basically set the target bar angle based on the mode phase
-    and zone we are in when in park or wiggle mode """
+    and zone we are in when in park or wiggle mode
+    >>> k=Kite(400, targetangle=10)
+    >>> b=Base(barangle=15, kitebarratio=2)
+    >>> c=Controls(1)
+    >>> calcbarangle(k,b,c)
+    35
+
+    >>> k=Kite(400, phase='TurnR', targetangle=10)
+    >>> b=Base(barangle=15, kitebarratio=2)
+    >>> c=Controls(1)
+    >>> calcbarangle(k,b,c)
+    45
+
+    """
     if kite.phase == "TurnR" or kite.phase == "TurnL":
-        return setangleturn(kite, base, controls)
+        return setangleturn(kite, base)
     else:
         return setangle(kite, base, controls)
 
@@ -47,7 +61,13 @@ def calcbarangle(kite, base, controls):
 def setangle(kite, base, controls):
     """This will return targetbarangle for park mode based largely on kiteangle
     We will start simple but may move to a pid mode if required
-    
+
+    >>> k=Kite(400, targetangle=10)
+    >>> b=Base(barangle=15, kitebarratio=2)
+    >>> c=Controls(1)
+    >>> setangle(k,b,c)
+    35
+
     """  
     delta = kite.targetangle - kite.kiteangle
     targetbarangle = checklimits(base.barangle + (delta * base.kitebarratio),
@@ -56,9 +76,15 @@ def setangle(kite, base, controls):
     return targetbarangle
 
 
-def setangleturn(kite, base, controls):
+def setangleturn(kite, base):
     """This should be a simple function as we will always aim to turn as fast as poss
-    identifying the point to ease off from max turn should be done as part of phase setting and not here """
+    identifying the point to ease off from max turn should be done as part of phase setting and not here
+
+    >>> k=Kite(400)
+    >>> b=Base(400)
+    >>> setangleturn(k,b)
+    -45
+    """
     if kite.phase == "TurnR":
         targetbarangle = base.maxright
     else:
@@ -67,6 +93,21 @@ def setangleturn(kite, base, controls):
 
                 
 def checklimits(angle, maxleft, maxright):
+    """
+
+    :param angle:
+    :param maxleft:
+    :param maxright:
+    :return:
+
+    >>> checklimits(50,-45,30)
+    30
+    >>> checklimits(-50,-45,30)
+    -45
+    >>> checklimits(-20,-45,30)
+    -20
+
+    """
     if angle < maxleft:
         angle = maxleft
     elif angle > maxright:
@@ -76,7 +117,7 @@ def checklimits(angle, maxleft, maxright):
 
 def _test():
     import doctest
-    doctest.testmod(verbose=True)
+    doctest.testmod(verbose=False)
 
 
 if __name__ == '__main__':
