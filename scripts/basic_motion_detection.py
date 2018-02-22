@@ -86,7 +86,7 @@ def drawcross(manx, many, crosstype='Man'):
 
 # Main routine start
 # this will need to not happen if arguments are passed
-source = 2  # change back to 1 to get prompt
+source = 1  # change back to 1 to get prompt
 while source not in {1, 2}:
     source = input('Key 1 for camera or 2 for source')
 # should define source here
@@ -98,6 +98,10 @@ else:
     logging = 0
     # TODO at some point will change this to current directory and append file - not urnger
     camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
+
+width = int(camera.get(3))
+height = int(camera.get(4))
+
 
 # initiate class instances
 control = Controls()
@@ -135,6 +139,7 @@ writer = None
 cv2.startWindowThread()
 cv2.namedWindow('contours')
 fps = 15
+#fps = camera.get(cv2.CV_CAP_PROP_FPS)
 
 while True:  # Main module loop
     ret, frame = camera.read()
@@ -145,7 +150,7 @@ while True:  # Main module loop
 
     if logging and writer is None:
         # h, w = frame.shape[:2]
-        height, width = 480, 640
+        #height, width = 480, 640 - removed should now be set above
         writer = initwriter("record.avi", height, width, fps)
 
     gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -235,12 +240,12 @@ while True:  # Main module loop
             continue
 
         kite.kiteangle = get_angle(box, kite.dX, kite.dY)
-        cv2.putText(frame, "Act Angle:" + str(int(kite.kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
+        cv2.putText(frame, "Act Angle:" + str(int(kite.kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 3)
         kite.targetheading = get_heading_points((kite.x, kite.y), (kite.targetx, kite.targety))
 
         kite.targetangle = kite.targetheading
-        cv2.putText(frame, "Tgt Angle:" + str(int(kite.targetangle)), (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
-        cv2.putText(frame, "Tgt Heading:" + str(int(kite.targetheading)), (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255),
+        cv2.putText(frame, "Tgt Angle:" + str(int(kite.targetangle)), (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 3)
+        cv2.putText(frame, "Tgt Heading:" + str(int(kite.targetheading)), (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255),
                 3)
     kite.update_zone(control)
     kite.update_phase()
@@ -264,16 +269,18 @@ while True:  # Main module loop
         tempstr = "Found: No"
 
     # output flight values
-    cv2.putText(frame, 'Zone:' + kite.zone, (800, 140), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
-    cv2.putText(frame, tempstr, (800, 160), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
-    cv2.putText(frame, 'Mode:' + kite.mode, (800, 180), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
-    cv2.putText(frame, 'Phase:' + kite.phase, (800, 200), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
-    cv2.putText(frame, control.modestring, (200, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
+    outx = width - 120
+    fontsize = 0.5
+    cv2.putText(frame, 'Zone:' + kite.zone, (outx, 140), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
+    cv2.putText(frame, tempstr, (outx, 160), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
+    cv2.putText(frame, 'Mode:' + kite.mode, (outx, 180), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
+    cv2.putText(frame, 'Phase:' + kite.phase, (outx, 200), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
+    cv2.putText(frame, control.modestring, (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
 
     # output bar values
-    cv2.putText(frame, 'Base', (800, 500), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
-    cv2.putText(frame, 'Act:' + str(base.barangle), (800, 520), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
-    cv2.putText(frame, 'Tgt:' + str(base.targetbarangle), (800, 540), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
+    cv2.putText(frame, 'Base', (outx, 400), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
+    cv2.putText(frame, 'Act:' + str(base.barangle), (outx, 420), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
+    cv2.putText(frame, 'Tgt:' + str(base.targetbarangle), (outx, 440), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
 
     kite_pos(kite.x, kite.y, kite.kiteangle, kite.dX, kite.dY, 0, 0)
     # cv2.imshow("roi", finalframe)
