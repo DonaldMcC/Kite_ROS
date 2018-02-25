@@ -3,7 +3,7 @@
 #   1 park mode - aim is just to keep the kiteangle to zero so we adjust bar angle accordingly
 #   2 wiggle mode - aim will I think be to get kiteangle to specified value and once there we change so
 #     essentially a variation of 1 with targetangle not being zero - when we hit the target angle we trigger
-#     change phase
+#     change phase - aim of wiggle is to learn something about the kite
 #   3 xwind phase - here there are some options as to how best to proceed - if we have clear direction may use that
 #     if no direction then we could calculate and use targetangle - but this seems a fairly different approach
 #   4 turn phase - when starting we will have a maximum setting on the base and will just use that

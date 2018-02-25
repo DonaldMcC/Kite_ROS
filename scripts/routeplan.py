@@ -146,7 +146,7 @@ class Kite(object):
 
 class Controls(object):
 
-    def __init__(self, inputmode=0, step=8):
+    def __init__(self, inputmode=0, step=8, mode=0):
         try:  # this will fail on windows but don't need yet and not convinced I need to set parameters separately
             self.centrex = rospy.get_param('centrex', 400)
             self.centrey = rospy.get_param('centrey', 300)
@@ -162,6 +162,7 @@ class Controls(object):
         self.inputmodes = ('Standard', 'SetFlight', 'ManFly')
         self.inputmode = inputmode
         self.step = step
+        self.mode = mode  # 0 = normal flight and 1 will be manual flight
         self.modestring = self.getmodestring()
         self.route = False
         self.maxy = 20  # this should be for top of centre line and sets they y target point for park mode
@@ -171,7 +172,7 @@ class Controls(object):
         if self.inputmode == 0:  # Standard
             return 'STD: Left Right Up Down Wider Narrow Expand Contract Pause Mode Quit'
         elif self.inputmode == 1:
-            return 'SETFLIGHTMODE: Park Fig8 Mode Quit'
+            return 'SETFLIGHTMODE: Park Fig8 Simulate Normal Mode Quit'
         else:
             return 'MANFLIGHT: Left Right Up Down Pause Mode Quit'
 
@@ -209,6 +210,10 @@ class Controls(object):
                 kite.mode = 'Wiggle'
             elif key == ord("f") and kite.zone == 'Centre':  # must be in central zone to change mode
                 kite.mode = 'Fig8'
+            elif key == ord("s"):  # simulation
+                self.mode = 1
+            elif key == ord("n"):  # normal with kite being present
+                self.mode = 0
         elif self.inputmode == 2:  # ManFlight - maybe switch to arrows
             if key == ord("l"):  # left
                 kite.x -= self.step  # this will change

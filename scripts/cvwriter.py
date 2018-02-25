@@ -11,6 +11,7 @@ writer = None
 (h, w) = (None, None)
 zeros = None
 
+
 # check if the writer is None
 def initwriter(output, h, w, fps):
     # store the image dimensions, initialzie the video writer,
@@ -23,7 +24,7 @@ def initwriter(output, h, w, fps):
 def writeframe(writer, frame, h, w):
     # grab the frame from the video stream and resize it to have a
     # maximum width of 300 pixels
-    #frame = imutils.resize(frame, width=300)
+    # frame = imutils.resize(frame, width=300)
 
     output = np.zeros((h, w, 3), dtype="uint8")
     output[0:h, 0:w] = frame
