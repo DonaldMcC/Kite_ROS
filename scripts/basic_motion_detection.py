@@ -121,7 +121,7 @@ def getdirection(kite):
     
 # Main routine start
 # this will need to not happen if arguments are passed
-source = 1  # change back to 1 to get prompt
+source = 2  # change back to 1 to get prompt
 while source not in {1, 2}:
     source = input('Key 1 for camera or 2 for source')
 # should define source here
@@ -238,59 +238,22 @@ while True:  # Main module loop
 
     # start direction and analysis - this will be a routine based on class
     getdirection(kite)
-    #for i in np.arange(1, len(kite.pts)):
-    #    if kite.pts[i] is None:
-    #        continue
-    #    # check to see if enough points have been accumulated in the buffer
-    #    if counter >= 10 and i == 1 and kite.pts and len(kite.pts) > 10 and kite.pts[10] is not None:
-    #        # compute the difference between the x and  y  coordinates and re-initialize the direction
-    #        # text variables
-    #        kite.dX = kite.pts[i][0] - kite.pts[-10][0]
-    #        kite.dY = kite.pts[i][1] - kite.pts[-10][1]
-    #        (dirX, dirY) = ("", "")
 
-    #        # ensure there is significant movement in the x-direction
-    #        if np.abs(kite.dX) > 20:
-    #            dirX = "East" if np.sign(kite.dX) == 1 else "West"
-    #
-    #        # ensure there is significant movement in the y-direction
-    #        if np.abs(kite.dY) > 20:
-    #            dirY = "South" if np.sign(kite.dY) == 1 else "North"
-    #
-    #            # handle when both directions are non-empty
-    #        if dirX != "" and dirY != "":
-    #            kite.direction = "{}-{}".format(dirY, dirX)
+    #TODO sort how we do this outside loop
+    #cv2.line(frame, kite.pts[i - 1], kite.pts[i], (0, 0, 255), kite.thickness)
 
-    #                # otherwise, only one direction is non-empty
-    #        else:
-    #            kite.direction = dirX if dirX != "" else dirY
-
-    #        # otherwise, compute the thickness of the line and draw the connecting lines
-    #        thickness = int(np.sqrt(32 / float(i + 1)) * 2.5)
-    
-    #        cv2.line(frame, kite.pts[i - 1], kite.pts[i], (0, 0, 255), kite.thickness)
-
-    #            # show the movement deltas and the direction of movement on the frame
-    #        cv2.putText(frame, kite.direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
-    #        cv2.putText(frame, "dx: {}, dy: {}".format(kite.dX, kite.dY),
-    #                    (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 1)
-    #        continue
-
-        
-        cv2.line(frame, kite.pts[i - 1], kite.pts[i], (0, 0, 255), kite.thickness)
-
-        # show the movement deltas and the direction of movement on the frame
-        cv2.putText(frame, kite.direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
-        cv2.putText(frame, "dx: {}, dy: {}".format(kite.dX, kite.dY),
+    # show the movement deltas and the direction of movement on the frame
+    cv2.putText(frame, kite.direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
+    cv2.putText(frame, "dx: {}, dy: {}".format(kite.dX, kite.dY),
                         (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 1)
             
-        kite.kiteangle = get_angle(box, kite.dX, kite.dY)
-        kite.targetheading = get_heading_points((kite.x, kite.y), (kite.targetx, kite.targety))
-        kite.targetangle = kite.targetheading
+    kite.kiteangle = get_angle(box, kite.dX, kite.dY)
+    kite.targetheading = get_heading_points((kite.x, kite.y), (kite.targetx, kite.targety))
+    kite.targetangle = kite.targetheading
         
-        cv2.putText(frame, "Act Angle:" + str(int(kite.kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 3)
-        cv2.putText(frame, "Tgt Angle:" + str(int(kite.targetangle)), (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 3)
-        cv2.putText(frame, "Tgt Heading:" + str(int(kite.targetheading)), (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255),
+    cv2.putText(frame, "Act Angle:" + str(int(kite.kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 3)
+    cv2.putText(frame, "Tgt Angle:" + str(int(kite.targetangle)), (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 3)
+    cv2.putText(frame, "Tgt Heading:" + str(int(kite.targetheading)), (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255),
                 3)
     kite.update_zone(control)
     kite.update_phase()
