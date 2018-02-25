@@ -27,15 +27,12 @@ from move_func import get_heading_points
 
 class Kite(object):
 
-    def __init__(self, x=0, y=0, manx=300, many=400, mode='Park', phase='Park',
-                 manangle=0, targetheading=0, targetangle=0):
+    def __init__(self, x=0, y=0, mode='Park', phase='Park', targetheading=0, targetangle=0,
+                 thickness=1):
         self.x = x
         self.y = y
         self.mode = mode
         self.phase = phase
-        self.manx = manx
-        self.many = many
-        self.manangle = manangle
         self.pts = deque(maxlen=16)
         self.kiteangles = deque(maxlen=16)
         self.timestamps = deque(maxlen=16)
@@ -51,6 +48,8 @@ class Kite(object):
         self.found = False
         self.targetheading = targetheading
         self.targetangle = targetangle
+        self.thickness = 1
+        
 
     def get_zone(self, leftx, rightx):
         """
@@ -212,13 +211,13 @@ class Controls(object):
                 kite.mode = 'Fig8'
         elif self.inputmode == 2:  # ManFlight - maybe switch to arrows
             if key == ord("l"):  # left
-                kite.manx -= self.step  # this will change
+                kite.x -= self.step  # this will change
             elif key == ord("r"):  # right
-                kite.manx += self.step
+                kite.x += self.step
             elif key == ord("u"):  # up
-                kite.many -= self.step
+                kite.y -= self.step
             elif key == ord("d"):  # down
-                kite.many += self.step
+                kite.y += self.step
             elif key == ord("p"):  # pause - this may apply in all moades
                 time.sleep(10)
 

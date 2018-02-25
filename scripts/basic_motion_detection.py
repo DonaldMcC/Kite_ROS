@@ -20,7 +20,8 @@
 #
 # while in flow it should be possible to
 # 1 amend the flight mode
-# 2 switch from sending actual kite position to manually controlled one
+# 2 switch from sending actual kite position to manually controlled one - think this
+# should be a new object
 # 3 adjust the routing - it should default when the flight mode is changed
 # 4 on playback it should be possible to go into slow motion
 
@@ -83,7 +84,41 @@ def drawcross(manx, many, crosstype='Man'):
              colour, thickness=thickness, lineType=8, shift=0)
     return
 
+def getdirection(kite):
+    # start direction and analysis - this will be a routine based on class
+    for i in np.arange(1, len(kite.pts)):
+        if kite.pts[i] is None:
+            continue
+        # check to see if enough points have been accumulated in the buffer
+        if counter >= 10 and i == 1 and kite.pts and len(kite.pts) > 10 and kite.pts[10] is not None:
+            # compute the difference between the x and  y  coordinates and re-initialize the direction
+            # text variables
+            kite.dX = kite.pts[i][0] - kite.pts[-10][0]
+            kite.dY = kite.pts[i][1] - kite.pts[-10][1]
+            (dirX, dirY) = ("", "")
 
+            # ensure there is significant movement in the x-direction
+            if np.abs(kite.dX) > 20:
+                dirX = "East" if np.sign(kite.dX) == 1 else "West"
+
+            # ensure there is significant movement in the y-direction
+            if np.abs(kite.dY) > 20:
+                dirY = "South" if np.sign(kite.dY) == 1 else "North"
+
+                # handle when both directions are non-empty
+            if dirX != "" and dirY != "":
+                kite.direction = "{}-{}".format(dirY, dirX)
+
+                # otherwise, only one direction is non-empty
+            else:
+                kite.direction = dirX if dirX != "" else dirY
+
+            # otherwise, compute the thickness of the line and draw the connecting lines
+            kite.thickness = int(np.sqrt(32 / float(i + 1)) * 2.5)
+            continue
+
+    return
+    
 # Main routine start
 # this will need to not happen if arguments are passed
 source = 1  # change back to 1 to get prompt
@@ -102,10 +137,10 @@ else:
 width = int(camera.get(3))
 height = int(camera.get(4))
 
-
 # initiate class instances
 control = Controls()
-kite = Kite(control.centrex, control.centrey)
+actkite = Kite(control.centrex, control.centrey)
+mankite = Kite(300,400)
 base = Base()
 # Initialisation steps
 es = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
@@ -161,10 +196,15 @@ while True:  # Main module loop
     image, cnts, hierarchy = cv2.findContours(diff.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     # hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
+    if control.inputmodes[control.inputmode] == 'Manfly':
+        kite = mankite
+    else:
+        kite = actkite
+        
     kite.found = False
     # lets draw and move cross for manual flying
     if control.inputmodes[control.inputmode] == 'ManFly':
-        drawcross(kite.manx, kite.many)
+        drawcross(mankite.x, mankite.y)
         kite.found = True
 
     # Aim to identify the kite and print the direction and so forth - maybe we do let this run
@@ -183,14 +223,9 @@ while True:  # Main module loop
             cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 255, 0), 2)
             finalframe = frame[y:y + h, x:x + w]
             center = (x + (w // 2), y + (h // 2))
-            if control.inputmodes[control.inputmode] != 'ManFly':
-                kite.pts.appendleft(center)
-                kite.x = center[0]
-                kite.y = center[1]
-            else:
-                kite.pts.appendleft((kite.manx, kite.many))
-                kite.x = kite.manx
-                kite.y = kite.many
+            kite.pts.appendleft(center)
+            kite.x = center[0]
+            kite.y = center[1]
 
             # Min Area seems reasonable to get angle of kite
             rect = cv2.minAreaRect(c)
@@ -201,49 +236,59 @@ while True:  # Main module loop
 
             continue
 
-    # start direction and analysis
-    for i in np.arange(1, len(kite.pts)):
-        if kite.pts[i] is None:
-            continue
-        # check to see if enough points have been accumulated in the buffer
-        if counter >= 10 and i == 1 and kite.pts and len(kite.pts) > 10 and kite.pts[10] is not None:
-            # compute the difference between the x and  y  coordinates and re-initialize the direction
-            # text variables
-            kite.dX = kite.pts[i][0] - kite.pts[-10][0]
-            kite.dY = kite.pts[i][1] - kite.pts[-10][1]
-            (dirX, dirY) = ("", "")
+    # start direction and analysis - this will be a routine based on class
+    getdirection(kite)
+    #for i in np.arange(1, len(kite.pts)):
+    #    if kite.pts[i] is None:
+    #        continue
+    #    # check to see if enough points have been accumulated in the buffer
+    #    if counter >= 10 and i == 1 and kite.pts and len(kite.pts) > 10 and kite.pts[10] is not None:
+    #        # compute the difference between the x and  y  coordinates and re-initialize the direction
+    #        # text variables
+    #        kite.dX = kite.pts[i][0] - kite.pts[-10][0]
+    #        kite.dY = kite.pts[i][1] - kite.pts[-10][1]
+    #        (dirX, dirY) = ("", "")
 
-            # ensure there is significant movement in the x-direction
-            if np.abs(kite.dX) > 20:
-                dirX = "East" if np.sign(kite.dX) == 1 else "West"
+    #        # ensure there is significant movement in the x-direction
+    #        if np.abs(kite.dX) > 20:
+    #            dirX = "East" if np.sign(kite.dX) == 1 else "West"
+    #
+    #        # ensure there is significant movement in the y-direction
+    #        if np.abs(kite.dY) > 20:
+    #            dirY = "South" if np.sign(kite.dY) == 1 else "North"
+    #
+    #            # handle when both directions are non-empty
+    #        if dirX != "" and dirY != "":
+    #            kite.direction = "{}-{}".format(dirY, dirX)
 
-            # ensure there is significant movement in the y-direction
-            if np.abs(kite.dY) > 20:
-                dirY = "South" if np.sign(kite.dY) == 1 else "North"
+    #                # otherwise, only one direction is non-empty
+    #        else:
+    #            kite.direction = dirX if dirX != "" else dirY
 
-                # handle when both directions are non-empty
-            if dirX != "" and dirY != "":
-                kite.direction = "{}-{}".format(dirY, dirX)
+    #        # otherwise, compute the thickness of the line and draw the connecting lines
+    #        thickness = int(np.sqrt(32 / float(i + 1)) * 2.5)
+    
+    #        cv2.line(frame, kite.pts[i - 1], kite.pts[i], (0, 0, 255), kite.thickness)
 
-                # otherwise, only one direction is non-empty
-            else:
-                kite.direction = dirX if dirX != "" else dirY
+    #            # show the movement deltas and the direction of movement on the frame
+    #        cv2.putText(frame, kite.direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
+    #        cv2.putText(frame, "dx: {}, dy: {}".format(kite.dX, kite.dY),
+    #                    (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 1)
+    #        continue
 
-            # otherwise, compute the thickness of the line and draw the connecting lines
-            thickness = int(np.sqrt(32 / float(i + 1)) * 2.5)
-            cv2.line(frame, kite.pts[i - 1], kite.pts[i], (0, 0, 255), thickness)
+        
+        cv2.line(frame, kite.pts[i - 1], kite.pts[i], (0, 0, 255), kite.thickness)
 
-            # show the movement deltas and the direction of movement on the frame
-            cv2.putText(frame, kite.direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
-            cv2.putText(frame, "dx: {}, dy: {}".format(kite.dX, kite.dY),
+        # show the movement deltas and the direction of movement on the frame
+        cv2.putText(frame, kite.direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
+        cv2.putText(frame, "dx: {}, dy: {}".format(kite.dX, kite.dY),
                         (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 1)
-            continue
-
+            
         kite.kiteangle = get_angle(box, kite.dX, kite.dY)
-        cv2.putText(frame, "Act Angle:" + str(int(kite.kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 3)
         kite.targetheading = get_heading_points((kite.x, kite.y), (kite.targetx, kite.targety))
-
         kite.targetangle = kite.targetheading
+        
+        cv2.putText(frame, "Act Angle:" + str(int(kite.kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 3)
         cv2.putText(frame, "Tgt Angle:" + str(int(kite.targetangle)), (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 3)
         cv2.putText(frame, "Tgt Heading:" + str(int(kite.targetheading)), (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255),
                 3)
@@ -251,15 +296,10 @@ while True:  # Main module loop
     kite.update_phase()
 
     if kite.changezone or kite.changephase:
-        kite.update_target(control.routepoints[0][0], control.routepoints[0][1], control.centrex, control.maxy,
-                           control.routepoints[3][0], control.routepoints[3][1])
-
-    # end of directiocv2.putText(frame, str(int(kite.kiteangle)), (10, 50),
-    # cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)n and analysis
+        kite.update_target(control.routepoints[0][0], control.routepoints[0][1], control.centrex, control.maxy, control.routepoints[3][0], control.routepoints[3][1])
 
     drawroute(control.routepoints, control.centrex, control.centrey)
     drawcross(kite.targetx, kite.targety, 'Target')
-
 
     base.targetbarangle = calcbarangle(kite, base, control)
 
