@@ -174,7 +174,7 @@ class Controls(object):
         elif self.inputmode == 1:
             return 'SETFLIGHTMODE: Park Fig8 Simulate Normal Mode Quit'
         else:
-            return 'MANFLIGHT: Left Right Up Down Pause Mode Quit'
+            return 'MANFLIGHT: Left Right Up Down Pause Anti Clock Mode Quit'
 
     def keyhandler(self, key, kite):
         # this will now support a change of flight mode and operating mode so different keys will
@@ -223,6 +223,10 @@ class Controls(object):
                 kite.y -= self.step
             elif key == ord("d"):  # down
                 kite.y += self.step
+            elif key == ord("a"):  # anti clockwise
+                kite.kiteangle -= self.step
+            elif key == ord("c"):  # clockwise
+                kite.kiteangle += self.step
             elif key == ord("p"):  # pause - this may apply in all moades
                 time.sleep(10)
 

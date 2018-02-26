@@ -287,7 +287,7 @@ while True:  # Main module loop
     cv2.putText(frame, control.modestring, (10, frame.shape[0] - 10),
                 cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
 
-    # output bar values
+    # output bar values - TODO change to graphical circle with actual bar and target bar
     cv2.putText(frame, 'Base', (outx, 400), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
     cv2.putText(frame, 'Act:' + str(base.barangle), (outx, 420), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
     cv2.putText(frame, 'Tgt:' + str(base.targetbarangle), (outx, 440), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
@@ -300,16 +300,6 @@ while True:  # Main module loop
     counter += 1
     # writeframe(writer, frame, height, width)
 
-    if counter % 100 == 0:
-        pass
-        # print(center)
-        # print(kite.pts[10][0],kite.pts[10][1])
-        # print(kite.dX, kite.dY)
-        # print(kite.direction)
-    # cv2.imshow("dif", diff)
-    # keys should be Left, Right, Up, Down, Widen and Narrow, Extend and Contract which
-    # should set all routes
-    # Pause should hold for 5 secs
     key = cv2.waitKey(8) & 0xff
     # think there will be a mode option in here as well
     # one key changes mode and we would show the possible keys somewhere
