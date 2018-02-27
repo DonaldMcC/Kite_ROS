@@ -264,6 +264,8 @@ def get_angled_corners(x, y, anglechange, centx=0, centy=0):
     (3.0, -4.0)
     >>> get_angled_corners(-3,-4,180)
     (2.9999999999999987, 4.000000000000002)
+    >>> get_angled_corners(1,0,90)
+    (0, -1)
     >>>
     """
     x = x - centx

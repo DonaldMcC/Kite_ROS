@@ -31,7 +31,7 @@
 import numpy as np
 import time
 import cv2
-from move_func import get_heading_points
+from move_func import get_heading_points, get_angled_corners
 
 # modules
 from routeplan import Kite, Controls
@@ -119,6 +119,29 @@ def getdirection(kte):
 
     return
 
+
+def display_base():
+    # output bar values - TODO change to graphical circle with actual bar and target bar
+    cv2.putText(frame, 'Base', (outx, 320), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
+    centx = outx + 60
+    centy = 410
+    radius = 60
+    cv2.circle(frame, (centx, centy), radius, (0, 255, 255), 2)
+    cv2.putText(frame, 'Act:' + str(base.barangle), (outx + 100, 500), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 255, 0), 2)
+    cv2.putText(frame, 'Tgt:' + str(base.targetbarangle), (outx, 500), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 255, 255), 2)
+    display_line(base.targetbarangle * -1, centx, centy, radius, (0, 255, 255))
+    display_line(base.barangle * -1, centx, centy, radius, (0, 255, 0))
+    return
+
+def display_line(angle, cx,cy, radius, colour):
+    pointx, pointy = get_angled_corners(cx + radius, cy, angle, cx, cy)
+    pointx = int(pointx)
+    pointy = int(pointy)
+    offx = cx - (pointx - cx)
+    offy = cy - (pointy - cy)
+
+    cv2.line(frame, (offx, offy), (pointx, pointy), colour , 2)
+    return
 
 # Main routine start
 # this will need to not happen if arguments are passed
@@ -278,7 +301,7 @@ while True:  # Main module loop
         tempstr = "Found: No"
 
     # output flight values
-    outx = width - 120
+    outx = width - 180
     fontsize = 0.5
     cv2.putText(frame, 'Zone:' + kite.zone, (outx, 140), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
     cv2.putText(frame, tempstr, (outx, 160), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
@@ -287,10 +310,7 @@ while True:  # Main module loop
     cv2.putText(frame, control.modestring, (10, frame.shape[0] - 10),
                 cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
 
-    # output bar values - TODO change to graphical circle with actual bar and target bar
-    cv2.putText(frame, 'Base', (outx, 400), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
-    cv2.putText(frame, 'Act:' + str(base.barangle), (outx, 420), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
-    cv2.putText(frame, 'Tgt:' + str(base.targetbarangle), (outx, 440), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
+    display_base()
 
     kite_pos(kite.x, kite.y, kite.kiteangle, kite.dX, kite.dY, 0, 0)
     # cv2.imshow("roi", finalframe)
