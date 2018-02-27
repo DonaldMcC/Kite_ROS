@@ -122,13 +122,13 @@ def getdirection(kte):
 
 def display_base():
     # output bar values - TODO change to graphical circle with actual bar and target bar
-    cv2.putText(frame, 'Base', (outx, 320), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
     centx = outx + 60
-    centy = 410
+    centy = 300
     radius = 60
+    cv2.putText(frame, 'Base', (outx, centy-40), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
     cv2.circle(frame, (centx, centy), radius, (0, 255, 255), 2)
-    cv2.putText(frame, 'Act:' + str(base.barangle), (outx + 100, 500), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 255, 0), 2)
-    cv2.putText(frame, 'Tgt:' + str(base.targetbarangle), (outx, 500), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 255, 255), 2)
+    cv2.putText(frame, 'Act:' + str(base.barangle), (outx + 100, centy+100), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 255, 0), 2)
+    cv2.putText(frame, 'Tgt:' + str(base.targetbarangle), (outx, centy+100), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 255, 255), 2)
     display_line(base.targetbarangle * -1, centx, centy, radius, (0, 255, 255))
     display_line(base.barangle * -1, centx, centy, radius, (0, 255, 0))
     return
@@ -145,7 +145,7 @@ def display_line(angle, cx,cy, radius, colour):
 
 # Main routine start
 # this will need to not happen if arguments are passed
-source = 2  # change back to 1 to get prompt
+source = 1  # change back to 1 to get prompt
 while source not in {1, 2}:
     source = input('Key 1 for camera or 2 for source')
 # should define source here
@@ -256,7 +256,7 @@ while True:  # Main module loop
                 box = np.int0(box)
 
                 cv2.drawContours(frame, [box], 0, (0, 0, 255), 2)
-
+                kite.kiteangle = get_angle(box, kite.dX, kite.dY)
                 continue
 
     # start direction and analysis - this will be a routine based on class
@@ -266,22 +266,22 @@ while True:  # Main module loop
     # cv2.line(frame, kite.pts[i - 1], kite.pts[i], (0, 0, 255), kite.thickness)
 
     # show the movement deltas and the direction of movement on the frame
-    cv2.putText(frame, kite.direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 3)
+    cv2.putText(frame, kite.direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
     cv2.putText(frame, "dx: {}, dy: {}".format(kite.dX, kite.dY),
                         (10, height - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 1)
     cv2.putText(frame, "x: {}, y: {}".format(mankite.x, mankite.y),
                         (180, height - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 1)
             
-    kite.kiteangle = get_angle(box, kite.dX, kite.dY)
+
     kite.targetheading = get_heading_points((kite.x, kite.y), (kite.targetx, kite.targety))
     kite.targetangle = kite.targetheading
         
-    cv2.putText(frame, "Act Angle:" + str(int(kite.kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 3)
+    cv2.putText(frame, "Act Angle:" + str(int(kite.kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
     cv2.putText(frame, "Tgt Angle:" + str(int(kite.targetangle)), (10, 70),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 3)
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
     cv2.putText(frame, "Tgt Heading:" + str(int(kite.targetheading)), (10, 90),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255),3)
-    cv2.putText(frame, "Mode:" + str(control.mode), (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255),3)
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255),2)
+    cv2.putText(frame, "Mode:" + str(control.mode), (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255),2)
 
     kite.update_zone(control)
     kite.update_phase()
