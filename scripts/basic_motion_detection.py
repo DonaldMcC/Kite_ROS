@@ -56,18 +56,16 @@ def drawroute(route, centrex, centrey):
     return
 
 
-def drawcross(manx, many, crosstype='Man'):
+def drawcross(manx, many, crosstype='Man', colour=(255,0,255)):
     global frame  #
     # stuff below was to allow angle calculation of angle - which may well
     # do once we have got direction of travel unpicked
     if crosstype == 'Man':
         crosssize = 10
         thickness = 2
-        colour = (255, 0, 255)
     else:  # Target for now
-        crosssize = 6
-        thickness = 4
-        colour = (0, 0, 0)
+        crosssize = 9
+        thickness = 3
     starthorx = manx - crosssize
     endhorx = manx + crosssize
     endhory = many
@@ -127,8 +125,11 @@ def display_base():
     radius = 60
     cv2.putText(frame, 'Base', (outx, centy-40), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
     cv2.circle(frame, (centx, centy), radius, (0, 255, 255), 2)
-    cv2.putText(frame, 'Act:' + str(base.barangle), (outx + 100, centy+100), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 255, 0), 2)
-    cv2.putText(frame, 'Tgt:' + str(base.targetbarangle), (outx, centy+100), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 255, 255), 2)
+    #cv2.putText(frame, 'Act:' + str(base.barangle), (outx + 100, centy+100), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 255, 0), 2)
+    cv2.putText(frame, 'Act:' + '{:5.1f}'.format(base.barangle), (outx + 85, centy + 100), cv2.FONT_HERSHEY_SIMPLEX, 0.65,
+                (0, 255, 0), 2)
+    cv2.putText(frame, 'Tgt:' + '{:5.1f}'.format(base.targetbarangle), (outx - 15, centy + 100),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 255, 255), 2)
     display_line(base.targetbarangle * -1, centx, centy, radius, (0, 255, 255))
     display_line(base.barangle * -1, centx, centy, radius, (0, 255, 0))
     return
@@ -291,7 +292,7 @@ while True:  # Main module loop
                            control.centrex, control.maxy, control.routepoints[3][0], control.routepoints[3][1])
 
     drawroute(control.routepoints, control.centrex, control.centrey)
-    drawcross(kite.targetx, kite.targety, 'Target')
+    drawcross(kite.targetx, kite.targety, 'Target', (0, 150, 250))
 
     base.targetbarangle = calcbarangle(kite, base, control)
 
