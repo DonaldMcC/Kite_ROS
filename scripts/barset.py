@@ -1,4 +1,5 @@
-#  This module will cover setting the bar angle based on desired route
+#  This module will cover setting the target bar angle based on desired route.  The actual bar angle
+#  will come via arduino or some other rospy simulation message
 #   their will be a number of situations
 #   1 park mode - aim is just to keep the kiteangle to zero so we adjust bar angle accordingly
 #   2 wiggle mode - aim will I think be to get kiteangle to specified value and once there we change so
