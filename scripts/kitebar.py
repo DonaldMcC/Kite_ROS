@@ -5,7 +5,7 @@
 # there should always be some sort of input, some processing and publishing of output message with the angle and
 # estimeated forces on the bar
 
-# it is proposed to structure this over 4 mddules
+# it is proposed to structure this over 4 modules
 # kiteb_input will handle reading ROS messages and convert into dictionaries most likely to transfer to
 # kiteb_process which should do the conversion of the data to get the result
 # kiteb_ouput will publish the ROS message
@@ -15,7 +15,7 @@
 
 import rospy
 from kite_ros.msg import Kitepos
-from kiteb_input import call_arduino
+from kiteb_input import call_arduino, call_kite_infer, call_manual
 params = {}
 
 
@@ -49,13 +49,13 @@ def kitebar(source):
         # think everything else can happen in kitepos after the
 
     elif source == 'kite_infer':
-        rospy.Subscriber("kite_arduino", Kitepos, callkite_infer)
+        rospy.Subscriber("kite_arduino", Kitepos, call_kite_infer)
         # get kitepos
         # calc angles from kitepos
         # publish converted results
 
     elif source == 'manual':
-        pass
+        rospy.Subscriber("kite_arduino", Kitepos, call_manual)
         # get previous angle or 0
         # process keyboard or joystick input source
         # publish updated results
