@@ -146,7 +146,7 @@ def display_line(angle, cx,cy, radius, colour):
 
 # Main routine start
 # this will need to not happen if arguments are passed
-source = 1  # change back to 1 to get prompt
+source = 2  # change back to 1 to get prompt
 while source not in {1, 2}:
     source = input('Key 1 for camera or 2 for source')
 # should define source here
@@ -287,7 +287,8 @@ while True:  # Main module loop
     kite.update_zone(control)
     kite.update_phase()
 
-    if kite.changezone or kite.changephase:
+
+    if kite.changezone or kite.changephase or kite.routechange:
         kite.update_target(control.routepoints[0][0], control.routepoints[0][1],
                            control.centrex, control.maxy, control.routepoints[3][0], control.routepoints[3][1])
 
