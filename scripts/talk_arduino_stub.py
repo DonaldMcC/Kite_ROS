@@ -11,12 +11,13 @@ def kite_arduino(posx, posy, kiteangle, dirx, diry, routepoints, priorpos):
     rospy.init_node('custom_talker', anonymous=True)
     rate = rospy.Rate(10)  # 10hz
     msg = Kite_arduino()
-    msg.name = "Kite Position"
-    msg.posx = posx
-    msg.posy = posy
-    msg.kiteangle = kiteangle
-    msg.dirx = dirx
-    msg.diry = diry
+    msg.rleft = 100
+    msg.rcent = 150
+    msg.rright = 200
+    msg.heading = 150
+    msg.varx = 30
+    msg.vary = 60
+    msg.varz = 90
     rospy.loginfo(msg)
     pub.publish(msg)
     rate.sleep()
