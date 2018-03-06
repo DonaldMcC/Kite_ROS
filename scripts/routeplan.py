@@ -45,6 +45,7 @@ class Kite(object):
         self.targety = 0
         self.changezone = False
         self.changephase = False
+        self.routechange = False
         self.found = False
         self.targetheading = targetheading
         self.targetangle = targetangle
@@ -199,10 +200,11 @@ class Controls(object):
                 self.radius -= self.step
             elif key == ord("s"):  # slow
                 self.slow += 0.1
-            elif key == ord("f"):  # slow
+            elif key == ord("f"):  # fast
                 self.slow = 0.0
             elif key == ord("p"):  # pause - this may apply in all modes
                 time.sleep(10)
+            kite.routechange = True
         elif self.inputmode == 1:  # SetFlight
             if key == ord("p"):  # park
                 kite.mode = 'Park'
