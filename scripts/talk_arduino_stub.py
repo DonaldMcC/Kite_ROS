@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 # from ros wiki for initial testing
 import rospy
-from std_msgs.msg import String
-from kite_ros.msg import Kitepos
-from Kite_arduino.msg import Kite_arduino
+from kite_ros.msg import Kite_arduino
 
 
 def kite_arduino(posx, posy, kiteangle, dirx, diry, routepoints, priorpos):
@@ -11,6 +9,7 @@ def kite_arduino(posx, posy, kiteangle, dirx, diry, routepoints, priorpos):
     rospy.init_node('custom_talker', anonymous=True)
     rate = rospy.Rate(10)  # 10hz
     msg = Kite_arduino()
+    #msg.posx=100
     msg.rleft = 100
     msg.rcent = 150
     msg.rright = 200
