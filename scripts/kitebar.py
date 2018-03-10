@@ -14,7 +14,7 @@
 
 
 import rospy
-from kite_ros.msg import Kitepos
+from kite_arduino.msg import Kitepos
 from kiteb_input import call_arduino
 params = {}
 
@@ -46,7 +46,7 @@ def kitebar(source):
 
     if source == 'arduino':
         rospy.Subscriber("kite_arduino", Kitepos, call_arduino)
-        # think everything else can happen in kitepos after the
+        # think everything else can happen in call arduino after the
 
     elif source == 'kite_infer':
         rospy.Subscriber("kite_arduino", Kitepos, callkite_infer)

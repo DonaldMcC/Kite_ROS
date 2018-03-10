@@ -5,7 +5,7 @@ import rospy
 from std_msgs.msg import String
 from kite_ros.msg import Kitepos
 from message_converter import convert_ros_message_to_dictionary
-#from kiteb_process import proc_arduino
+from kiteb_process import proc_arduino
 #from kiteb_output import pub_base_msg
 
 
