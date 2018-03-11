@@ -54,6 +54,7 @@ add_message_files(
     FILES
     Kitepos.msg
     Kite_arduino.msg
+    Kitebase.msg
 )
 
 ## Generate services in the 'srv' folder
