@@ -17,9 +17,11 @@ def kite_arduino(posx, posy, kiteangle, dirx, diry, routepoints, priorpos):
     msg.varx = 30
     msg.vary = 60
     msg.varz = 90
-    rospy.loginfo(msg)
-    pub.publish(msg)
-    rate.sleep()
+    while not rospy.is_shutdown():
+    #    hello_str = "hello world %s" % rospy.get_time()
+        rospy.loginfo(msg)
+        pub.publish(msg)
+        rate.sleep()
     return
 
 

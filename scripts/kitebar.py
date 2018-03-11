@@ -14,27 +14,9 @@
 
 
 import rospy
-from kite_arduino.msg import Kitepos
+from kite_ros.msg import Kitepos
 from kiteb_input import call_arduino
-params = {}
-
-
-def get_params():
-    """This will download all exepcted parameters from the ROS parameter server"""
-    # TODO look at identifying values not received for now this is setting default value but that may not be best
-    global params
-    params['source'] = rospy.get_param('source', 'arduino')
-    params['leftmax'] = rospy.get_param('leftmax', 1000)
-    params['leftmin'] = rospy.get_param('leftmin', 0)
-    params['centremaxleft'] = rospy.get_param('centremaxleft', 1000)
-    params['centremiddle'] = rospy.get_param('centremiddle', 500)
-    params['centremaxright'] = rospy.get_param('centremaxright', 0)
-    params['maxangleleft'] = rospy.get_param('maxangleleft', -65)
-    params['maxangleright'] = rospy.get_param('maxangleright', 60)
-    params['rightmax'] = rospy.get_param('rightmax', 1000)
-    params['rightmin'] = rospy.get_param('rightmin', 0)
-    return params
-
+from kitetb_params import get_params, params
 
 def kitebar(source):
     # In ROS, nodes are uniquely named. If two nodes with the same
@@ -49,7 +31,7 @@ def kitebar(source):
         # think everything else can happen in call arduino after the
 
     elif source == 'kite_infer':
-        rospy.Subscriber("kite_arduino", Kitepos, callkite_infer)
+        rospy.Subscriber("kite_arduino", Kitepos, call_arduino)
         # get kitepos
         # calc angles from kitepos
         # publish converted results

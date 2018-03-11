@@ -5,7 +5,7 @@
 # should be fairly straightforward
 # result will be an outmessage dictionary - this module should not require any ROS functions
 
-from kitebar import params
+from kiteb_params import params
 
 
 def get_force(messageval, minohm, maxohm, minforce, maxforce):
