@@ -6,18 +6,18 @@ from std_msgs.msg import String
 from kite_ros.msg import Kitepos
 from message_converter import convert_ros_message_to_dictionary
 from kiteb_process import proc_arduino
-#from kiteb_output import pub_base_msg
+from kiteb_output import pub_base_msg
 
 
 def call_arduino(data):
     rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.name)
     message = convert_ros_message_to_dictionary(data)
 
-    #will then call something in kiteb_process with message and should
-    #return an answer as dictionary
-    #answer=proc_arduino(message)
+    answer=proc_arduino(message)
 
-    #pub_base_msg(answer)
+    pub_base_msg(answer)
+
+    return
 
 
 def call_kite_infer(data):
