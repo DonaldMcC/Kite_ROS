@@ -26,9 +26,11 @@ def pub_base_msg(answer):
     pub = rospy.Publisher('kitebase_msg', Kitebase, queue_size=10)
     rospy.init_node('kitebase_data', anonymous=True)
     rate = rospy.Rate(10)  # 10hz
-    msg = convert_dictionary_to_ros_message(Kitebase, answer):
-    #msg = Kitebase()
-    #msg.name = "Kite Position"
+    #msg = convert_dictionary_to_ros_message(Kitebase, answer)
+    msg = Kitebase()
+    msg.forceleft = answer['forceleft']
+    msg.forceright = answer['forceright']
+    msg.barangle = answer['barangle']
     #msg.posx = posx
     #msg.posy = posy
     #msg.kiteangle = kiteangle
@@ -42,7 +44,7 @@ def pub_base_msg(answer):
 if __name__ == '__main__':
     # talker()
     try:
-        test_answer={}
+        test_answer={'forceleft':10, 'forceright':30, 'barangle':35}
         pub_base_msg(test_answer)
     except rospy.ROSInterruptException:
         pass
