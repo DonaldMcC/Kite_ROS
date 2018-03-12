@@ -5,7 +5,7 @@
 # should be fairly straightforward
 # result will be an outmessage dictionary - this module should not require any ROS functions
 
-from kiteb_params import params
+from kiteb_param import params
 
 
 def get_force(messageval, minohm, maxohm, minforce, maxforce):
@@ -66,12 +66,13 @@ def get_bar_angle(rcent, centremaxleft, centremiddle, centremaxright, maxanglele
 def proc_arduino(message):
     """This will receive a dictionary and initially just convert the three resistors via a function"""
     answer = {}
-    answer['forceleft'] = get_force(message.rleft, params.leftmin, params.leftmax,
-                                    params.leftforcemin, params.leftforcemax)
-    answer['forceright'] = get_force(message.rright, params.rightmin, params.rightmax,
-                                     params.rightforcemin, params.rightforcemax)
-    answer['barangle'] = get_bar_angle(message.rcent, params.centremaxleft, params.centremiddle,
-                                   params.centremaxright, params.maxangleleft, params.maxangleright)
+    print message['rleft']
+    answer['forceleft'] = get_force(message['rleft'], params['leftmin'], params['leftmax'],
+                                    params['leftmin'], params['leftmax'])
+    answer['forceright'] = get_force(message['rright'], params['rightmin'], params['rightmax'],
+                                     params['rightmin'], params['rightmax'])
+    answer['barangle'] = get_bar_angle(message['rcent'], params['centremaxleft'], params['centremiddle'],
+                                   params['centremaxright'], params['maxangleleft'], params['maxangleright'])
     return answer
 
 

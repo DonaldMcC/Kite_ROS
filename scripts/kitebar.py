@@ -14,9 +14,9 @@
 
 
 import rospy
-from kite_ros.msg import Kitepos
+from kite_ros.msg import Kite_arduino
 from kiteb_input import call_arduino
-from kitetb_params import get_params, params
+from kiteb_param import get_params
 
 def kitebar(source):
     # In ROS, nodes are uniquely named. If two nodes with the same
@@ -27,7 +27,7 @@ def kitebar(source):
     rospy.init_node('kitebar')
 
     if source == 'arduino':
-        rospy.Subscriber("kite_arduino", Kitepos, call_arduino)
+        rospy.Subscriber('custom_chatter', Kite_arduino, call_arduino)
         # think everything else can happen in call arduino after the
 
     elif source == 'kite_infer':

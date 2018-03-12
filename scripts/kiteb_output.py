@@ -22,9 +22,10 @@ from message_converter import convert_dictionary_to_ros_message
 # this displays on basic motion detection and in theory we then have full capture and should
 # move to calibrate the bar angle part in proc_arduino and then fly the thing again
 
+
 def pub_base_msg(answer):
-    pub = rospy.Publisher('kitebase_msg', Kitebase, queue_size=10)
-    rospy.init_node('kitebase_data', anonymous=True)
+    pub = rospy.Publisher('kitebase_node', Kitebase, queue_size=10)
+    #rospy.init_node('kitebase_node', anonymous=True)
     rate = rospy.Rate(10)  # 10hz
     #msg = convert_dictionary_to_ros_message(Kitebase, answer)
     msg = Kitebase()

@@ -8,9 +8,8 @@ from kiteb_output import pub_base_msg
 
 
 def call_arduino(data):
-    rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.name)
+    rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.rleft)
     message = convert_ros_message_to_dictionary(data)
-
     answer=proc_arduino(message)
 
     pub_base_msg(answer)
