@@ -8,6 +8,7 @@ params = {}
 def get_params():
     """This will download all exepcted parameters from the ROS parameter server"""
     # TODO look at identifying values not received for now this is setting default value but that may not be best
+    # possibly additional parameters required here
     global params
     params['source'] = rospy.get_param('source', 'arduino')
     params['leftmax'] = rospy.get_param('leftmax', 1000)

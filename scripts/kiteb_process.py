@@ -41,23 +41,23 @@ def get_bar_angle(rcent, centremaxleft, centremiddle, centremaxright, maxanglele
         90.0
     """
 
+    angle = 0
     # allow resistor to operate either way +ve
     if centremaxleft < centremaxright:
-        if rcent >= centremiddle and rcent<= centremaxright:
+        if centremiddle <= rcent <= centremaxright:
             angle = linearmap(rcent, centremiddle, centremaxright, 0, maxangleright)
-        elif rcent >= centremaxleft and rcent < centremiddle:
-            #this should return a -ve and maxangleleft should also be set as -ve
+        elif centremaxleft <= rcent < centremiddle:
+            # this should return a -ve and maxangleleft should also be set as -ve
             angle = linearmap(rcent, centremiddle, centremaxleft, 0, maxangleleft)
         else:
             print('centre angle outwith permitted range')
     else:  # centremaxleft is +ve so we need to invert mapping
-        if rcent >= centremiddle and rcent <= centremaxleft:
+        if centremiddle <= rcent <= centremaxleft:
             angle = linearmap(rcent, centremiddle, centremaxright, 0, maxangleleft*-1)
-        elif rcent >= centremaxright and rcent < centremiddle:
+        elif centremaxright <= rcent < centremiddle:
             # this should return a -ve and maxangleleft should also be set as -ve
             angle = linearmap(rcent, centremiddle, centremaxleft, 0, maxangleright * -1)
         else:
-            angle = 0
             print('centre angle outwith permitted range')
 
     return angle
@@ -65,14 +65,12 @@ def get_bar_angle(rcent, centremaxleft, centremiddle, centremaxright, maxanglele
 
 def proc_arduino(message):
     """This will receive a dictionary and initially just convert the three resistors via a function"""
-    answer = {}
-    print message['rleft']
-    answer['forceleft'] = get_force(message['rleft'], params['leftmin'], params['leftmax'],
-                                    params['leftmin'], params['leftmax'])
-    answer['forceright'] = get_force(message['rright'], params['rightmin'], params['rightmax'],
-                                     params['rightmin'], params['rightmax'])
-    answer['barangle'] = get_bar_angle(message['rcent'], params['centremaxleft'], params['centremiddle'],
-                                   params['centremaxright'], params['maxangleleft'], params['maxangleright'])
+    answer = {'forceleft': get_force(message['rleft'], params['leftmin'], params['leftmax'],
+                                     params['leftmin'], params['leftmax']),
+              'forceright': get_force(message['rright'], params['rightmin'], params['rightmax'],
+                                      params['rightmin'], params['rightmax']),
+              'barangle': get_bar_angle(message['rcent'], params['centremaxleft'], params['centremiddle'],
+                                        params['centremaxright'], params['maxangleleft'], params['maxangleright'])}
     return answer
 
 

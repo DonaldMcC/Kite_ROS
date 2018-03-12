@@ -10,7 +10,7 @@ from kiteb_output import pub_base_msg
 def call_arduino(data):
     rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.rleft)
     message = convert_ros_message_to_dictionary(data)
-    answer=proc_arduino(message)
+    answer = proc_arduino(message)
 
     pub_base_msg(answer)
 
@@ -18,12 +18,8 @@ def call_arduino(data):
 
 
 def call_kite_infer(data):
-    #message = msg_to_dict(data)
-    message={}
-    message['timestamp'] = data.header.stamp
-    message['rleft'] = data.rleft
-    message['msgkiteangle'] = data.kiteangle
-    message['msgdirx'] = data.dirx
-    message['msgdiry'] = data.diry
+    # message = msg_to_dict(data)
+    message = {'timestamp': data.header.stamp, 'rleft': data.rleft, 'msgkiteangle': data.kiteangle,
+               'msgdirx': data.dirx, 'msgdiry': data.diry}
     rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.name)
     return message

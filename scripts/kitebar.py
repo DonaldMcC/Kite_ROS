@@ -18,6 +18,7 @@ from kite_ros.msg import Kite_arduino
 from kiteb_input import call_arduino
 from kiteb_param import get_params
 
+
 def kitebar(source):
     # In ROS, nodes are uniquely named. If two nodes with the same
     # node are launched, the previous one is kicked off. The
@@ -26,6 +27,7 @@ def kitebar(source):
     # run simultaneously.
     rospy.init_node('kitebar')
 
+    # TODO change custom chatter to something better
     if source == 'arduino':
         rospy.Subscriber('custom_chatter', Kite_arduino, call_arduino)
         # think everything else can happen in call arduino after the
