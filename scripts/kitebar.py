@@ -29,7 +29,7 @@ def kitebar(source):
 
     # TODO change custom chatter to something better
     if source == 'arduino':
-        rospy.Subscriber('custom_chatter', Kite_arduino, call_arduino)
+        rospy.Subscriber('arduino_values', Kite_arduino, call_arduino)
         # think everything else can happen in call arduino after the
 
     elif source == 'kite_infer':
@@ -46,6 +46,7 @@ def kitebar(source):
 
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
+    return
 
 
 def startnode(source='arduino'):

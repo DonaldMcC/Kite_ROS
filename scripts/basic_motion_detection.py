@@ -39,6 +39,7 @@ from barset import Base, calcbarangle
 from move_func import get_angle
 from talker import kite_pos, kiteimage
 from cvwriter import initwriter, writeframe
+from basic_listen_barangle import get_barangle
 
 
 # this is just for display flight decisions will be elsewhere
@@ -295,7 +296,9 @@ while True:  # Main module loop
     drawroute(control.routepoints, control.centrex, control.centrey)
     drawcross(kite.targetx, kite.targety, 'Target', (0, 150, 250))
 
+    base.barangle = getbarangle()
     base.targetbarangle = calcbarangle(kite, base, control)
+
 
     if kite.found:
         tempstr = "Found: Yes"

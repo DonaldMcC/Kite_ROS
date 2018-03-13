@@ -25,24 +25,18 @@ from message_converter import convert_dictionary_to_ros_message
 def pub_base_msg(answer):
     pub = rospy.Publisher('kitebase_node', Kitebase, queue_size=10)
     # rospy.init_node('kitebase_node', anonymous=True)
-    rate = rospy.Rate(10)  # 10hz
+    rate = rospy.Rate(5)  # 5hz
     # msg = convert_dictionary_to_ros_message(Kitebase, answer)
     msg = Kitebase()
     msg.forceleft = answer['forceleft']
     msg.forceright = answer['forceright']
     msg.barangle = answer['barangle']
-    # msg.posx = posx
-    # msg.posy = posy
-    # msg.kiteangle = kiteangle
-    # msg.dirx = dirx
-    # msg.diry = diry
     rospy.loginfo(msg)
     pub.publish(msg)
     return
 
 
 if __name__ == '__main__':
-    # talker()
     try:
         test_answer = {'forceleft': 10, 'forceright': 30, 'barangle': 35}
         pub_base_msg(test_answer)
