@@ -69,7 +69,7 @@ def setangle(kite, base, controls):
     >>> setangle(k,b,c)
     35
 
-    """  .
+    """
     delta = kite.targetangle - kite.kiteangle
     targetbarangle = checklimits(base.barangle + (delta * base.kitebarratio),
                                  base.maxleft, base.maxright)
