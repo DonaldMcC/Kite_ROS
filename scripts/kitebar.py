@@ -5,7 +5,7 @@
 # there should always be some sort of input, some processing and publishing of output message with the angle and
 # estimeated forces on the bar
 
-# it is proposed to structure this over 4 modules
+# it is proposed to structure this over 4 mddules
 # kiteb_input will handle reading ROS messages and convert into dictionaries most likely to transfer to
 # kiteb_process which should do the conversion of the data to get the result
 # kiteb_ouput will publish the ROS message
@@ -14,26 +14,9 @@
 
 
 import rospy
-from kite_ros.msg import Kitepos
-from kiteb_input import call_arduino, call_kite_infer, call_manual
-params = {}
-
-
-def get_params():
-    """This will download all exepcted parameters from the ROS parameter server"""
-    # TODO look at identifying values not received for now this is setting default value but that may not be best
-    global params
-    params['source'] = rospy.get_param('source', 'arduino')
-    params['leftmax'] = rospy.get_param('leftmax', 1000)
-    params['leftmin'] = rospy.get_param('leftmin', 0)
-    params['centremaxleft'] = rospy.get_param('centremaxleft', 1000)
-    params['centremiddle'] = rospy.get_param('centremiddle', 500)
-    params['centremaxright'] = rospy.get_param('centremaxright', 0)
-    params['maxangleleft'] = rospy.get_param('maxangleleft', -65)
-    params['maxangleright'] = rospy.get_param('maxangleright', 60)
-    params['rightmax'] = rospy.get_param('rightmax', 1000)
-    params['rightmin'] = rospy.get_param('rightmin', 0)
-    return params
+from kite_ros.msg import Kite_arduino
+from kiteb_input import call_arduino
+from kiteb_param import get_params
 
 
 def kitebar(source):
@@ -44,24 +27,26 @@ def kitebar(source):
     # run simultaneously.
     rospy.init_node('kitebar')
 
+    # TODO change custom chatter to something better
     if source == 'arduino':
-        rospy.Subscriber("kite_arduino", Kitepos, call_arduino)
-        # think everything else can happen in kitepos after the
+        rospy.Subscriber('arduino_values', Kite_arduino, call_arduino)
+        # think everything else can happen in call arduino after the
 
     elif source == 'kite_infer':
-        rospy.Subscriber("kite_arduino", Kitepos, call_kite_infer)
+        rospy.Subscriber("kite_arduino", Kitepos, call_arduino)
         # get kitepos
         # calc angles from kitepos
         # publish converted results
 
     elif source == 'manual':
-        rospy.Subscriber("kite_arduino", Kitepos, call_manual)
+        pass
         # get previous angle or 0
         # process keyboard or joystick input source
         # publish updated results
 
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
+    return
 
 
 def startnode(source='arduino'):

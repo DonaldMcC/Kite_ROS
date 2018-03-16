@@ -39,6 +39,7 @@ from barset import Base, calcbarangle
 from move_func import get_angle
 from talker import kite_pos, kiteimage
 from cvwriter import initwriter, writeframe
+from basic_listen_barangle import listen_kitebase, get_barangle
 
 
 # this is just for display flight decisions will be elsewhere
@@ -195,6 +196,7 @@ for (lower, upper) in boundaries:
     low = np.array(lower, dtype="uint8")
     upp = np.array(upper, dtype="uint8")
 
+listen_kitebase()
 writer = None
 cv2.startWindowThread()
 cv2.namedWindow('contours')
@@ -295,7 +297,9 @@ while True:  # Main module loop
     drawroute(control.routepoints, control.centrex, control.centrey)
     drawcross(kite.targetx, kite.targety, 'Target', (0, 150, 250))
 
+    base.barangle = get_barangle()
     base.targetbarangle = calcbarangle(kite, base, control)
+
 
     if kite.found:
         tempstr = "Found: Yes"
