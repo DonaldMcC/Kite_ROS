@@ -44,7 +44,7 @@ def kite_pos(posx, posy, kiteangle, dirx, diry, routepoints, priorpos):
 class kiteimage:
 
     def __init__(self):
-        self.image_pub = rospy.Publisher('kite_chatter', Image)
+        self.image_pub = rospy.Publisher('kite_chatter', Image, queue_size=10)
         self.bridge = CvBridge()
 
     def pubimage(self, cv_image):

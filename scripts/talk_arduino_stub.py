@@ -25,7 +25,7 @@ def kite_arduino(rleft, rcent, rright, heading, varx, vary, varz):
         rate.sleep()
         msg.rcent += inc
         if msg.rcent >= 1000:
-            msg.rcent = 1
+            msg.rcent = 3
     return
 
 

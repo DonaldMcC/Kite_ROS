@@ -1,5 +1,5 @@
 Header header
-uint16 forceleft
-uint16 forceright
-uint16 barangle
+int16 forceleft
+int16 forceright
+int16 barangle
 
