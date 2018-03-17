@@ -40,5 +40,6 @@ if __name__ == '__main__':
     try:
         test_answer = {'forceleft': 10, 'forceright': 30, 'barangle': 35}
         pub_base_msg(test_answer)
+
     except rospy.ROSInterruptException:
         pass
