@@ -1,0 +1,6 @@
+<launch>
+
+    <node name="kitebar" pkg="kite_ros" type="kitebar.py" />
+    <node name="talk_arduino_stub" pkg="kite_ros" type="talk_arduino_stub.py" />
+
+    </launch>

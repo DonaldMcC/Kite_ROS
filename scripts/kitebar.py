@@ -27,9 +27,8 @@ def kitebar(source):
     # run simultaneously.
     rospy.init_node('kitebar')
 
-    # TODO change custom chatter to something better
     if source == 'arduino':
-        rospy.Subscriber('arduino_values', Kite_arduino, call_arduino)
+        rospy.Subscriber('kite_arduino', Kite_arduino, call_arduino)
         # think everything else can happen in call arduino after the
 
     elif source == 'kite_infer':

@@ -7,8 +7,8 @@ from kite_ros.msg import Kite_arduino
 
 
 def kite_arduino(rleft, rcent, rright, heading, varx, vary, varz):
-    pub = rospy.Publisher('arduino_values', Kite_arduino, queue_size=3)
-    rospy.init_node('arduino_values', anonymous=True)
+    pub = rospy.Publisher('kite_arduino', Kite_arduino, queue_size=3)
+    rospy.init_node('kite_arduino', anonymous=True)
     rate = rospy.Rate(5)  # 5hz
     msg = Kite_arduino()
     msg.rleft = rleft
