@@ -147,7 +147,7 @@ def display_line(angle, cx,cy, radius, colour):
 
 # Main routine start
 # this will need to not happen if arguments are passed
-source = 2  # change back to 1 to get prompt
+source = 1  # change back to 1 to get prompt
 while source not in {1, 2}:
     source = input('Key 1 for camera or 2 for source')
 # should define source here
