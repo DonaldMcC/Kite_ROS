@@ -4,3 +4,5 @@
     <node name="talk_arduino_stub" pkg="kite_ros" type="talk_arduino_stub.py" />
 
     </launch>
+
+  /*  rosrun rosserial_python serial_node.py /dev/ttyACM*/
