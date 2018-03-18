@@ -5,4 +5,4 @@
 
     </launch>
 
-  /*  rosrun rosserial_python serial_node.py /dev/ttyACM*/
+  <!--  rosrun rosserial_python serial_node.py /dev/ttyACM*/ -->

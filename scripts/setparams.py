@@ -13,6 +13,8 @@ def set_kite_base():
     rospy.set_param('centremaxright', 1015)
     rospy.set_param('rightmax', 227)
     rospy.set_param('rightmin', 697)
+    rospy.set_param('maxangleleft', 45)
+    rospy.set_param('maxangleright', 47)
 
 
 def set_source():

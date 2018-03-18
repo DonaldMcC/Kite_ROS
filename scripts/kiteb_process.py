@@ -22,14 +22,22 @@ def linearmap(value, minx, maxx, miny, maxy):
         -30.0
         >>> linearmap(400, 100, 500, 60, 0)
         15.0
+        >>> linearmap(674, 826.0, 990.0, 0.0, 47.0)
+        -43.5609756097561
+        >>> linearmap(826, 826.0, 990.0, 0.0, 47.0)
+        0.0
+        >>> linearmap(1005, 826.0, 990.0, 0.0, 47)
+        51.29878048780488
+
+
     """
+
+
     return miny + (value-minx)/(1.0 * maxx-minx) * (maxy-miny)
 
 
 def get_bar_angle(rcent, centremaxleft, centremiddle, centremaxright, maxangleleft, maxangleright):
-    # TODO need to establish if resistor is linear across range - probalby some graphing required and also what
-    # are the max angle then we have a plot to work with
-
+    # seems resistor is roughly linear
     """Transform resistance to angle in degrees
         >>> get_bar_angle(300, 100, 500, 900, -60, 60)
         -30.0
@@ -39,26 +47,15 @@ def get_bar_angle(rcent, centremaxleft, centremiddle, centremaxright, maxanglele
         -15.0
         >>> get_bar_angle(100, 900, 500, 100, -60, 90)
         90.0
+        >>> get_bar_angle(700, 657, 826, 1005, -45, 47)
+        -33.08379888268156
+
     """
 
     angle = 0
     # allow resistor to operate either way +ve
-    if centremaxleft < centremaxright:
-        if centremiddle <= rcent <= centremaxright:
-            angle = linearmap(rcent, centremiddle, centremaxright, 0, maxangleright)
-        elif centremaxleft <= rcent < centremiddle:
-            # this should return a -ve and maxangleleft should also be set as -ve
-            angle = linearmap(rcent, centremiddle, centremaxleft, 0, maxangleleft)
-        else:
-            print('centre angle outwith permitted range')
-    else:  # centremaxleft is +ve so we need to invert mapping
-        if centremiddle <= rcent <= centremaxleft:
-            angle = linearmap(rcent, centremiddle, centremaxright, 0, maxangleleft*-1)
-        elif centremaxright <= rcent < centremiddle:
-            # this should return a -ve and maxangleleft should also be set as -ve
-            angle = linearmap(rcent, centremiddle, centremaxleft, 0, maxangleright * -1)
-        else:
-            print('centre angle outwith permitted range')
+
+    angle = linearmap(rcent, centremiddle, centremaxright, 0, maxangleright)
 
     return angle
 
@@ -74,11 +71,11 @@ def proc_arduino(message):
     return answer
 
 
-def _test():
+def _test(verbosity):
     import doctest
-    doctest.testmod(verbose=True)
+    doctest.testmod(verbose=verbosity)
 
 
 if __name__ == '__main__':
     'Can run with -v option if you want to confirm tests were run'
-    _test()
+    _test(False)

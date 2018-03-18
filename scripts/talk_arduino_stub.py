@@ -24,13 +24,13 @@ def kite_arduino(rleft, rcent, rright, heading, varx, vary, varz):
         pub.publish(msg)
         rate.sleep()
         msg.rcent += inc
-        if msg.rcent >= 1000:
-            msg.rcent = 3
+        if msg.rcent >= 1005:
+            msg.rcent = 674
     return
 
 
 if __name__ == '__main__':
     try:
-        kite_arduino(100, 200, 45, 1, 0, 0, 0)
+        kite_arduino(100, 674, 45, 1, 0, 0, 0)
     except rospy.ROSInterruptException:
         pass
