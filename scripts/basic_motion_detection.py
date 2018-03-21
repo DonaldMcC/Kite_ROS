@@ -214,7 +214,11 @@ while True:  # Main module loop
         # h, w = frame.shape[:2]
         #height, width = 480, 640 - removed should now be set above
         writer = initwriter("record.avi", height, width, fps)
-
+        origwriter = initwriter("origrecord.avi", height, width, fps)
+        
+    if logging:
+        writeframe(origwriter, frame, height, width)
+        
     gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     gray_frame = cv2.GaussianBlur(gray_frame, (21, 21), 0)
     diff = cv2.absdiff(background, gray_frame)
