@@ -147,7 +147,7 @@ def display_line(angle, cx,cy, radius, colour):
 
 # Main routine start
 # this will need to not happen if arguments are passed
-source = 2  # change back to 1 to get prompt
+source = 1  # change back to 1 to get prompt
 while source not in {1, 2}:
     source = input('Key 1 for camera or 2 for source')
 # should define source here
@@ -221,7 +221,6 @@ while True:  # Main module loop
     diff = cv2.threshold(diff, 25, 255, cv2.THRESH_BINARY)[1]
     diff = cv2.dilate(diff, es, iterations=2)
     image, cnts, hierarchy = cv2.findContours(diff.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    # hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
     if control.mode == 1:
         kite = mankite
@@ -267,7 +266,6 @@ while True:  # Main module loop
 
     # TODO sort how we do this outside loop
     # cv2.line(frame, kite.pts[i - 1], kite.pts[i], (0, 0, 255), kite.thickness)
-
     # show the movement deltas and the direction of movement on the frame
     cv2.putText(frame, kite.direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
     cv2.putText(frame, "dx: {}, dy: {}".format(kite.dX, kite.dY),
@@ -324,7 +322,7 @@ while True:  # Main module loop
     cv2.imshow("contours", frame)
     kiteimage.pubimage(imagemessage, frame)
     counter += 1
-    # writeframe(writer, frame, height, width)
+    writeframe(writer, frame, height, width)
 
     key = cv2.waitKey(8) & 0xff
     # think there will be a mode option in here as well
