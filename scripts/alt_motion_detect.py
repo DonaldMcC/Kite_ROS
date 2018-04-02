@@ -1,6 +1,7 @@
 # import the necessary packages -this came from pyimagesearch.com and will be compared to
 # basic_motion_detction
-# not currently being used int this project - may revert to if issues with kite detection
+# not currently being used int this project - may revert to if issues with kite detection on the camera
+
 import numpy as np
 from collections import deque
 import argparse

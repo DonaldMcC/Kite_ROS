@@ -1,5 +1,5 @@
 #  This module will cover setting the target bar angle based on desired route.  The actual bar angle
-#  will come via arduino or some other rospy simulation message
+#  will come via arduino or some other rospy simulation message eg talk_arduino_stub.py
 #   their will be a number of situations
 #   1 park mode - aim is just to keep the kiteangle to zero so we adjust bar angle accordingly
 #   2 wiggle mode - aim will I think be to get kiteangle to specified value and once there we change so
@@ -17,7 +17,7 @@
 #  when coming out of a turn - let's assume we don't need PID style control yet as wind is dynamic and there is no real
 #  stability - however there is undoubtedly lag between moving the bar and the kite adjusting and if we don't have a
 #  system to cope with that then it will fail - we probably need to project and anticipate at the start and end
-#  but also if possible learn the likely 
+#  but also if possible learn the likely patterns
 
 from collections import deque
 from routeplan import Kite, Controls
@@ -73,7 +73,6 @@ def setangle(kite, base, controls):
     delta = kite.targetangle - kite.kiteangle
     targetbarangle = checklimits(base.barangle + (delta * base.kitebarratio),
                                  base.maxleft, base.maxright)
-                                 
     return targetbarangle
 
 
