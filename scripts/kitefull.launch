@@ -4,5 +4,6 @@
 <launch>
   <node name="kite_ros" pkg= 'kite_ros' type="basic_motion_detection.py" />
     <node name="arduino" pkg= 'rosserial_python' type="serial_node.py" args="/dev/ttyACM0"/>
+    <node name="kite_ros" pkg= 'kite_ros' type="kitebar.py" />
     <node pkg="rosbag" type="record" name="record" output="screen" args="-a"/>
 </launch>
