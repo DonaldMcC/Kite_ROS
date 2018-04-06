@@ -20,7 +20,7 @@ def talker():
 
 
 def kite_pos(posx, posy, kiteangle, dirx, diry, routepoints, priorpos):
-    pub = rospy.Publisher('custom_chatter', Kitepos, queue_size=10)
+    pub = rospy.Publisher('kite_position', Kitepos, queue_size=10)
     rospy.init_node('custom_talker', anonymous=True)
     rate = rospy.Rate(10)  # 10hz
     msg = Kitepos()
@@ -33,18 +33,13 @@ def kite_pos(posx, posy, kiteangle, dirx, diry, routepoints, priorpos):
     rospy.loginfo(msg)
     pub.publish(msg)
 
-    # while not rospy.is_shutdown():
-    #    hello_str = "hello world %s" % rospy.get_time()
-    #    rospy.loginfo(msg)
-    #    pub.publish(msg)
-    #    rate.sleep()
     return
 
 
 class kiteimage:
 
     def __init__(self):
-        self.image_pub = rospy.Publisher('kite_chatter', Image, queue_size=10)
+        self.image_pub = rospy.Publisher('kite_image', Image, queue_size=10)
         self.bridge = CvBridge()
 
     def pubimage(self, cv_image):
