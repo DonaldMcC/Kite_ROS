@@ -2,7 +2,11 @@ Header header
 uint16 rleft
 uint16 rcent
 uint16 rright
-uint16 heading
-uint16 varx
-uint16 vary
-uint16 varz
+uint16 rother
+uint16 rother2
+float32 pitch
+float32 roll
+float32 heading
+float32 varx
+float32 vary
+float32 varz
