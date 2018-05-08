@@ -48,10 +48,10 @@ def drawroute(route, centrex, centrey):
     for i, j in enumerate(route):
         if i < len(route) - 1:
             cv2.line(frame, (j[0], j[1]), (route[i + 1][0], route[i + 1][1]),
-                     (255, 0, 255), thickness=1, lineType=8, shift=0)
+                     (0, 255, 70), thickness=2, lineType=8, shift=0)
         else:
             cv2.line(frame, (j[0], j[1]), (route[0][0], route[0][1]),
-                     (255, 0, 255), thickness=1, lineType=8, shift=0)
+                     (0, 255, 70), thickness=2, lineType=8, shift=0)
     cv2.line(frame, (centrex, 0), (centrex, centrey * 2),
              (255, 0, 0), thickness=2, lineType=8, shift=0)
     return
