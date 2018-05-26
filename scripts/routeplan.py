@@ -39,6 +39,7 @@ class Kite(object):
         (self.dX, self.dY) = (0, 0)
         self.direction = ""
         self.kiteangle = 0
+        self.contourarea = 0
         self.zone = ""
         self.targettype = 'Angle'
         self.targetx = 0

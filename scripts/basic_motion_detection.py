@@ -147,7 +147,7 @@ def display_line(angle, cx,cy, radius, colour):
 
 # Main routine start
 # this will need to not happen if arguments are passed
-source = 1  # change back to 1 to get prompt
+source = 2  # change back to 1 to get prompt
 while source not in {1, 2}:
     source = input('Key 1 for camera or 2 for source')
 # should define source here
@@ -158,7 +158,8 @@ if source == 1:
 else:
     logging = 0
     # TODO at some point will change this to current directory and append file - not urnger
-    camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
+    #camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
+    camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/orig2605.avi')
 
 width = int(camera.get(3))
 height = int(camera.get(4))
@@ -222,9 +223,13 @@ while True:  # Main module loop
     gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     gray_frame = cv2.GaussianBlur(gray_frame, (21, 21), 0)
     diff = cv2.absdiff(background, gray_frame)
+    #diff = cv2.threshold(diff, 25, 255, cv2.THRESH_BINARY)[1]
     diff = cv2.threshold(diff, 25, 255, cv2.THRESH_BINARY)[1]
+    # below didnt work
+    # diff = cv2.adaptiveThreshold(diff,255,cv2.ADAPTIVE_THRESH_MEAN_C,cv2.THRESH_BINARY,11,2)
+
     diff = cv2.dilate(diff, es, iterations=2)
-    image, cnts, hierarchy = cv2.findContours(diff.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    image, cnts, hierarchy = cv2.findContours(diff.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
     if control.mode == 1:
         kite = mankite
@@ -249,6 +254,7 @@ while True:  # Main module loop
             if np.sum(mask) > 1000:
                 # outputframe = cv2.bitwise_and(roi, mask, mask=mask)
                 kite.found = True
+                kite.countourarea = cv2.contourArea(c)
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 255, 0), 2)
                 finalframe = frame[y:y + h, x:x + w]
                 center = (x + (w // 2), y + (h // 2))
@@ -263,7 +269,8 @@ while True:  # Main module loop
 
                 cv2.drawContours(frame, [box], 0, (0, 0, 255), 2)
                 kite.kiteangle = get_angle(box, kite.dX, kite.dY)
-                continue
+                if kite.contourarea < 3000: #else look for smaller area
+                    continue
 
     # start direction and analysis - this will be a routine based on class
     getdirection(kite)
@@ -276,7 +283,6 @@ while True:  # Main module loop
                         (10, height - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 1)
     cv2.putText(frame, "x: {}, y: {}".format(mankite.x, mankite.y),
                         (180, height - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 1)
-            
 
     kite.targetheading = get_heading_points((kite.x, kite.y), (kite.targetx, kite.targety))
     kite.targetangle = kite.targetheading
@@ -287,6 +293,8 @@ while True:  # Main module loop
     cv2.putText(frame, "Tgt Heading:" + str(int(kite.targetheading)), (10, 90),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255),2)
     cv2.putText(frame, "Mode:" + str(control.mode), (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255),2)
+    cv2.putText(frame, "Area:" + str(kite.countourarea), (10, 130), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255),2)
+
 
     kite.update_zone(control)
     kite.update_phase()
@@ -325,10 +333,15 @@ while True:  # Main module loop
     # cv2.imshow("mask", mask)
     cv2.imshow("contours", frame)
     kiteimage.pubimage(imagemessage, frame)
-    counter += 1
-    writeframe(writer, frame, height, width)
 
-    key = cv2.waitKey(8) & 0xff
+
+    counter += 1
+    if logging: # not saving this either as it errors on other screen
+
+        writeframe(writer, frame, height, width)
+
+    # change to -1 for debugging
+    key = cv2.waitKey(1) & 0xff
     # think there will be a mode option in here as well
     # one key changes mode and we would show the possible keys somewhere
     if key == ord("q"):
@@ -336,6 +349,7 @@ while True:  # Main module loop
     elif key != -1:
         routepoints = control.keyhandler(key, kite)
     time.sleep(control.slow)
+    print counter
 
 print("[INFO] cleaning up...")
 cv2.destroyAllWindows()
