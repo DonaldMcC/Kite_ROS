@@ -178,6 +178,7 @@ imagemessage = kiteimage()
 # initialize the list of tracked points, the frame counter,
 # and the coordinate deltas
 counter = 0
+foundcounter = 0
 
 # http://www.pyimagesearch.com/2014/08/04/opencv-python-color-detection/
 # define the list of boundaries
@@ -187,10 +188,16 @@ counter = 0
 # orange
 # boundaries = [([0, 50, 100], [100, 200, 255])]
 
-boundaries = [([0, 0, 0], [40, 40, 40]),
+#boundaries = [([0, 0, 0], [40, 40, 40]),
+#              ([10, 100, 10], [100, 255, 100]),
+#              ([0, 50, 100], [100, 200, 255])
+#              ]
+
+boundaries = [([0, 0, 0], [70, 70, 70]),
               ([10, 100, 10], [100, 255, 100]),
-              ([0, 50, 100], [100, 200, 255])
+              ([0, 50, 100], [120, 220, 255])
               ]
+
 
 for (lower, upper) in boundaries:
     # create NumPy arrays from the boundaries
@@ -245,16 +252,16 @@ while True:  # Main module loop
     # identify the kite
     if control.mode == 0:  # not detecting if in manual mode
         for c in cnts:
-            if cv2.contourArea(c) < 1500:
+            if cv2.contourArea(c) < 800:
                 continue
             (x, y, w, h) = cv2.boundingRect(c)
             roi = frame[y:y + h, x:x + w]
             # loop over the boundaries
             mask = cv2.inRange(roi, low, upp)
-            if np.sum(mask) > 1000:
+            if np.sum(mask) > 500:
                 # outputframe = cv2.bitwise_and(roi, mask, mask=mask)
                 kite.found = True
-                kite.countourarea = cv2.contourArea(c)
+                kite.contourarea = cv2.contourArea(c)
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 255, 0), 2)
                 finalframe = frame[y:y + h, x:x + w]
                 center = (x + (w // 2), y + (h // 2))
@@ -293,7 +300,7 @@ while True:  # Main module loop
     cv2.putText(frame, "Tgt Heading:" + str(int(kite.targetheading)), (10, 90),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255),2)
     cv2.putText(frame, "Mode:" + str(control.mode), (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255),2)
-    cv2.putText(frame, "Area:" + str(kite.countourarea), (10, 130), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255),2)
+    cv2.putText(frame, "Area:" + str(kite.contourarea), (10, 130), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255),2)
 
 
     kite.update_zone(control)
@@ -336,6 +343,8 @@ while True:  # Main module loop
 
 
     counter += 1
+    if kite.found:
+        foundcounter += 1
     if logging: # not saving this either as it errors on other screen
 
         writeframe(writer, frame, height, width)
@@ -350,6 +359,9 @@ while True:  # Main module loop
         routepoints = control.keyhandler(key, kite)
     time.sleep(control.slow)
     print counter
+    if counter > 633:
+        print 'found:', foundcounter
+        break
 
 print("[INFO] cleaning up...")
 cv2.destroyAllWindows()
