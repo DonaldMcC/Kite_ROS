@@ -6,7 +6,9 @@ import time
 if __name__ == '__main__' :
 
     # Start default camera
-    video = cv2.VideoCapture(0);
+    #video = cv2.VideoCapture(0);
+    video = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/orig2605.avi')
+
 
     # Find OpenCV version
     (major_ver, minor_ver, subminor_ver) = (cv2.__version__).split('.')
