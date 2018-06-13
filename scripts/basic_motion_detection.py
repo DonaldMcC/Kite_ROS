@@ -159,7 +159,8 @@ else:
     logging = 0
     # TODO at some point will change this to current directory and append file - not urnger
     #camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
-    camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/orig2605.avi')
+    #camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/orig2605.avi')
+    camera = cv2.VideoCapture(r'/home/donald/kite_videos/IMG_1023.MOV')
 
 width = int(camera.get(3))
 height = int(camera.get(4))
