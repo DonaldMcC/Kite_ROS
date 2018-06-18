@@ -159,7 +159,9 @@ else:
     logging = 0
     # TODO at some point will change this to current directory and append file - not urnger
     #camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
-    camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/orig2605.avi')
+    #camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/orig2605.avi')
+    camera = cv2.VideoCapture(r'/home/donald/Videos/IMG_1023.MOV')
+    print 'video:',camera.grab()
 
 width = int(camera.get(3))
 height = int(camera.get(4))
@@ -252,6 +254,7 @@ while True:  # Main module loop
     # identify the kite
     if control.mode == 0:  # not detecting if in manual mode
         for c in cnts:
+            # so potentially changing this to look for 2 yellow balls on line l
             if cv2.contourArea(c) < 800:
                 continue
             (x, y, w, h) = cv2.boundingRect(c)
