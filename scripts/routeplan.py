@@ -28,7 +28,7 @@ from move_func import get_heading_points
 class Kite(object):
 
     def __init__(self, x=0, y=0, mode='Park', phase='Park', targetheading=0, targetangle=0,
-                 thickness=1):
+                 thickness=1, leftballx=0, leftbally=0, rightballx=0, rightbally=0):
         self.x = x
         self.y = y
         self.mode = mode
@@ -51,6 +51,10 @@ class Kite(object):
         self.targetheading = targetheading
         self.targetangle = targetangle
         self.thickness = 1
+        self.leftballx = 0
+        self.leftbally = 0
+        self.rightballx = 0
+        self.rightbally = 0
         
 
     def get_zone(self, leftx, rightx):

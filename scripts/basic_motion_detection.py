@@ -148,6 +148,9 @@ def display_line(angle, cx,cy, radius, colour):
 # Main routine start
 # this will need to not happen if arguments are passed
 source = 2  # change back to 1 to get prompt
+config = 'std' # this is the kitebase present and no balls on the lines
+# config = 'yellowballs'  # alternative when base not present will also possibly be combo
+
 while source not in {1, 2}:
     source = input('Key 1 for camera or 2 for source')
 # should define source here
@@ -206,7 +209,8 @@ for (lower, upper) in boundaries:
     low = np.array(lower, dtype="uint8")
     upp = np.array(upper, dtype="uint8")
 
-listen_kitebase()
+if config == 'std':  # otherwise not present
+    listen_kitebase()
 writer = None
 cv2.startWindowThread()
 cv2.namedWindow('contours')
@@ -252,7 +256,7 @@ while True:  # Main module loop
         kite.found = True
 
     # identify the kite
-    if control.mode == 0:  # not detecting if in manual mode
+    if control.mode == 0 and config == 'std':  # not detecting if in manual mode
         for c in cnts:
             # so potentially changing this to look for 2 yellow balls on line l
             if cv2.contourArea(c) < 800:
@@ -281,7 +285,36 @@ while True:  # Main module loop
                 kite.kiteangle = get_angle(box, kite.dX, kite.dY)
                 if kite.contourarea < 3000: #else look for smaller area
                     continue
+    elif config == 'yellowballs':
+        for c in cnts:
+            # so this is now going to look for 2 yellow balls on the line and identify centre of them
+            if cv2.contourArea(c) < 800:
+                continue
+            (x, y, w, h) = cv2.boundingRect(c)
+            roi = frame[y:y + h, x:x + w]
+            # loop over the boundaries
+            mask = cv2.inRange(roi, low, upp)
+            if np.sum(mask) > 500:
+                # outputframe = cv2.bitwise_and(roi, mask, mask=mask)
+                kite.found = True
+                kite.contourarea = cv2.contourArea(c)
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 255, 0), 2)
+                finalframe = frame[y:y + h, x:x + w]
+                center = (x + (w // 2), y + (h // 2))
+                kite.pts.appendleft(center)
+                kite.x = center[0]
+                kite.y = center[1]
 
+                # Min Area seems reasonable to get angle of kite
+                rect = cv2.minAreaRect(c)
+                box = cv2.boxPoints(rect)  # cv2.boxPoints(rect) for OpenCV 3.x
+                box = np.int0(box)
+
+                cv2.drawContours(frame, [box], 0, (0, 0, 255), 2)
+                kite.kiteangle = get_angle(box, kite.dX, kite.dY)
+                if kite.contourarea < 3000: #else look for smaller area
+                    continue
+                    
     # start direction and analysis - this will be a routine based on class
     getdirection(kite)
 
