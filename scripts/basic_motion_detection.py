@@ -262,47 +262,38 @@ while True:  # Main module loop
 
     # identify the kite
     if control.mode == 0 and config == 'std':  # not detecting if in manual mode
-        maxmask = 0
+        maxmask = -1
         index = -1
         for i, c in enumerate(cnts):
             mask = kitemask(c, frame, low, upp)
             if mask>maxmask:
                 index= i
                 maxmask = mask
-            #if cv2.contourArea(c) < 800:
-            #    continue
-            #(x, y, w, h) = cv2.boundingRect(c)
-            #roi = frame[y:y + h, x:x + w]
-            # loop over the boundaries
-            #mask = cv2.inRange(roi, low, upp)
-            #if np.sum(mask) > 500 and np.sum(mask) > maxmask:
-                # outputframe = cv2.bitwise_and(roi, mask, mask=mask)
-                #maxmask = np.sum(mask)
-                #kite.found = True
-                #kite.contourarea = cv2.contourArea(c)
-                #cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 255, 0), 2)
-                #finalframe = frame[y:y + h, x:x + w]
-                #center = (x + (w // 2), y + (h // 2))
-                #kite.pts.appendleft(center)
-                #kite.x = center[0]
-                #kite.y = center[1]
 
-                # Min Area seems reasonable to get angle of kite
-                #rect = cv2.minAreaRect(c)
-                #box = cv2.boxPoints(rect)  # cv2.boxPoints(rect) for OpenCV 3.x
-                #box = np.int0(box)
+        if maxmask > 0:
+            kite.found = True
+            c=cnts[index]
+            kite.contourarea = cv2.contourArea(cnts[index])
+            (x, y, w, h) = cv2.boundingRect(c)
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 255, 0), 2)
+            finalframe = frame[y:y + h, x:x + w]
+            center = (x + (w // 2), y + (h // 2))
+            kite.pts.appendleft(center)
+            kite.x = center[0]
+            kite.y = center[1]
 
-                #cv2.drawContours(frame, [box], 0, (0, 0, 255), 2)
-                #kite.kiteangle = get_angle(box, kite.dX, kite.dY)
-                #if kite.contourarea < 3000: #else look for smaller area
-                #    continue
+            # Min Area seems reasonable to get angle of kite
+            rect = cv2.minAreaRect(c)
+            box = cv2.boxPoints(rect)  # cv2.boxPoints(rect) for OpenCV 3.x
+            box = np.int0(box)
+
+            cv2.drawContours(frame, [box], 0, (0, 0, 255), 2)
+            kite.kiteangle = get_angle(box, kite.dX, kite.dY)
         #print index, maxmask
 
     # start direction and analysis - this will be a routine based on class
     getdirection(kite)
 
-    # TODO sort how we do this outside loop
-    # cv2.line(frame, kite.pts[i - 1], kite.pts[i], (0, 0, 255), kite.thickness)
     # show the movement deltas and the direction of movement on the frame
     cv2.putText(frame, kite.direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
     cv2.putText(frame, "dx: {}, dy: {}".format(kite.dX, kite.dY),
