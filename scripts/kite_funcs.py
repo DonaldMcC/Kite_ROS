@@ -13,7 +13,7 @@ import cv2
 
 
 def kitemask(c, frame):
-    if cv2.contourArea(c) < 800:
+    if cv2.contourArea(c) < 3000:
         return 0
 
     boundaries = [([0, 0, 0], [30, 30, 30]),
@@ -37,6 +37,6 @@ def kitemask(c, frame):
         # loop over the boundaries
         mask = cv2.inRange(roi, low, upp)
         totmask *= np.sum(mask)
-        #print x,y,w,h, "cont", cv2.contourArea(c)
-        #print "mask: ", np.sum(mask), totmask
+        print x,y,w,h, "cont", cv2.contourArea(c)
+        print "mask: ", np.sum(mask), totmask
     return totmask
