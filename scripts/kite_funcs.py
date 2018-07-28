@@ -10,19 +10,26 @@ import cv2
 # orange
 # boundaries = [([0, 50, 100], [100, 200, 255])]
 
-
+#iphone video
+#contourmin = 3000
+#wind
+contourmin = 800
 
 def kitemask(c, frame):
-    if cv2.contourArea(c) < 3000:
+    if cv2.contourArea(c) < contourmin:
         return 0
 
     boundaries = [([0, 0, 0], [30, 30, 30]),
                   ([10, 10, 100], [100, 100, 255]),
                   ([0, 50, 100], [120, 220, 255])
                   ]
-    # looking for red and yellow only
+    # iphone
     boundaries = [([0, 0, 100], [100, 100, 255]),
                   ([0, 50, 150], [120, 220, 255])
+                  ]
+    # wind 64,111,106
+    boundaries = [([0, 0, 100], [100, 100, 255]),
+                  ([0, 50, 100], [120, 220, 255])
                   ]
     totmask = 1
 

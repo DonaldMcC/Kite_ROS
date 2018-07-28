@@ -150,6 +150,10 @@ def display_line(angle, cx,cy, radius, colour):
 # this will need to not happen if arguments are passed
 source = 2  # change back to 1 to get prompt
 config = 'std' # this is the kitebase present and no balls on the lines
+#iphone
+masklimit = 10000
+#wind
+masklimit = 1000
 # config = 'yellowballs'  # alternative when base not present will also possibly be combo
 
 while source not in {1, 2}:
@@ -162,9 +166,9 @@ if source == 1:
 else:
     logging = 0
     # TODO at some point will change this to current directory and append file - not urnger
-    #camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
+    camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
     #camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/orig2605.avi')
-    camera = cv2.VideoCapture(r'/home/donald/Videos/IMG_1389Trim1.mp4')
+    #camera = cv2.VideoCapture(r'/home/donald/Videos/IMG_1389Trim1.mp4')
     print 'video:',camera.grab()
 
 width = int(camera.get(3))
@@ -263,7 +267,7 @@ while True:  # Main module loop
             #(x, y, w, h) = cv2.boundingRect(c)
             #cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 125, 0), 2)
 
-        if maxmask > 10000:
+        if maxmask > masklimit:
             kite.found = True
             c=cnts[index]
             kite.contourarea = cv2.contourArea(cnts[index])
