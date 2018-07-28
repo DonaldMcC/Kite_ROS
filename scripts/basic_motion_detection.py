@@ -186,29 +186,20 @@ imagemessage = kiteimage()
 counter = 0
 foundcounter = 0
 
-# http://www.pyimagesearch.com/2014/08/04/opencv-python-color-detection/
-# define the list of boundaries
-# boundaries = [([0, 0, 0], [40, 40, 40])]
-# green
-# boundaries = [([10, 100, 10], [100, 255, 100])]
-# orange
-# boundaries = [([0, 50, 100], [100, 200, 255])]
 
-#boundaries = [([0, 0, 0], [40, 40, 40]),
+
+
+
+#boundaries = [([0, 0, 0], [70, 70, 70]),
 #              ([10, 100, 10], [100, 255, 100]),
-#              ([0, 50, 100], [100, 200, 255])
+#              ([0, 50, 100], [120, 220, 255])
 #              ]
 
-boundaries = [([0, 0, 0], [70, 70, 70]),
-              ([10, 100, 10], [100, 255, 100]),
-              ([0, 50, 100], [120, 220, 255])
-              ]
 
-
-for (lower, upper) in boundaries:
-    # create NumPy arrays from the boundaries
-    low = np.array(lower, dtype="uint8")
-    upp = np.array(upper, dtype="uint8")
+#for (lower, upper) in boundaries:
+#    # create NumPy arrays from the boundaries
+#    low = np.array(lower, dtype="uint8")
+#    upp = np.array(upper, dtype="uint8")
 
 if config == 'std':  # otherwise not present
     listen_kitebase()
@@ -265,12 +256,14 @@ while True:  # Main module loop
         maxmask = -1
         index = -1
         for i, c in enumerate(cnts):
-            mask = kitemask(c, frame, low, upp)
+            mask = kitemask(c, frame)
             if mask>maxmask:
                 index= i
                 maxmask = mask
+            #(x, y, w, h) = cv2.boundingRect(c)
+            #cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 125, 0), 2)
 
-        if maxmask > 0:
+        if maxmask > 10000:
             kite.found = True
             c=cnts[index]
             kite.contourarea = cv2.contourArea(cnts[index])
