@@ -148,7 +148,7 @@ def display_line(angle, cx,cy, radius, colour):
 
 # Main routine start
 # this will need to not happen if arguments are passed
-source = 2  # change back to 1 to get prompt
+source = 1  # change back to 1 to get prompt
 config = 'std' # this is the kitebase present and no balls on the lines
 #iphone
 masklimit = 10000
@@ -156,20 +156,21 @@ masklimit = 10000
 masklimit = 1000
 # config = 'yellowballs'  # alternative when base not present will also possibly be combo
 
+
 while source not in {1, 2}:
     source = input('Key 1 for camera or 2 for source')
 # should define source here
 if source == 1:
-    camera = cv2.VideoCapture(0)
+    #camera = cv2.VideoCapture(0)
     logging = 1
-# camera=cv2.VideoCapture('IMG_0464.MOV')
+    camera=cv2.VideoCapture('IMG_0464.MOV')
 else:
     logging = 0
     # TODO at some point will change this to current directory and append file - not urnger
     camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
     #camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/orig2605.avi')
     #camera = cv2.VideoCapture(r'/home/donald/Videos/IMG_1389Trim1.mp4')
-    print 'video:',camera.grab()
+    print('video:',camera.grab())
 
 width = int(camera.get(3))
 height = int(camera.get(4))
@@ -367,9 +368,9 @@ while True:  # Main module loop
     elif key != -1:
         routepoints = control.keyhandler(key, kite)
     time.sleep(control.slow)
-    print counter
+    print (counter)
     if counter > 633:
-        print 'found:', foundcounter
+        print ('found:', foundcounter)
         break
 
 print("[INFO] cleaning up...")
