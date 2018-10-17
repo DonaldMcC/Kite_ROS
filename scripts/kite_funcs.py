@@ -44,6 +44,6 @@ def kitemask(c, frame):
         # loop over the boundaries
         mask = cv2.inRange(roi, low, upp)
         totmask *= np.sum(mask)
-        print x,y,w,h, "cont", cv2.contourArea(c)
-        print "mask: ", np.sum(mask), totmask
+        print (x,y,w,h, "cont", cv2.contourArea(c))
+        print ("mask: ", np.sum(mask), totmask)
     return totmask

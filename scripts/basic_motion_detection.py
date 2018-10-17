@@ -148,7 +148,7 @@ def display_line(angle, cx,cy, radius, colour):
 
 # Main routine start
 # this will need to not happen if arguments are passed
-source = 1  # change back to 1 to get prompt
+source = 2  # change back to 1 to get prompt
 config = 'std' # this is the kitebase present and no balls on the lines
 #iphone
 masklimit = 10000
@@ -349,7 +349,8 @@ while True:  # Main module loop
     # cv2.imshow("roi", finalframe)
     # cv2.imshow("mask", mask)
     cv2.imshow("contours", frame)
-    kiteimage.pubimage(imagemessage, frame)
+    #below commented due to failing on 18.04    
+    #kiteimage.pubimage(imagemessage, frame)
 
 
     counter += 1
