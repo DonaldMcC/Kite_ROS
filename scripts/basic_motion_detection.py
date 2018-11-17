@@ -161,15 +161,15 @@ while source not in {1, 2}:
     source = input('Key 1 for camera or 2 for source')
 # should define source here
 if source == 1:
-    #camera = cv2.VideoCapture(0)
+    camera = cv2.VideoCapture(0)
     logging = 1
-    camera=cv2.VideoCapture('IMG_0464.MOV')
+    #camera=cv2.VideoCapture('IMG_0464.MOV')
 else:
     logging = 0
     # TODO at some point will change this to current directory and append file - not urnger
-    camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
+    #camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
     #camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/orig2605.avi')
-    #camera = cv2.VideoCapture(r'/home/donald/Videos/IMG_1389Trim1.mp4')
+    camera = cv2.VideoCapture(r'/home/donald/Downloads/IMG_1545.MOV')
     print('video:',camera.grab())
 
 width = int(camera.get(3))

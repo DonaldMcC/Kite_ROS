@@ -25,12 +25,8 @@ def kitemask(c, frame, kitecolours = 'kite1'):
         return 0
 
     if kitecolours == 'indoorkite':
-        now 
-        boundaries = [([0, 0, 100], [100, 100, 255]),
-                  ([0, 50, 100], [120, 220, 255])
-                  ]
+        boundaries = [([10, 10, 140], [70, 70, 200])]
         
-    
     else:
         boundaries = [([0, 0, 0], [30, 30, 30]),
                   ([10, 10, 100], [100, 100, 255]),
