@@ -155,7 +155,7 @@ masklimit = 10000
 #wind
 masklimit = 1000
 # config = 'yellowballs'  # alternative when base not present will also possibly be combo
-
+KITETYPE = 'indoorkite'  # need to comment out for external
 
 while source not in {1, 2}:
     source = input('Key 1 for camera or 2 for source')
@@ -190,21 +190,6 @@ imagemessage = kiteimage()
 # and the coordinate deltas
 counter = 0
 foundcounter = 0
-
-
-
-
-
-#boundaries = [([0, 0, 0], [70, 70, 70]),
-#              ([10, 100, 10], [100, 255, 100]),
-#              ([0, 50, 100], [120, 220, 255])
-#              ]
-
-
-#for (lower, upper) in boundaries:
-#    # create NumPy arrays from the boundaries
-#    low = np.array(lower, dtype="uint8")
-#    upp = np.array(upper, dtype="uint8")
 
 if config == 'std':  # otherwise not present
     listen_kitebase()
@@ -261,7 +246,7 @@ while True:  # Main module loop
         maxmask = -1
         index = -1
         for i, c in enumerate(cnts):
-            mask = kitemask(c, frame)
+            mask = kitemask(c, frame, KITETYPE)
             if mask>maxmask:
                 index= i
                 maxmask = mask
