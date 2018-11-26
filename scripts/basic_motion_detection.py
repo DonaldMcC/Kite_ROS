@@ -155,6 +155,7 @@ masklimit = 10000
 #wind
 masklimit = 1000
 # config = 'yellowballs'  # alternative when base not present will also possibly be combo
+KITETYPE = 'indoorkite'  # need to comment out for external
 
 while source not in {1, 2}:
     source = input('Key 1 for camera or 2 for source')
@@ -162,14 +163,14 @@ while source not in {1, 2}:
 if source == 1:
     camera = cv2.VideoCapture(0)
     logging = 1
-# camera=cv2.VideoCapture('IMG_0464.MOV')
+    #camera=cv2.VideoCapture('IMG_0464.MOV')
 else:
     logging = 0
     # TODO at some point will change this to current directory and append file - not urnger
-    camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
+    #camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
     #camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/orig2605.avi')
-    #camera = cv2.VideoCapture(r'/home/donald/Videos/IMG_1389Trim1.mp4')
-    print 'video:',camera.grab()
+    camera = cv2.VideoCapture(r'/home/donald/Downloads/IMG_1545.MOV')
+    print('video:',camera.grab())
 
 width = int(camera.get(3))
 height = int(camera.get(4))
@@ -189,21 +190,6 @@ imagemessage = kiteimage()
 # and the coordinate deltas
 counter = 0
 foundcounter = 0
-
-
-
-
-
-#boundaries = [([0, 0, 0], [70, 70, 70]),
-#              ([10, 100, 10], [100, 255, 100]),
-#              ([0, 50, 100], [120, 220, 255])
-#              ]
-
-
-#for (lower, upper) in boundaries:
-#    # create NumPy arrays from the boundaries
-#    low = np.array(lower, dtype="uint8")
-#    upp = np.array(upper, dtype="uint8")
 
 if config == 'std':  # otherwise not present
     listen_kitebase()
@@ -260,7 +246,7 @@ while True:  # Main module loop
         maxmask = -1
         index = -1
         for i, c in enumerate(cnts):
-            mask = kitemask(c, frame)
+            mask = kitemask(c, frame, KITETYPE)
             if mask>maxmask:
                 index= i
                 maxmask = mask
@@ -348,7 +334,8 @@ while True:  # Main module loop
     # cv2.imshow("roi", finalframe)
     # cv2.imshow("mask", mask)
     cv2.imshow("contours", frame)
-    kiteimage.pubimage(imagemessage, frame)
+    #below commented due to failing on 18.04    
+    #kiteimage.pubimage(imagemessage, frame)
 
 
     counter += 1
@@ -367,9 +354,9 @@ while True:  # Main module loop
     elif key != -1:
         routepoints = control.keyhandler(key, kite)
     time.sleep(control.slow)
-    print counter
+    print (counter)
     if counter > 633:
-        print 'found:', foundcounter
+        print ('found:', foundcounter)
         break
 
 print("[INFO] cleaning up...")

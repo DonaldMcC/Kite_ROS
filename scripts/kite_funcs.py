@@ -15,22 +15,33 @@ import cv2
 #wind
 contourmin = 800
 
-def kitemask(c, frame):
+def kitemask(c, frame, kitecolours = 'kite1'):
+    # This sets the properties for the kite we are looking for
+    # setup for now is just for kite1 but we can be looking for in
+    # different conditions and this might affect the colours
+    # so think we amend this to add the object for indoorkite
+    # and 
     if cv2.contourArea(c) < contourmin:
         return 0
 
-    boundaries = [([0, 0, 0], [30, 30, 30]),
+    if kitecolours == 'indoorkite':
+        boundaries = [([10, 10, 140], [70, 70, 200])]
+
+    else:
+        boundaries = [([0, 0, 0], [30, 30, 30]),
                   ([10, 10, 100], [100, 100, 255]),
                   ([0, 50, 100], [120, 220, 255])
                   ]
-    # iphone
-    boundaries = [([0, 0, 100], [100, 100, 255]),
+        # iphone
+        boundaries = [([0, 0, 100], [100, 100, 255]),
                   ([0, 50, 150], [120, 220, 255])
                   ]
-    # wind 64,111,106
-    boundaries = [([0, 0, 100], [100, 100, 255]),
+        # wind 64,111,106
+        boundaries = [([0, 0, 100], [100, 100, 255]),
                   ([0, 50, 100], [120, 220, 255])
                   ]
+        
+    
     totmask = 1
 
     for (lower, upper) in boundaries:
@@ -44,6 +55,6 @@ def kitemask(c, frame):
         # loop over the boundaries
         mask = cv2.inRange(roi, low, upp)
         totmask *= np.sum(mask)
-        print x,y,w,h, "cont", cv2.contourArea(c)
-        print "mask: ", np.sum(mask), totmask
+        print (x,y,w,h, "cont", cv2.contourArea(c))
+        print ("mask: ", np.sum(mask), totmask)
     return totmask
