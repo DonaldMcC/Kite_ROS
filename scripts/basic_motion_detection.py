@@ -136,15 +136,16 @@ def display_base():
     display_line(base.barangle * -1, centx, centy, radius, (0, 255, 0))
     return
 
+
 def display_line(angle, cx,cy, radius, colour):
     pointx, pointy = get_angled_corners(cx + radius, cy, angle, cx, cy)
     pointx = int(pointx)
     pointy = int(pointy)
     offx = cx - (pointx - cx)
     offy = cy - (pointy - cy)
-
     cv2.line(frame, (offx, offy), (pointx, pointy), colour , 2)
     return
+
 
 # Main routine start
 # this will need to not happen if arguments are passed
@@ -157,15 +158,30 @@ masklimit = 1000
 # config = 'yellowballs'  # alternative when base not present will also possibly be combo
 KITETYPE = 'indoorkite'  # need to comment out for external
 
-while source not in {1, 2}:
-    source = input('Key 1 for camera or 2 for source')
+#so thinking we have kite and controls, the video frame, posible sensor class
+#and perhaps a configuration class
+
+class Config(object):
+
+    def __init__(self, source=2,  setup='std', masklimit=10000, logging=0):
+        self.source = source
+        self.setup = setup
+        self.masklimit = masklimit
+        self.logging = logging
+
+config = Config()
+
+
+
+
+while config.source not in {1, 2}:
+    config.source = input('Key 1 for camera or 2 for source')
 # should define source here
-if source == 1:
+if config.source == 1:
     camera = cv2.VideoCapture(0)
-    logging = 1
+    config.logging = 1
     #camera=cv2.VideoCapture('IMG_0464.MOV')
 else:
-    logging = 0
     # TODO at some point will change this to current directory and append file - not urnger
     #camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
     #camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/orig2605.avi')
@@ -191,7 +207,7 @@ imagemessage = kiteimage()
 counter = 0
 foundcounter = 0
 
-if config == 'std':  # otherwise not present
+if config.setup == 'std':  # otherwise not present
     listen_kitebase()
 writer = None
 cv2.startWindowThread()
@@ -206,13 +222,13 @@ while True:  # Main module loop
         background = cv2.GaussianBlur(background, (21, 21), 0)
         continue
 
-    if logging and writer is None:
+    if config.logging and writer is None:
         # h, w = frame.shape[:2]
         #height, width = 480, 640 - removed should now be set above
         writer = initwriter("record.avi", height, width, fps)
         origwriter = initwriter("origrecord.avi", height, width, fps)
         
-    if logging:
+    if config.logging:
         writeframe(origwriter, frame, height, width)
         
     gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -341,7 +357,7 @@ while True:  # Main module loop
     counter += 1
     if kite.found:
         foundcounter += 1
-    if logging: # not saving this either as it errors on other screen
+    if config.logging: # not saving this either as it errors on other screen
 
         writeframe(writer, frame, height, width)
 
