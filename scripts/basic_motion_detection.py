@@ -160,19 +160,18 @@ KITETYPE = 'indoorkite'  # need to comment out for external
 
 #so thinking we have kite and controls, the video frame, posible sensor class
 #and perhaps a configuration class
+# controsl setup self.inputmodes = ('Standard', 'SetFlight', 'ManFly')
+
 
 class Config(object):
-
-    def __init__(self, source=2,  setup='std', masklimit=10000, logging=0):
+    def __init__(self, source=2,  setup='Standard', masklimit=10000, logging=0):
         self.source = source
         self.setup = setup
         self.masklimit = masklimit
         self.logging = logging
 
-config = Config()
 
-
-
+config = Config(setup='Manfly', source=1)
 
 while config.source not in {1, 2}:
     config.source = input('Key 1 for camera or 2 for source')
@@ -186,16 +185,17 @@ else:
     #camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
     #camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/orig2605.avi')
     camera = cv2.VideoCapture(r'/home/donald/Downloads/IMG_1545.MOV')
-    print('video:',camera.grab())
+    print('video:', camera.grab())
 
 width = int(camera.get(3))
 height = int(camera.get(4))
 
 # initiate class instances
-control = Controls()
+control = Controls(config.setup)
 actkite = Kite(control.centrex, control.centrey)
 mankite = Kite(300, 400)
 base = Base()
+
 # Initialisation steps
 es = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
 kernel = np.ones((5, 5), np.uint8)
@@ -207,7 +207,7 @@ imagemessage = kiteimage()
 counter = 0
 foundcounter = 0
 
-if config.setup == 'std':  # otherwise not present
+if config.setup == 'Standard':  # otherwise not present
     listen_kitebase()
 writer = None
 cv2.startWindowThread()
@@ -227,10 +227,10 @@ while True:  # Main module loop
         #height, width = 480, 640 - removed should now be set above
         writer = initwriter("record.avi", height, width, fps)
         origwriter = initwriter("origrecord.avi", height, width, fps)
-        
+
     if config.logging:
         writeframe(origwriter, frame, height, width)
-        
+
     gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     gray_frame = cv2.GaussianBlur(gray_frame, (21, 21), 0)
     diff = cv2.absdiff(background, gray_frame)
@@ -246,7 +246,7 @@ while True:  # Main module loop
         kite = mankite
     else:
         kite = actkite
-        
+
     kite.found = False
     # lets draw and move cross for manual flying
     if control.mode == 1:
@@ -304,7 +304,7 @@ while True:  # Main module loop
     kite.targetangle = kite.targetheading
 
 
-        
+
     cv2.putText(frame, "Act Angle:" + str(int(kite.kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
     cv2.putText(frame, "Tgt Angle:" + str(int(kite.targetangle)), (10, 70),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
@@ -350,7 +350,7 @@ while True:  # Main module loop
     # cv2.imshow("roi", finalframe)
     # cv2.imshow("mask", mask)
     cv2.imshow("contours", frame)
-    #below commented due to failing on 18.04    
+    #below commented due to failing on 18.04
     #kiteimage.pubimage(imagemessage, frame)
 
 

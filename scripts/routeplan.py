@@ -152,7 +152,7 @@ class Kite(object):
 
 class Controls(object):
 
-    def __init__(self, inputmode=0, step=8, mode=0):
+    def __init__(self, config ='Standard', inputmode=0, step=8, mode=0):
         try:  # this will fail on windows but don't need yet and not convinced I need to set parameters separately
             self.centrex = rospy.get_param('centrex', 400)
             self.centrey = rospy.get_param('centrey', 300)
@@ -165,7 +165,8 @@ class Controls(object):
             self.halfwidth = 200
             self.radius = 100
         self.routepoints = calc_route(self.centrex, self.centrey, self.halfwidth, self.radius)
-        self.inputmodes = ('Standard', 'SetFlight', 'ManFly')
+        # possible config ('Standard', 'SetFlight', 'ManFly')
+        self.config = config
         self.inputmode = inputmode
         self.step = step
         self.mode = mode  # 0 = normal flight and 1 will be manual flight
@@ -238,6 +239,7 @@ class Controls(object):
                 time.sleep(10)
 
         if key == ord("m"):  # modechange
+            print (self.inputmode)
             self.inputmode += 1
             if self.inputmode == 3:  # simple toggle around 3 modes
                 self.inputmode = 0
