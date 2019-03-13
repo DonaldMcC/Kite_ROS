@@ -325,6 +325,9 @@ while True:  # Main module loop
     drawroute(control.routepoints, control.centrex, control.centrey)
     drawcross(kite.targetx, kite.targety, 'Target', (0, 150, 250))
 
+    if config.setup == 'Manfly':
+        drawcross(kite.x, kite.y, 'Man', )
+
     base.barangle = get_barangle()
     base.targetbarangle = calcbarangle(kite, base, control)
 
