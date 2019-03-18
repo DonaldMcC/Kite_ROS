@@ -181,9 +181,9 @@ class Controls(object):
         elif self.inputmode == 1:
             return 'SETFLIGHTMODE: Park Fig8 Simulate Normal Mode Quit'
         else:
-            return 'MANFLIGHT: Left Right Up Down Pause Anti Clock Mode Quit'
+            return 'MANFLIGHT: Left Right Up Down Pause Anti Clock Gauche Droite Mode Quit'
 
-    def keyhandler(self, key, kite):
+    def keyhandler(self, key, kite, base=None):
         # this will now support a change of flight mode and operating mode so different keys will
         # do different things depending on inputmode,
 
@@ -231,6 +231,10 @@ class Controls(object):
                 kite.y -= self.step
             elif key == ord("d"):  # down
                 kite.y += self.step
+            elif key == ord("g"):  # bar gauche
+                base.barangle -= self.step
+            elif key == ord("d"):  # bar droite
+                base.barangle += self.step
             elif key == ord("a"):  # anti clockwise
                 kite.kiteangle -= self.step
             elif key == ord("c"):  # clockwise
