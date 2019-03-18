@@ -152,7 +152,7 @@ class Kite(object):
 
 class Controls(object):
 
-    def __init__(self, config ='Standard', inputmode=0, step=8, mode=0):
+    def __init__(self, config ='Standard', inputmode=0, step=8):
         try:  # this will fail on windows but don't need yet and not convinced I need to set parameters separately
             self.centrex = rospy.get_param('centrex', 400)
             self.centrey = rospy.get_param('centrey', 300)
@@ -169,7 +169,6 @@ class Controls(object):
         self.config = config
         self.inputmode = inputmode
         self.step = step
-        self.mode = mode  # 0 = normal flight and 1 will be manual flight
         self.modestring = self.getmodestring()
         self.route = False
         self.maxy = 20  # this should be for top of centre line and sets they y target point for park mode
@@ -181,7 +180,7 @@ class Controls(object):
         elif self.inputmode == 1:
             return 'SETFLIGHTMODE: Park Fig8 Simulate Normal Mode Quit'
         else:
-            return 'MANFLIGHT: Left Right Up Down Pause Anti Clock Gauche Droite Mode Quit'
+            return 'MANFLIGHT: Left Right Up Down Pause Anti Clock Gauche rigHt Mode Quit'
 
     def keyhandler(self, key, kite, base=None):
         # this will now support a change of flight mode and operating mode so different keys will
@@ -233,7 +232,7 @@ class Controls(object):
                 kite.y += self.step
             elif key == ord("g"):  # bar gauche
                 base.barangle -= self.step
-            elif key == ord("d"):  # bar droite
+            elif key == ord("h"):  # bar rigHt
                 base.barangle += self.step
             elif key == ord("a"):  # anti clockwise
                 kite.kiteangle -= self.step

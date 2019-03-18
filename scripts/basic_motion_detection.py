@@ -242,14 +242,14 @@ while True:  # Main module loop
     diff = cv2.dilate(diff, es, iterations=2)
     image, cnts, hierarchy = cv2.findContours(diff.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
-    if control.mode == 1:
+    if control.config == "Manfly":
         kite = mankite
     else:
         kite = actkite
 
     kite.found = False
     # lets draw and move cross for manual flying
-    if control.mode == 1:
+    if control.config == "Manfly":
         drawcross(mankite.x, mankite.y)
         kite.found = True
 
@@ -258,7 +258,7 @@ while True:  # Main module loop
     #print(results[0], results[1])
 
     # identify the kite
-    if control.mode == 0 and config == 'std':  # not detecting if in manual mode
+    if control.config != "Manfly" and config == 'std':  # not detecting if in manual mode
         maxmask = -1
         index = -1
         for i, c in enumerate(cnts):
@@ -310,7 +310,7 @@ while True:  # Main module loop
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
     cv2.putText(frame, "Tgt Heading:" + str(int(kite.targetheading)), (10, 90),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255),2)
-    cv2.putText(frame, "Mode:" + str(control.mode), (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255),2)
+    cv2.putText(frame, "Mode:" + str(control.config), (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255),2)
     cv2.putText(frame, "Area:" + str(kite.contourarea), (10, 130), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255),2)
 
 
@@ -325,10 +325,11 @@ while True:  # Main module loop
     drawroute(control.routepoints, control.centrex, control.centrey)
     drawcross(kite.targetx, kite.targety, 'Target', (0, 150, 250))
 
-    if config.setup == 'Manfly':
+    if control.config == 'Manfly':
         drawcross(kite.x, kite.y, 'Man', )
 
-    base.barangle = get_barangle()
+    get_barangle(kite, base, control)
+    print('brangle', base.barangle)
     base.targetbarangle = calcbarangle(kite, base, control)
 
 
@@ -371,7 +372,7 @@ while True:  # Main module loop
     if key == ord("q"):
         break
     elif key != -1:
-        routepoints = control.keyhandler(key, kite)
+        routepoints = control.keyhandler(key, kite, base)
     time.sleep(control.slow)
     print (counter)
     if counter > 633:

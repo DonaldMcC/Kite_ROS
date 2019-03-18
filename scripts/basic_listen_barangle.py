@@ -2,7 +2,7 @@
 # from ros wiki for initial testing
 import rospy
 from kite_ros.msg import Kitebase
-barangle = 10
+barangle = 6
 
 def callback(data):
     global barangle
@@ -24,8 +24,11 @@ def listen_kitebase():
     #spin() simply keeps python from exiting until this node is stopped
     #rospy.spin()
 
-def get_barangle():
-    #print barangle
+def get_barangle(kite, base, control):
+    if control.config == "Manfly":
+        return
+    else:
+        base.barangle = barangle
     return barangle
 
 
