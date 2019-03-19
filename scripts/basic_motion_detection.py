@@ -82,6 +82,31 @@ def drawcross(manx, many, crosstype='Man', colour=(255,0,255)):
              colour, thickness=thickness, lineType=8, shift=0)
     return
 
+def drawkite(kite):
+    global frame  #
+    # stuff below was to allow angle calculation of angle - which may well
+    # do once we have got direction of travel unpicked
+    height = 20
+    width = 20
+    thickness = 2
+    colour = (0,255,255)
+    starthorx = kite.x - width
+    endhorx = kite.x + width
+    endhory = kite.y
+    starthory = kite.y
+    startvery = kite.y - height
+    endvery = kite.y + height * 2
+    endverx = kite.x
+    startverx = kite.x
+    starthorx, starthory = get_angled_corners(starthorx, starthory, kite.kiteangle, kite.x, kite.y, 'int')
+    endhorx, endhory = get_angled_corners(endhorx, endhory, kite.kiteangle, kite.x, kite.y, 'int')
+
+    cv2.line(frame, (starthorx, starthory), (endhorx, endhory),
+             colour, thickness=thickness, lineType=8, shift=0)
+    cv2.line(frame, (startverx, startvery), (endverx, endvery),
+             colour, thickness=thickness, lineType=8, shift=0)
+    return
+
 
 def getdirection(kte):
     # start direction and analysis - this will be a routine based on class
@@ -250,7 +275,7 @@ while True:  # Main module loop
     kite.found = False
     # lets draw and move cross for manual flying
     if control.config == "Manfly":
-        drawcross(mankite.x, mankite.y)
+        drawkite(kite)
         kite.found = True
 
     #max(enumerate(list), key=(lambda x: x[1]), default=-1)

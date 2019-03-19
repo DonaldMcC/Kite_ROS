@@ -235,9 +235,9 @@ class Controls(object):
             elif key == ord("h"):  # bar rigHt
                 base.barangle += self.step
             elif key == ord("a"):  # anti clockwise
-                kite.kiteangle -= self.step
-            elif key == ord("c"):  # clockwise
                 kite.kiteangle += self.step
+            elif key == ord("c"):  # clockwise
+                kite.kiteangle -= self.step
             elif key == ord("p"):  # pause - this may apply in all moades
                 time.sleep(10)
 
