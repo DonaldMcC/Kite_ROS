@@ -101,10 +101,22 @@ def drawkite(kite):
     starthorx, starthory = get_angled_corners(starthorx, starthory, kite.kiteangle, kite.x, kite.y, 'int')
     endhorx, endhory = get_angled_corners(endhorx, endhory, kite.kiteangle, kite.x, kite.y, 'int')
 
+    startverx, startvery = get_angled_corners(startverx, startvery, kite.kiteangle, kite.x, kite.y, 'int')
+    endverx,endvery = get_angled_corners(endverx, endvery, kite.kiteangle, kite.x, kite.y, 'int')
+
     cv2.line(frame, (starthorx, starthory), (endhorx, endhory),
              colour, thickness=thickness, lineType=8, shift=0)
     cv2.line(frame, (startverx, startvery), (endverx, endvery),
              colour, thickness=thickness, lineType=8, shift=0)
+    cv2.line(frame, (starthorx, starthory), (endverx, endvery),
+             colour, thickness=thickness, lineType=8, shift=0)
+    cv2.line(frame, (endverx, endvery), (endhorx, endhory),
+             colour, thickness=thickness, lineType=8, shift=0)
+    cv2.line(frame, (endhorx, endhory), (startverx, startvery),
+             colour, thickness=thickness, lineType=8, shift=0)
+    cv2.line(frame, (startverx, startvery), (starthorx, starthory),
+             colour, thickness=thickness, lineType=8, shift=0)
+
     return
 
 
