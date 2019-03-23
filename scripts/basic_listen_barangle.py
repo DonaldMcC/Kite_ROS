@@ -26,7 +26,14 @@ def listen_kitebase():
 
 def get_barangle(kite, base, control):
     global barangle
-    return barangle
+    if control.config == 'Manfly':
+        if base.updatemode < 2:
+            return base.barangle
+        else:  # when kiteangle is driving the barangle
+            #TO DO add kitebar ration to this
+            return kite.kiteangle
+    else: # automated flight reading from some sort of sensor via ROS
+        return barangle
 
 
 if __name__ == '__main__':
