@@ -58,3 +58,86 @@ def kitemask(c, frame, kitecolours = 'kite1'):
         print (x,y,w,h, "cont", cv2.contourArea(c))
         print ("mask: ", np.sum(mask), totmask)
     return totmask
+
+
+def calcbarangle(kite, base, controls):
+    """This should just basically set the target bar angle based on the mode phase
+    and zone we are in when in park or wiggle mode
+    >>> k=Kite(400, targetangle=10)
+    >>> b=Base(barangle=15, kitebarratio=2)
+    >>> c=Controls(1)
+    >>> calcbarangle(k,b,c)
+    35
+
+    >>> k=Kite(400, phase='TurnR', targetangle=10)
+    >>> b=Base(barangle=15, kitebarratio=2)
+    >>> c=Controls(1)
+    >>> calcbarangle(k,b,c)
+    45
+
+    """
+    if kite.phase == "TurnR" or kite.phase == "TurnL":
+        return setangleturn(kite, base)
+    else:
+        return setangle(kite, base, controls)
+
+
+def setangle(kite, base, controls):
+    """This will return targetbarangle for park mode based largely on kiteangle
+    We will start simple but may move to a pid mode if required
+
+    >>> k=Kite(400, targetangle=10)
+    >>> b=Base(barangle=15, kitebarratio=2)
+    >>> c=Controls(1)
+    >>> setangle(k,b,c)
+    35
+
+    """
+    delta = kite.targetangle - kite.kiteangle
+    targetbarangle = checklimits(base.barangle + (delta * base.kitebarratio),
+                                 base.maxleft, base.maxright)
+    return targetbarangle
+
+
+def setangleturn(kite, base):
+    """This should be a simple function as we will always aim to turn as fast as poss
+    identifying the point to ease off from max turn should be done as part of phase setting and not here
+
+    >>> k=Kite(400)
+    >>> b=Base(400)
+    >>> setangleturn(k,b)
+    -45
+    """
+    if kite.phase == "TurnR":
+        targetbarangle = base.maxright
+    else:
+        targetbarangle = base.maxleft
+    return targetbarangle
+
+
+def checklimits(angle, maxleft, maxright):
+    """
+
+    :param angle:
+    :param maxleft:
+    :param maxright:
+    :return:
+
+    >>> checklimits(50,-45,30)
+    30
+    >>> checklimits(-50,-45,30)
+    -45
+    >>> checklimits(-20,-45,30)
+    -20
+
+    """
+    if angle < maxleft:
+        angle = maxleft
+    elif angle > maxright:
+        angle = maxright
+    return angle
+
+
+def _test():
+    import doctest
+    doctest.testmod(verbose=False)

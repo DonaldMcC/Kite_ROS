@@ -25,6 +25,22 @@ from collections import deque
 
 from move_func import get_heading_points
 
+
+class Base(object):
+
+    def __init__(self, barangle=0, parkangle=0, maxright=45, maxleft=-45, lag=1,
+                 targetbarangle=0, kitebarratio=1, updatemode=0):
+        self.barangle = barangle
+        self.parkangle = parkangle
+        self.maxright = maxright
+        self.maxleft = maxleft
+        self.lag = lag
+        self.barangles = deque(maxlen=16)
+        self.targetbarangle = targetbarangle
+        self.kitebarratio = kitebarratio  # this will be the rate of change of barangle to kite angle
+        self.updatemode = updatemode #  0 will be unconnected and 1 will bar angles kite
+
+
 class Kite(object):
 
     def __init__(self, x=0, y=0, mode='Park', phase='Park', targetheading=0, targetangle=0,
