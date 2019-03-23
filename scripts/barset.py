@@ -26,7 +26,7 @@ from routeplan import Kite, Controls
 class Base(object):
 
     def __init__(self, barangle=0, parkangle=0, maxright=45, maxleft=-45, lag=1,
-                 targetbarangle=0, kitebarratio=1):
+                 targetbarangle=0, kitebarratio=1, updatemode=0):
         self.barangle = barangle
         self.parkangle = parkangle
         self.maxright = maxright
@@ -35,6 +35,7 @@ class Base(object):
         self.barangles = deque(maxlen=16)
         self.targetbarangle = targetbarangle
         self.kitebarratio = kitebarratio  # this will be the rate of change of barangle to kite angle
+        self.updatemode = updatemode #  0 will be unconnected and 1 will bar angles kite
     
 
 def calcbarangle(kite, base, controls):

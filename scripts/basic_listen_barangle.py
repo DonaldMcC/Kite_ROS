@@ -25,10 +25,7 @@ def listen_kitebase():
     #rospy.spin()
 
 def get_barangle(kite, base, control):
-    if control.config == "Manfly":
-        return
-    else:
-        base.barangle = barangle
+    global barangle
     return barangle
 
 

@@ -364,8 +364,9 @@ while True:  # Main module loop
 
     if control.config == 'Manfly':
         drawcross(kite.x, kite.y, 'Man', )
-
-    get_barangle(kite, base, control)
+    else:
+        base.barangle=get_barangle()
+        
     print('brangle', base.barangle)
     base.targetbarangle = calcbarangle(kite, base, control)
 
