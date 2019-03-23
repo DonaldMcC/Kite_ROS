@@ -215,7 +215,7 @@ if config.source == 1:
     config.logging = 1
     # camera=cv2.VideoCapture('IMG_0464.MOV')
 else:
-    # TODO at some point will change this to current directory and append file - not urnger
+    # TODO at some point will change this to current directory and append file - not urgent
     # camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
     # camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/orig2605.avi')
     camera = cv2.VideoCapture(r'/home/donald/Downloads/IMG_1545.MOV')
@@ -401,9 +401,9 @@ while True:  # Main module loop
         routepoints = control.keyhandler(key, kite, base)
     time.sleep(control.slow)
     print(counter)
-    if counter > 633:
-        print('found:', foundcounter)
-        break
+    # if counter > 633: # turn off expiry after so many frames
+    #     print('found:', foundcounter)
+    #     break
 
 print("[INFO] cleaning up...")
 cv2.destroyAllWindows()
