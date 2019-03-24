@@ -89,31 +89,31 @@ class Kite(object):
         """
 
         if self.x < leftx:
-            zone = 'Left'
+            self.zone = 'Left'
         elif self.x > rightx:
-            zone = 'Right'
+            self.zone = 'Right'
         else:
-            zone = 'Centre'
-        return zone
+            self.zone = 'Centre'
+        return self.zone
 
-    def get_phase(self, zone, mode):
-        if mode == 'Park':
+    def get_phase(self):
+        if self.mode == 'Park':
             # For park this is now OK we want to get kiteangle to zero
             phase = 'Hold'
-        elif mode == 'Wiggle':
+        elif self.mode == 'Wiggle':
             phase = 'Wiggle'
         else:  # fig8 - assumed
-            if zone == 'Centre':
-                phase = 'Xwind'
-            elif zone == 'Left':
-                phase = 'TurnRight'
+            if self.zone == 'Centre':
+                self.phase = 'Xwind'
+            elif self.zone == 'Left':
+                self.phase = 'TurnRight'
             else:
-                phase = 'Turnleft'
-        return phase
+                self.phase = 'Turnleft'
+        return
 
     def update_zone(self, control):
         currentzone = self.zone
-        self.zone = self.get_zone(control.routepoints[0][0], control.routepoints[3][0])
+        self.get_zone(control.routepoints[0][0], control.routepoints[3][0])
         if self.zone != currentzone:
             self.changezone = True
         else:
@@ -121,7 +121,7 @@ class Kite(object):
 
     def update_phase(self):
         currentphase = self.phase
-        self.phase = self.get_phase(self.zone, self.mode)
+        self.get_phase()
         if self.phase != currentphase:
             self.changephase = True
         else:
