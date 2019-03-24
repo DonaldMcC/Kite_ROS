@@ -268,6 +268,8 @@ def get_angled_corners(x, y, anglechange, centx=0, centy=0, format='float'):
     (0, -1)
     >>>
     """
+
+    anglechange = -anglechange  #  swapped for different axis in opencv
     x = x - centx
     y = y - centy
     

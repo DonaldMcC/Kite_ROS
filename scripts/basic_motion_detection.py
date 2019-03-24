@@ -167,8 +167,8 @@ def display_base():
                 0.65, (0, 255, 0), 2)
     cv2.putText(frame, 'Tgt:' + '{:5.1f}'.format(base.targetbarangle), (outx - 15, centy + 100),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 255, 255), 2)
-    display_line(base.targetbarangle * -1, centx, centy, radius, (0, 255, 255))
-    display_line(base.barangle * -1, centx, centy, radius, (0, 255, 0))
+    display_line(base.targetbarangle, centx, centy, radius, (0, 255, 255))
+    display_line(base.barangle, centx, centy, radius, (0, 255, 0))
     return
 
 
@@ -347,6 +347,9 @@ while True:  # Main module loop
 
     kite.update_zone(control)
     kite.update_phase()
+    base.barangle = get_barangle(kite, base, control)
+    base.targetbarangle = calcbarangle(kite, base, control)
+
 
     if kite.changezone or kite.changephase or kite.routechange:
         kite.update_target(control.routepoints[0][0], control.routepoints[0][1],
@@ -355,10 +358,6 @@ while True:  # Main module loop
     drawroute(control.routepoints, control.centrex, control.centrey)
     drawcross(kite.targetx, kite.targety, 'Target', (0, 150, 250))
 
-    base.barangle = get_barangle(kite, base, control)
-
-    print('brangle', base.barangle)
-    base.targetbarangle = calcbarangle(kite, base, control)
 
     if kite.found:
         tempstr = "Found: Yes"

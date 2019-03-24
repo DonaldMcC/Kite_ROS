@@ -29,7 +29,7 @@ from move_func import get_heading_points
 class Base(object):
 
     def __init__(self, barangle=0, parkangle=0, maxright=45, maxleft=-45, lag=1,
-                 targetbarangle=0, kitebarratio=1, updatemode=0):
+                 targetbarangle=0, kitebarratio=1, updatemode=2):
         self.barangle = barangle
         self.parkangle = parkangle
         self.maxright = maxright
@@ -162,7 +162,7 @@ class Kite(object):
                 self.targetangle = get_heading_points((self.x, self.y), (self.targetx, self.targety))
             elif self.changezone:  # think we should still set this roughly in the turn phase
                 self.targettype = self.phase
-                if self.phase = 'TurnR':
+                if self.phase == 'TurnR':
                     self.targetangle = 90
                 else:
                     self.targetangle = -90
@@ -261,9 +261,9 @@ class Controls(object):
             elif key == ord("h"):  # bar rigHt
                 base.barangle += self.step
             elif key == ord("a"):  # anti clockwise
-                kite.kiteangle += self.step
-            elif key == ord("c"):  # clockwise
                 kite.kiteangle -= self.step
+            elif key == ord("c"):  # clockwise
+                kite.kiteangle += self.step
             elif key == ord("p"):  # pause - this may apply in all moades
                 time.sleep(10)
 
