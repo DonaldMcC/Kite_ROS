@@ -127,8 +127,14 @@ class Kite(object):
         else:
             self.changephase = False
 
+    def get_wiggle_angle(self):
+        if self.kitangle > 0:
+            return -10
+        else:
+            return 10
+
     def update_target(self, leftx, lefty, centrex, centrey, rightx, righty):
-        # this gets called when mode, zone or phase changes
+        # this gets called when mode, zone, phase or route changes
         if self.mode == 'Park':
             # For park this is now OK we want to get kiteangle to zero
             self.targettype = 'Angle'
@@ -137,7 +143,7 @@ class Kite(object):
             self.targety = centrey
         elif self.mode == 'Wiggle':
             self.targettype = 'Angle'
-            self.targetangle = get_wiggle_angle()
+            self.targetangle = self.get_wiggle_angle()
             self.targetx = centrex
             self.targety = centrey
         else:  # fig8 - by definition
@@ -156,7 +162,11 @@ class Kite(object):
                 self.targetangle = get_heading_points((self.x, self.y), (self.targetx, self.targety))
             elif self.changezone:  # think we should still set this roughly in the turn phase
                 self.targettype = self.phase
-                self.targetangle = 90
+                if self.phase = 'TurnR':
+                    self.targetangle = 90
+                else:
+                    self.targetangle = -90
+                    
                 # TODO - may compute the target location
             else:
                 print ('End of update_target reached without cover expected cases most likely ')
