@@ -235,7 +235,7 @@ def get_coord(x, y, anglechange):
     return newx, newy
 
 
-def get_angled_corners(x, y, anglechange, centx=0, centy=0):
+def get_angled_corners(x, y, anglechange, centx=0, centy=0, format='float'):
     """
 
     :param x:
@@ -268,6 +268,8 @@ def get_angled_corners(x, y, anglechange, centx=0, centy=0):
     (0, -1)
     >>>
     """
+
+    anglechange = -anglechange  #  swapped for different axis in opencv
     x = x - centx
     y = y - centy
     
@@ -289,6 +291,9 @@ def get_angled_corners(x, y, anglechange, centx=0, centy=0):
     # print(newangle * 180/math.pi)
     cx = radius * math.sin(newangle) + centx
     cy = radius * math.cos(newangle) + centy
+    if format == 'int':
+        cx = int(cx)
+        cy = int(cy)
     return cx, cy
 
 
@@ -318,6 +323,7 @@ def get_corners(x, y, width, height, shape='rectangle', bottom=0, angle=0):
                    (x, y + height),
                    (x + (width / 2), y),
                    (x, y - bottom))
+
     if angle == 0:
         return corners
     else:

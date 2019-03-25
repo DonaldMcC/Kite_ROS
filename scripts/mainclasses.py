@@ -25,6 +25,22 @@ from collections import deque
 
 from move_func import get_heading_points
 
+
+class Base(object):
+
+    def __init__(self, barangle=0, parkangle=0, maxright=45, maxleft=-45, lag=1,
+                 targetbarangle=0, kitebarratio=1, updatemode=2):
+        self.barangle = barangle
+        self.parkangle = parkangle
+        self.maxright = maxright
+        self.maxleft = maxleft
+        self.lag = lag
+        self.barangles = deque(maxlen=16)
+        self.targetbarangle = targetbarangle
+        self.kitebarratio = kitebarratio  # this will be the rate of change of barangle to kite angle
+        self.updatemode = updatemode #  0 will be unconnected and 1 will bar angles kite
+
+
 class Kite(object):
 
     def __init__(self, x=0, y=0, mode='Park', phase='Park', targetheading=0, targetangle=0,
@@ -73,31 +89,31 @@ class Kite(object):
         """
 
         if self.x < leftx:
-            zone = 'Left'
+            self.zone = 'Left'
         elif self.x > rightx:
-            zone = 'Right'
+            self.zone = 'Right'
         else:
-            zone = 'Centre'
-        return zone
+            self.zone = 'Centre'
+        return self.zone
 
-    def get_phase(self, zone, mode):
-        if mode == 'Park':
+    def get_phase(self):
+        if self.mode == 'Park':
             # For park this is now OK we want to get kiteangle to zero
             phase = 'Hold'
-        elif mode == 'Wiggle':
+        elif self.mode == 'Wiggle':
             phase = 'Wiggle'
         else:  # fig8 - assumed
-            if zone == 'Centre':
-                phase = 'Xwind'
-            elif zone == 'Left':
-                phase = 'TurnRight'
+            if self.zone == 'Centre':
+                self.phase = 'Xwind'
+            elif self.zone == 'Left':
+                self.phase = 'TurnRight'
             else:
-                phase = 'Turnleft'
-        return phase
+                self.phase = 'Turnleft'
+        return
 
     def update_zone(self, control):
         currentzone = self.zone
-        self.zone = self.get_zone(control.routepoints[0][0], control.routepoints[3][0])
+        self.get_zone(control.routepoints[0][0], control.routepoints[3][0])
         if self.zone != currentzone:
             self.changezone = True
         else:
@@ -105,14 +121,20 @@ class Kite(object):
 
     def update_phase(self):
         currentphase = self.phase
-        self.phase = self.get_phase(self.zone, self.mode)
+        self.get_phase()
         if self.phase != currentphase:
             self.changephase = True
         else:
             self.changephase = False
 
+    def get_wiggle_angle(self):
+        if self.kitangle > 0:
+            return -10
+        else:
+            return 10
+
     def update_target(self, leftx, lefty, centrex, centrey, rightx, righty):
-        # this gets called when mode, zone or phase changes
+        # this gets called when mode, zone, phase or route changes
         if self.mode == 'Park':
             # For park this is now OK we want to get kiteangle to zero
             self.targettype = 'Angle'
@@ -121,7 +143,7 @@ class Kite(object):
             self.targety = centrey
         elif self.mode == 'Wiggle':
             self.targettype = 'Angle'
-            self.targetangle = get_wiggle_angle()
+            self.targetangle = self.get_wiggle_angle()
             self.targetx = centrex
             self.targety = centrey
         else:  # fig8 - by definition
@@ -140,7 +162,11 @@ class Kite(object):
                 self.targetangle = get_heading_points((self.x, self.y), (self.targetx, self.targety))
             elif self.changezone:  # think we should still set this roughly in the turn phase
                 self.targettype = self.phase
-                self.targetangle = 90
+                if self.phase == 'TurnR':
+                    self.targetangle = 90
+                else:
+                    self.targetangle = -90
+                    
                 # TODO - may compute the target location
             else:
                 print ('End of update_target reached without cover expected cases most likely ')
@@ -152,7 +178,7 @@ class Kite(object):
 
 class Controls(object):
 
-    def __init__(self, inputmode=0, step=8, mode=0):
+    def __init__(self, config ='Standard', inputmode=0, step=8):
         try:  # this will fail on windows but don't need yet and not convinced I need to set parameters separately
             self.centrex = rospy.get_param('centrex', 400)
             self.centrey = rospy.get_param('centrey', 300)
@@ -165,10 +191,10 @@ class Controls(object):
             self.halfwidth = 200
             self.radius = 100
         self.routepoints = calc_route(self.centrex, self.centrey, self.halfwidth, self.radius)
-        self.inputmodes = ('Standard', 'SetFlight', 'ManFly')
+        # possible config ('Standard', 'SetFlight', 'ManFly')
+        self.config = config
         self.inputmode = inputmode
         self.step = step
-        self.mode = mode  # 0 = normal flight and 1 will be manual flight
         self.modestring = self.getmodestring()
         self.route = False
         self.maxy = 20  # this should be for top of centre line and sets they y target point for park mode
@@ -180,9 +206,9 @@ class Controls(object):
         elif self.inputmode == 1:
             return 'SETFLIGHTMODE: Park Fig8 Simulate Normal Mode Quit'
         else:
-            return 'MANFLIGHT: Left Right Up Down Pause Anti Clock Mode Quit'
+            return 'MANFLIGHT: Left Right Up Down Pause Anti Clock Gauche rigHt Mode Quit'
 
-    def keyhandler(self, key, kite):
+    def keyhandler(self, key, kite, base=None):
         # this will now support a change of flight mode and operating mode so different keys will
         # do different things depending on inputmode,
 
@@ -230,6 +256,10 @@ class Controls(object):
                 kite.y -= self.step
             elif key == ord("d"):  # down
                 kite.y += self.step
+            elif key == ord("g"):  # bar gauche
+                base.barangle -= self.step
+            elif key == ord("h"):  # bar rigHt
+                base.barangle += self.step
             elif key == ord("a"):  # anti clockwise
                 kite.kiteangle -= self.step
             elif key == ord("c"):  # clockwise
@@ -238,6 +268,7 @@ class Controls(object):
                 time.sleep(10)
 
         if key == ord("m"):  # modechange
+            print (self.inputmode)
             self.inputmode += 1
             if self.inputmode == 3:  # simple toggle around 3 modes
                 self.inputmode = 0

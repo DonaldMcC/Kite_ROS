@@ -34,13 +34,12 @@ import cv2
 from move_func import get_heading_points, get_angled_corners
 
 # modules
-from routeplan import Kite, Controls
-from barset import Base, calcbarangle
+from mainclasses import Kite, Controls, Base
 from move_func import get_angle
 from talker import kite_pos, kiteimage
 from cvwriter import initwriter, writeframe
 from basic_listen_barangle import listen_kitebase, get_barangle
-from kite_funcs import kitemask
+from kite_funcs import kitemask, calcbarangle
 
 
 # this is just for display flight decisions will be elsewhere
@@ -58,7 +57,7 @@ def drawroute(route, centrex, centrey):
     return
 
 
-def drawcross(manx, many, crosstype='Man', colour=(255,0,255)):
+def drawcross(manx, many, crosstype='Man', colour=(255, 0, 255)):
     global frame  #
     # stuff below was to allow angle calculation of angle - which may well
     # do once we have got direction of travel unpicked
@@ -80,6 +79,44 @@ def drawcross(manx, many, crosstype='Man', colour=(255,0,255)):
              colour, thickness=thickness, lineType=8, shift=0)
     cv2.line(frame, (startverx, startvery), (endverx, endvery),
              colour, thickness=thickness, lineType=8, shift=0)
+    return
+
+
+def drawkite(kite):
+    global frame  #
+    # stuff below was to allow angle calculation of angle - which may well
+    # do once we have got direction of travel unpicked
+    height = 20
+    width = 20
+    thickness = 2
+    colour = (0, 255, 255)
+    starthorx = kite.x - width
+    endhorx = kite.x + width
+    endhory = kite.y
+    starthory = kite.y
+    startvery = kite.y - height
+    endvery = kite.y + height * 2
+    endverx = kite.x
+    startverx = kite.x
+    starthorx, starthory = get_angled_corners(starthorx, starthory, kite.kiteangle, kite.x, kite.y, 'int')
+    endhorx, endhory = get_angled_corners(endhorx, endhory, kite.kiteangle, kite.x, kite.y, 'int')
+
+    startverx, startvery = get_angled_corners(startverx, startvery, kite.kiteangle, kite.x, kite.y, 'int')
+    endverx, endvery = get_angled_corners(endverx, endvery, kite.kiteangle, kite.x, kite.y, 'int')
+
+    cv2.line(frame, (starthorx, starthory), (endhorx, endhory),
+             colour, thickness=thickness, lineType=8, shift=0)
+    cv2.line(frame, (startverx, startvery), (endverx, endvery),
+             colour, thickness=thickness, lineType=8, shift=0)
+    cv2.line(frame, (starthorx, starthory), (endverx, endvery),
+             colour, thickness=thickness, lineType=8, shift=0)
+    cv2.line(frame, (endverx, endvery), (endhorx, endhory),
+             colour, thickness=thickness, lineType=8, shift=0)
+    cv2.line(frame, (endhorx, endhory), (startverx, startvery),
+             colour, thickness=thickness, lineType=8, shift=0)
+    cv2.line(frame, (startverx, startvery), (starthorx, starthory),
+             colour, thickness=thickness, lineType=8, shift=0)
+
     return
 
 
@@ -121,20 +158,19 @@ def getdirection(kte):
 
 
 def display_base():
-    # output bar values - TODO change to graphical circle with actual bar and target bar
     centx = outx + 60
     centy = 300
     radius = 60
     cv2.putText(frame, 'Base', (outx, centy-40), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
     cv2.circle(frame, (centx, centy), radius, (0, 255, 255), 2)
-    #cv2.putText(frame, 'Act:' + str(base.barangle), (outx + 100, centy+100), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 255, 0), 2)
-    cv2.putText(frame, 'Act:' + '{:5.1f}'.format(base.barangle), (outx + 85, centy + 100), cv2.FONT_HERSHEY_SIMPLEX, 0.65,
-                (0, 255, 0), 2)
+    cv2.putText(frame, 'Act:' + '{:5.1f}'.format(base.barangle), (outx + 85, centy + 100), cv2.FONT_HERSHEY_SIMPLEX,
+                0.65, (0, 255, 0), 2)
     cv2.putText(frame, 'Tgt:' + '{:5.1f}'.format(base.targetbarangle), (outx - 15, centy + 100),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 255, 255), 2)
-    display_line(base.targetbarangle * -1, centx, centy, radius, (0, 255, 255))
-    display_line(base.barangle * -1, centx, centy, radius, (0, 255, 0))
+    display_line(base.targetbarangle, centx, centy, radius, (0, 255, 255))
+    display_line(base.barangle, centx, centy, radius, (0, 255, 0))
     return
+
 
 def display_line(angle, cx,cy, radius, colour):
     pointx, pointy = get_angled_corners(cx + radius, cy, angle, cx, cy)
@@ -142,44 +178,58 @@ def display_line(angle, cx,cy, radius, colour):
     pointy = int(pointy)
     offx = cx - (pointx - cx)
     offy = cy - (pointy - cy)
-
-    cv2.line(frame, (offx, offy), (pointx, pointy), colour , 2)
+    cv2.line(frame, (offx, offy), (pointx, pointy), colour, 2)
     return
+
 
 # Main routine start
 # this will need to not happen if arguments are passed
 source = 2  # change back to 1 to get prompt
-config = 'std' # this is the kitebase present and no balls on the lines
-#iphone
-masklimit = 10000
-#wind
+# iphone
+# masklimit = 10000
+# wind
 masklimit = 1000
 # config = 'yellowballs'  # alternative when base not present will also possibly be combo
 KITETYPE = 'indoorkite'  # need to comment out for external
 
-while source not in {1, 2}:
-    source = input('Key 1 for camera or 2 for source')
+# so thinking we have kite and controls, the video frame, posible sensor class
+# and perhaps a configuration class
+# controsl setup self.inputmodes = ('Standard', 'SetFlight', 'ManFly')
+
+
+class Config(object):
+    def __init__(self, source=2,  setup='Standard', masklimit=10000, logging=0):
+        self.source = source
+        self.setup = setup
+        self.masklimit = masklimit
+        self.logging = logging
+
+
+config = Config(setup='Manfly', source=1)
+
+while config.source not in {1, 2}:
+    config.source = input('Key 1 for camera or 2 for source')
 # should define source here
-if source == 1:
+if config.source == 1:
     camera = cv2.VideoCapture(0)
-    logging = 1
-    #camera=cv2.VideoCapture('IMG_0464.MOV')
+    config.logging = 1
+    # camera=cv2.VideoCapture('IMG_0464.MOV')
 else:
-    logging = 0
-    # TODO at some point will change this to current directory and append file - not urnger
-    #camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
-    #camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/orig2605.avi')
+    # TODO at some point will change this to current directory and append file - not urgent
+    # camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
+    # camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/orig2605.avi')
     camera = cv2.VideoCapture(r'/home/donald/Downloads/IMG_1545.MOV')
-    print('video:',camera.grab())
+    print('video:', camera.grab())
 
 width = int(camera.get(3))
 height = int(camera.get(4))
 
 # initiate class instances
-control = Controls()
+control = Controls(config.setup)
 actkite = Kite(control.centrex, control.centrey)
 mankite = Kite(300, 400)
 base = Base()
+
 # Initialisation steps
 es = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
 kernel = np.ones((5, 5), np.uint8)
@@ -191,7 +241,7 @@ imagemessage = kiteimage()
 counter = 0
 foundcounter = 0
 
-if config == 'std':  # otherwise not present
+if config.setup == 'Standard':  # otherwise not present
     listen_kitebase()
 writer = None
 cv2.startWindowThread()
@@ -206,19 +256,19 @@ while True:  # Main module loop
         background = cv2.GaussianBlur(background, (21, 21), 0)
         continue
 
-    if logging and writer is None:
+    if config.logging and writer is None:
         # h, w = frame.shape[:2]
-        #height, width = 480, 640 - removed should now be set above
+        # height, width = 480, 640 - removed should now be set above
         writer = initwriter("record.avi", height, width, fps)
         origwriter = initwriter("origrecord.avi", height, width, fps)
-        
-    if logging:
+
+    if config.logging:
         writeframe(origwriter, frame, height, width)
-        
+
     gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     gray_frame = cv2.GaussianBlur(gray_frame, (21, 21), 0)
     diff = cv2.absdiff(background, gray_frame)
-    #diff = cv2.threshold(diff, 25, 255, cv2.THRESH_BINARY)[1]
+    # diff = cv2.threshold(diff, 25, 255, cv2.THRESH_BINARY)[1]
     diff = cv2.threshold(diff, 25, 255, cv2.THRESH_BINARY)[1]
     # below didnt work
     # diff = cv2.adaptiveThreshold(diff,255,cv2.ADAPTIVE_THRESH_MEAN_C,cv2.THRESH_BINARY,11,2)
@@ -226,36 +276,36 @@ while True:  # Main module loop
     diff = cv2.dilate(diff, es, iterations=2)
     image, cnts, hierarchy = cv2.findContours(diff.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
-    if control.mode == 1:
+    if control.config == "Manfly":
         kite = mankite
     else:
         kite = actkite
-        
+
     kite.found = False
     # lets draw and move cross for manual flying
-    if control.mode == 1:
-        drawcross(mankite.x, mankite.y)
+    if control.config == "Manfly":
+        drawkite(kite)
         kite.found = True
 
-    #max(enumerate(list), key=(lambda x: x[1]), default=-1)
-    #results = max(enumerate(cnts), key=kitemask(x,frame,low,upp), default=-1)
-    #print(results[0], results[1])
+    # max(enumerate(list), key=(lambda x: x[1]), default=-1)
+    # results = max(enumerate(cnts), key=kitemask(x,frame,low,upp), default=-1)
+    # print (results[0], results[1])
 
     # identify the kite
-    if control.mode == 0 and config == 'std':  # not detecting if in manual mode
+    if control.config != "Manfly" and config == 'std':  # not detecting if in manual mode
         maxmask = -1
         index = -1
         for i, c in enumerate(cnts):
             mask = kitemask(c, frame, KITETYPE)
-            if mask>maxmask:
-                index= i
+            if mask > maxmask:
+                index = i
                 maxmask = mask
-            #(x, y, w, h) = cv2.boundingRect(c)
-            #cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 125, 0), 2)
+            # (x, y, w, h) = cv2.boundingRect(c)
+            # cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 125, 0), 2)
 
         if maxmask > masklimit:
             kite.found = True
-            c=cnts[index]
+            c = cnts[index]
             kite.contourarea = cv2.contourArea(cnts[index])
             (x, y, w, h) = cv2.boundingRect(c)
             cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 255, 0), 2)
@@ -272,7 +322,7 @@ while True:  # Main module loop
 
             cv2.drawContours(frame, [box], 0, (0, 0, 255), 2)
             kite.kiteangle = get_angle(box, kite.dX, kite.dY)
-        #print index, maxmask
+        # print index, maxmask
 
     # start direction and analysis - this will be a routine based on class
     getdirection(kite)
@@ -282,24 +332,23 @@ while True:  # Main module loop
     cv2.putText(frame, "dx: {}, dy: {}".format(kite.dX, kite.dY),
                         (10, height - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 1)
     cv2.putText(frame, "x: {}, y: {}".format(mankite.x, mankite.y),
-                        (180, height - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 1)
+                (180, height - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 1)
 
     kite.targetheading = get_heading_points((kite.x, kite.y), (kite.targetx, kite.targety))
     kite.targetangle = kite.targetheading
 
-
-        
     cv2.putText(frame, "Act Angle:" + str(int(kite.kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
     cv2.putText(frame, "Tgt Angle:" + str(int(kite.targetangle)), (10, 70),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
     cv2.putText(frame, "Tgt Heading:" + str(int(kite.targetheading)), (10, 90),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255),2)
-    cv2.putText(frame, "Mode:" + str(control.mode), (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255),2)
-    cv2.putText(frame, "Area:" + str(kite.contourarea), (10, 130), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255),2)
-
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+    cv2.putText(frame, "Mode:" + str(control.config), (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+    cv2.putText(frame, "Area:" + str(kite.contourarea), (10, 130), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
 
     kite.update_zone(control)
     kite.update_phase()
+    base.barangle = get_barangle(kite, base, control)
+    base.targetbarangle = calcbarangle(kite, base, control)
 
 
     if kite.changezone or kite.changephase or kite.routechange:
@@ -308,9 +357,6 @@ while True:  # Main module loop
 
     drawroute(control.routepoints, control.centrex, control.centrey)
     drawcross(kite.targetx, kite.targety, 'Target', (0, 150, 250))
-
-    base.barangle = get_barangle()
-    base.targetbarangle = calcbarangle(kite, base, control)
 
 
     if kite.found:
@@ -334,14 +380,13 @@ while True:  # Main module loop
     # cv2.imshow("roi", finalframe)
     # cv2.imshow("mask", mask)
     cv2.imshow("contours", frame)
-    #below commented due to failing on 18.04    
-    #kiteimage.pubimage(imagemessage, frame)
-
+    # below commented due to failing on 18.04
+    # kiteimage.pubimage(imagemessage, frame)
 
     counter += 1
     if kite.found:
         foundcounter += 1
-    if logging: # not saving this either as it errors on other screen
+    if config.logging:  # not saving this either as it errors on other screen
 
         writeframe(writer, frame, height, width)
 
@@ -352,12 +397,12 @@ while True:  # Main module loop
     if key == ord("q"):
         break
     elif key != -1:
-        routepoints = control.keyhandler(key, kite)
+        routepoints = control.keyhandler(key, kite, base)
     time.sleep(control.slow)
-    print (counter)
-    if counter > 633:
-        print ('found:', foundcounter)
-        break
+    print(counter)
+    # if counter > 633: # turn off expiry after so many frames
+    #     print('found:', foundcounter)
+    #     break
 
 print("[INFO] cleaning up...")
 cv2.destroyAllWindows()
