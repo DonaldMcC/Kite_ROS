@@ -17,8 +17,8 @@
       <file leaf-file-name="basic_motion_detection.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/basic_motion_detection.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="140">
-              <caret line="288" column="8" selection-start-line="288" selection-start-column="8" selection-end-line="288" selection-end-column="8" />
+            <state relative-caret-position="380">
+              <caret line="282" column="16" lean-forward="true" selection-start-line="282" selection-start-column="16" selection-end-line="282" selection-end-column="16" />
             </state>
           </provider>
         </entry>
@@ -48,7 +48,7 @@
         <entry file="file://$PROJECT_DIR$/mainclasses.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="380">
-              <caret line="267" column="30" lean-forward="true" selection-start-line="267" selection-start-column="30" selection-end-line="267" selection-end-column="30" />
+              <caret line="267" column="30" selection-start-line="267" selection-start-column="30" selection-end-line="267" selection-end-column="30" />
             </state>
           </provider>
         </entry>
@@ -1330,7 +1330,14 @@
       <option name="project" value="LOCAL" />
       <updated>1553552282151</updated>
     </task>
-    <option name="localTasksCounter" value="33" />
+    <task id="LOCAL-00033" summary="updatemode now working properly for 0 and 1 modes">
+      <created>1553555839825</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1553555839825</updated>
+    </task>
+    <option name="localTasksCounter" value="34" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -1374,7 +1381,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$" />
     </ignored-roots>
-    <MESSAGE value="further pep8" />
     <MESSAGE value="further pep8 changes" />
     <MESSAGE value="fix looping in talker.py" />
     <MESSAGE value="make kitepos use actual values" />
@@ -1399,7 +1405,8 @@
     <MESSAGE value="fix launch files" />
     <MESSAGE value="matched message definitions" />
     <MESSAGE value="change line colour" />
-    <option name="LAST_COMMIT_MESSAGE" value="change line colour" />
+    <MESSAGE value="updatemode now working properly for 0 and 1 modes" />
+    <option name="LAST_COMMIT_MESSAGE" value="updatemode now working properly for 0 and 1 modes" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1755,7 +1762,7 @@
     <entry file="file://$PROJECT_DIR$/mainclasses.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="380">
-          <caret line="267" column="30" lean-forward="true" selection-start-line="267" selection-start-column="30" selection-end-line="267" selection-end-column="30" />
+          <caret line="267" column="30" selection-start-line="267" selection-start-column="30" selection-end-line="267" selection-end-column="30" />
         </state>
       </provider>
     </entry>
@@ -1768,8 +1775,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/basic_motion_detection.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="140">
-          <caret line="288" column="8" selection-start-line="288" selection-start-column="8" selection-end-line="288" selection-end-column="8" />
+        <state relative-caret-position="380">
+          <caret line="282" column="16" lean-forward="true" selection-start-line="282" selection-start-column="16" selection-end-line="282" selection-end-column="16" />
         </state>
       </provider>
     </entry>

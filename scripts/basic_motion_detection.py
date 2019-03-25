@@ -249,7 +249,13 @@ cv2.namedWindow('contours')
 fps = 15
 # fps = camera.get(cv2.CV_CAP_PROP_FPS)
 
+if control.config == "Manfly":
+    kite = mankite
+else:
+    kite = actkite
+
 while True:  # Main module loop
+    # Read Frame
     ret, frame = camera.read()
     if background is None:
         background = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -270,18 +276,10 @@ while True:  # Main module loop
     diff = cv2.absdiff(background, gray_frame)
     # diff = cv2.threshold(diff, 25, 255, cv2.THRESH_BINARY)[1]
     diff = cv2.threshold(diff, 25, 255, cv2.THRESH_BINARY)[1]
-    # below didnt work
-    # diff = cv2.adaptiveThreshold(diff,255,cv2.ADAPTIVE_THRESH_MEAN_C,cv2.THRESH_BINARY,11,2)
 
     diff = cv2.dilate(diff, es, iterations=2)
     image, cnts, hierarchy = cv2.findContours(diff.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
-    if control.config == "Manfly":
-        kite = mankite
-    else:
-        kite = actkite
-
-    kite.found = False
     # lets draw and move cross for manual flying
     if control.config == "Manfly":
         if base.updatemode == 1:
@@ -289,12 +287,9 @@ while True:  # Main module loop
         drawkite(kite)
         kite.found = True
 
-    # max(enumerate(list), key=(lambda x: x[1]), default=-1)
-    # results = max(enumerate(cnts), key=kitemask(x,frame,low,upp), default=-1)
-    # print (results[0], results[1])
-
-    # identify the kite
+       # identify the kite
     if control.config != "Manfly" and config == 'std':  # not detecting if in manual mode
+        kite.found = False
         maxmask = -1
         index = -1
         for i, c in enumerate(cnts):
@@ -326,18 +321,36 @@ while True:  # Main module loop
             kite.kiteangle = get_angle(box, kite.dX, kite.dY)
         # print index, maxmask
 
+    if kite.found:
+        tempstr = "Found: Yes"
+    else:
+        tempstr = "Found: No"
+
+    #read sensors
+    base.barangle = get_barangle(kite, base, control)
+
+
     # start direction and analysis - this will be a routine based on class
     getdirection(kite)
+    kite.targetheading = get_heading_points((kite.x, kite.y), (kite.targetx, kite.targety))
+    kite.targetangle = kite.targetheading
 
+    kite.update_zone(control)
+    kite.update_phase()
+    base.targetbarangle = calcbarangle(kite, base, control)
+
+    # Establish route
+    if kite.changezone or kite.changephase or kite.routechange:
+        kite.update_target(control.routepoints[0][0], control.routepoints[0][1],
+                           control.centrex, control.maxy, control.routepoints[3][0], control.routepoints[3][1])
+
+    # display output
     # show the movement deltas and the direction of movement on the frame
     cv2.putText(frame, kite.direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
     cv2.putText(frame, "dx: {}, dy: {}".format(kite.dX, kite.dY),
                         (10, height - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 1)
     cv2.putText(frame, "x: {}, y: {}".format(mankite.x, mankite.y),
                 (180, height - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 1)
-
-    kite.targetheading = get_heading_points((kite.x, kite.y), (kite.targetx, kite.targety))
-    kite.targetangle = kite.targetheading
 
     cv2.putText(frame, "Act Angle:" + str(int(kite.kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
     cv2.putText(frame, "Tgt Angle:" + str(int(kite.targetangle)), (10, 70),
@@ -347,24 +360,8 @@ while True:  # Main module loop
     cv2.putText(frame, "Mode:" + str(control.config), (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
     cv2.putText(frame, "Area:" + str(kite.contourarea), (10, 130), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
 
-    kite.update_zone(control)
-    kite.update_phase()
-    base.barangle = get_barangle(kite, base, control)
-    base.targetbarangle = calcbarangle(kite, base, control)
-
-
-    if kite.changezone or kite.changephase or kite.routechange:
-        kite.update_target(control.routepoints[0][0], control.routepoints[0][1],
-                           control.centrex, control.maxy, control.routepoints[3][0], control.routepoints[3][1])
-
     drawroute(control.routepoints, control.centrex, control.centrey)
     drawcross(kite.targetx, kite.targety, 'Target', (0, 150, 250))
-
-
-    if kite.found:
-        tempstr = "Found: Yes"
-    else:
-        tempstr = "Found: No"
 
     # output flight values
     outx = width - 180
@@ -388,8 +385,8 @@ while True:  # Main module loop
     counter += 1
     if kite.found:
         foundcounter += 1
-    if config.logging:  # not saving this either as it errors on other screen
 
+    if config.logging:  # not saving this either as it errors on other screen
         writeframe(writer, frame, height, width)
 
     # change to -1 for debugging
