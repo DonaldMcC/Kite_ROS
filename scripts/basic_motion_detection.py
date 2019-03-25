@@ -228,7 +228,7 @@ height = int(camera.get(4))
 control = Controls(config.setup)
 actkite = Kite(control.centrex, control.centrey)
 mankite = Kite(300, 400)
-base = Base()
+base = Base(updatemode=1)
 
 # Initialisation steps
 es = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
@@ -284,6 +284,8 @@ while True:  # Main module loop
     kite.found = False
     # lets draw and move cross for manual flying
     if control.config == "Manfly":
+        if base.updatemode == 1:
+            kite.kiteangle = base.barangle
         drawkite(kite)
         kite.found = True
 
