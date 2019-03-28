@@ -56,7 +56,7 @@ class Kite(object):
         self.direction = ""
         self.kiteangle = 0
         self.contourarea = 0
-        self.zone = ""
+        self.zone = "Centre"
         self.targettype = 'Angle'
         self.targetx = 0
         self.targety = 0
@@ -71,7 +71,8 @@ class Kite(object):
         self.leftbally = 0
         self.rightballx = 0
         self.rightbally = 0
-        
+        self.turncomplete = False
+        self.turncomplete_angle = 60
 
     def get_zone(self, leftx, rightx):
         """
@@ -106,9 +107,17 @@ class Kite(object):
             if self.zone == 'Centre':
                 self.phase = 'Xwind'
             elif self.zone == 'Left':
-                self.phase = 'TurnRight'
-            else:
-                self.phase = 'Turnleft'
+                if self.turncomplete or self.kiteangle > self.turncomplete_angle:
+                    self.phase = 'Xwind'
+                    self.turncomplete = True
+                else:
+                    self.phase = 'TurnRight'
+            else:  # Right zone
+                if self.turncomplete or self.kiteangle < (0-self.turncomplete_angle):
+                    self.phase = 'Xwind'
+                    self.turncomplete = True
+                else:
+                    self.phase = 'Turnleft'
         return
 
     def update_zone(self, control):
@@ -118,6 +127,8 @@ class Kite(object):
             self.changezone = True
         else:
             self.changezone = False
+        if self.changezone:  # set to false at start of next turn
+            self.turncomplete = False
 
     def update_phase(self):
         currentphase = self.phase
