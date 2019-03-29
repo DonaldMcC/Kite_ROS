@@ -110,12 +110,14 @@ class Kite(object):
                 if self.turncomplete or self.kiteangle > self.turncomplete_angle:
                     self.phase = 'Xwind'
                     self.turncomplete = True
+                    self.routechange=True
                 else:
                     self.phase = 'TurnRight'
             else:  # Right zone
                 if self.turncomplete or self.kiteangle < (0-self.turncomplete_angle):
                     self.phase = 'Xwind'
                     self.turncomplete = True
+                    self.routchange = True
                 else:
                     self.phase = 'Turnleft'
         return
@@ -146,6 +148,7 @@ class Kite(object):
 
     def update_target(self, leftx, lefty, centrex, centrey, rightx, righty):
         # this gets called when mode, zone, phase or route changes
+        print('update targ caled')
         if self.mode == 'Park':
             # For park this is now OK we want to get kiteangle to zero
             self.targettype = 'Angle'
@@ -246,7 +249,7 @@ class Controls(object):
                 self.slow = 0.0
             elif key == ord("p"):  # pause - this may apply in all modes
                 time.sleep(10)
-            kite.routechange = True
+            # kite.routechange = True - don't want this triggered every time
         elif self.inputmode == 1:  # SetFlight
             if key == ord("p"):  # park
                 kite.mode = 'Park'
