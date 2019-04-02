@@ -343,7 +343,9 @@ while True:  # Main module loop
     if kite.changezone or kite.changephase or kite.routechange:
         kite.update_target(control.routepoints[0][0], control.routepoints[0][1],
                            control.centrex, control.maxy, control.routepoints[3][0], control.routepoints[3][1])
-
+        
+    if kite.zone == 'Centre' or kite.phase == 'Xwind':
+        kite.targetangle = get_heading_points((kite.x, kite.y), (kite.targetx, kite.targety))
     # display output
     # show the movement deltas and the direction of movement on the frame
     cv2.putText(frame, kite.direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)

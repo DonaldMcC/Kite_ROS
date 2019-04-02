@@ -83,7 +83,7 @@ def calcbarangle(kite, base, controls):
 
 
 def setangle(kite, base, controls):
-    """This will return targetbarangle for park mode based largely on kit target angle
+    """This will return targetbarangle for park mode based largely on kite target angle
     We will start simple but may move to a pid mode if required
 
     >>> k=Kite(400, targetangle=10)

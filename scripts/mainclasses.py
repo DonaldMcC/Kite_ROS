@@ -141,14 +141,14 @@ class Kite(object):
             self.changephase = False
 
     def get_wiggle_angle(self):
-        if self.kitangle > 0:
+        if self.kiteangle > 0:
             return -10
         else:
             return 10
 
     def update_target(self, leftx, lefty, centrex, centrey, rightx, righty):
         # this gets called when mode, zone, phase or route changes
-        print('update targ caled')
+        # print('update targ called')
         if self.mode == 'Park':
             # For park this is now OK we want to get kiteangle to zero
             self.targettype = 'Angle'
@@ -161,7 +161,7 @@ class Kite(object):
             self.targetx = centrex
             self.targety = centrey
         else:  # fig8 - by definition
-            if self.zone == 'Centre':
+            if self.zone == 'Centre' or self.phase == 'Xwind':
                 # Either we have just left the right or left turnzone so if nearest
                 # left we go right and if nearest right we go left
                 # or we have changed from park or wiggle to xwind which will be presumed to happen
@@ -173,7 +173,7 @@ class Kite(object):
                 else:
                     self.targetx = rightx
                     self.targety = righty
-                self.targetangle = get_heading_points((self.x, self.y), (self.targetx, self.targety))
+                # self.targetangle = get_heading_points((self.x, self.y), (self.targetx, self.targety))
             elif self.changezone:  # think we should still set this roughly in the turn phase
                 self.targettype = self.phase
                 if self.phase == 'TurnR':
