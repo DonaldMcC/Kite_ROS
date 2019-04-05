@@ -38,7 +38,7 @@ class Base(object):
         self.barangles = deque(maxlen=16)
         self.targetbarangle = targetbarangle
         self.kitebarratio = kitebarratio  # this will be the rate of change of barangle to kite angle
-        self.updatemode = updatemode #  0 will be unconnected and 1 will bar angles kite
+        self.updatemode = updatemode # 0 will be unconnected and 1 will bar angles kite 2 is kite angles bar
 
 
 class Kite(object):

@@ -228,7 +228,7 @@ height = int(camera.get(4))
 control = Controls(config.setup)
 actkite = Kite(control.centrex, control.centrey)
 mankite = Kite(300, 400)
-base = Base(updatemode=1)
+base = Base(updatemode=1, kitebarratio=3)
 
 # Initialisation steps
 es = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
@@ -283,7 +283,7 @@ while True:  # Main module loop
     # lets draw and move cross for manual flying
     if control.config == "Manfly":
         if base.updatemode == 1:
-            kite.kiteangle = base.barangle
+            kite.kiteangle = base.barangle * base.kitebarratio
         drawkite(kite)
         kite.found = True
 
@@ -343,7 +343,7 @@ while True:  # Main module loop
     if kite.changezone or kite.changephase or kite.routechange:
         kite.update_target(control.routepoints[0][0], control.routepoints[0][1],
                            control.centrex, control.maxy, control.routepoints[3][0], control.routepoints[3][1])
-        
+
     if kite.zone == 'Centre' or kite.phase == 'Xwind':
         kite.targetangle = get_heading_points((kite.x, kite.y), (kite.targetx, kite.targety))
     # display output
