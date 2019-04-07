@@ -330,6 +330,12 @@ while True:  # Main module loop
     base.barangle = get_barangle(kite, base, control)
 
 
+    # Establish route
+    if kite.changezone or kite.changephase or kite.routechange:
+        kite.update_target(control.routepoints[0][0], control.routepoints[0][1],
+                           control.centrex, control.maxy, control.routepoints[3][0], control.routepoints[3][1])
+
+
     # start direction and analysis - this will be a routine based on class
     getdirection(kite)
     kite.targetheading = get_heading_points((kite.x, kite.y), (kite.targetx, kite.targety))
@@ -339,10 +345,6 @@ while True:  # Main module loop
     kite.update_phase()
     base.targetbarangle = calcbarangle(kite, base, control)
 
-    # Establish route
-    if kite.changezone or kite.changephase or kite.routechange:
-        kite.update_target(control.routepoints[0][0], control.routepoints[0][1],
-                           control.centrex, control.maxy, control.routepoints[3][0], control.routepoints[3][1])
 
     if kite.zone == 'Centre' or kite.phase == 'Xwind':
         kite.targetangle = get_heading_points((kite.x, kite.y), (kite.targetx, kite.targety))

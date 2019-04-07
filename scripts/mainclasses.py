@@ -60,7 +60,7 @@ class Kite(object):
         self.targettype = 'Angle'
         self.targetx = 0
         self.targety = 0
-        self.changezone = False
+        self.changezone = True
         self.changephase = False
         self.routechange = False
         self.found = False
