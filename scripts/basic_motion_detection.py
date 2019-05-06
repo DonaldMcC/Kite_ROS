@@ -190,7 +190,8 @@ source = 2  # change back to 1 to get prompt
 # wind
 masklimit = 1000
 # config = 'yellowballs'  # alternative when base not present will also possibly be combo
-KITETYPE = 'indoorkite'  # need to comment out for external
+#KITETYPE = 'indoorkite'  # need to comment out for external
+KITETYPE = 'kite1'
 
 # so thinking we have kite and controls, the video frame, posible sensor class
 # and perhaps a configuration class
@@ -205,7 +206,8 @@ class Config(object):
         self.logging = logging
 
 
-config = Config(setup='Manfly', source=1)
+#config = Config(setup='Manfly', source=1)
+config = Config(setup='Standard', source=2)
 
 while config.source not in {1, 2}:
     config.source = input('Key 1 for camera or 2 for source')
@@ -216,9 +218,10 @@ if config.source == 1:
     # camera=cv2.VideoCapture('IMG_0464.MOV')
 else:
     # TODO at some point will change this to current directory and append file - not urgent
-    # camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
+    #camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
+    camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/newkite1.mp4')
     # camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/orig2605.avi')
-    camera = cv2.VideoCapture(r'/home/donald/Downloads/IMG_1545.MOV')
+    #camera = cv2.VideoCapture(r'/home/donald/Downloads/IMG_1545.MOV')
     print('video:', camera.grab())
 
 width = int(camera.get(3))
@@ -288,7 +291,7 @@ while True:  # Main module loop
         kite.found = True
 
        # identify the kite
-    if control.config != "Manfly" and config == 'std':  # not detecting if in manual mode
+    if control.config != "Manfly" and config.setup == 'Standard':  # not detecting if in manual mode
         kite.found = False
         maxmask = -1
         index = -1
