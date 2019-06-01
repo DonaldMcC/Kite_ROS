@@ -25,6 +25,10 @@
 # 3 adjust the routing - it should default when the flight mode is changed
 # 4 on playback it should be possible to go into slow motion
 
+# Currently working on option to support auxiliary camera - conceptually thinnk this is ok
+# but should be optional and if present we will switch to that when kite goes avove top of main
+# image ie for now auxiliary camera is always above and we try not to fly off the sides
+
 # standard library imports
 
 # library imports
