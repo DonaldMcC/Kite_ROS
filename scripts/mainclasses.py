@@ -26,6 +26,16 @@ from collections import deque
 from move_func import get_heading_points
 
 
+
+class Config(object):
+    def __init__(self, source=2,  setup='Standard', masklimit=10000, logging=0, numcams=1):
+        self.source = source
+        self.setup = setup
+        self.masklimit = masklimit
+        self.logging = logging
+        self.numcams = numcams
+
+
 class Base(object):
 
     def __init__(self, barangle=0, parkangle=0, maxright=45, maxleft=-45, lag=1,

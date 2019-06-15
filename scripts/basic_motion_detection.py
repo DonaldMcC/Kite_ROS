@@ -38,7 +38,7 @@ import cv2
 from move_func import get_heading_points, get_angled_corners
 
 # modules
-from mainclasses import Kite, Controls, Base
+from mainclasses import Kite, Controls, Base, Config
 from move_func import get_angle
 from talker import kite_pos, kiteimage
 from cvwriter import initwriter, writeframe
@@ -186,7 +186,7 @@ def display_line(angle, cx,cy, radius, colour):
     return
 
 
-# Main routine start
+# MAIN ROUTINE START
 # this will need to not happen if arguments are passed
 source = 2  # change back to 1 to get prompt
 # iphone
@@ -200,14 +200,6 @@ KITETYPE = 'kite1'
 # so thinking we have kite and controls, the video frame, posible sensor class
 # and perhaps a configuration class
 # controsl setup self.inputmodes = ('Standard', 'SetFlight', 'ManFly')
-
-
-class Config(object):
-    def __init__(self, source=2,  setup='Standard', masklimit=10000, logging=0):
-        self.source = source
-        self.setup = setup
-        self.masklimit = masklimit
-        self.logging = logging
 
 
 #config = Config(setup='Manfly', source=1)
