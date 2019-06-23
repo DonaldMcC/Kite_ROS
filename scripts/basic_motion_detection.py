@@ -3,15 +3,16 @@
 # for seeing and reporting back on the position and angle of
 # the kite - it will also be the only video output from the package and consequently
 # will display and also allow direct updating of the proposed route
-# however there will also be a separate ros node that will allow setting the route
-# and flying mode of the kit in due course and these will communicate via ROS messages
 
 # inputs
 # the module will support main input either input from a single webcam or from a video file initially - this may
-# extend to rosbag files in future
+# extend to rosbag files in future and support for a second camera now seems required as cameras I have do not
+# provide coverage of a sufficiently large angle of the sky - possibly building in capability to angle cameras
+# during operation should be looked at
 #
 # outputs
-# the main output will be  a ROS message reporting the x and y coordinates of the kite and it should also be
+# the main output will be a ROS message reporting the x and y coordinates of the kite the current angle of the
+# control bar and the motor instruction to change the angle of the bar.  It should also be
 # possible to record the input if required
 #
 # initial configuration
@@ -19,25 +20,22 @@
 # if started without arguments it should ask if webcam or file to be loaded
 #
 # while in flow it should be possible to
-# 1 amend the flight mode
-# 2 switch from sending actual kite position to manually controlled one - think this
-# should be a new object
+# 1 amend the flight mode - which is the flight path we are looking for the kite to try and follow
+# 2 switch from sending actual kite position to manually controlled one
 # 3 adjust the routing - it should default when the flight mode is changed
 # 4 on playback it should be possible to go into slow motion
 
-# Currently working on option to support auxiliary camera - conceptually thinnk this is ok
-# but should be optional and if present we will switch to that when kite goes avove top of main
+# Currently working on option to support auxiliary camera - conceptually think this is ok
+# but should be optional and if present we will switch to that when kite goes above top of main
 # image ie for now auxiliary camera is always above and we try not to fly off the sides
 
 # standard library imports
-
-# library imports
 import numpy as np
 import time
 import cv2
-from move_func import get_heading_points, get_angled_corners
 
-# modules
+# kite_ros imports
+from move_func import get_heading_points, get_angled_corners
 from mainclasses import Kite, Controls, Base, Config
 from move_func import get_angle
 from talker import kite_pos, kiteimage
@@ -49,8 +47,8 @@ from kite_funcs import kitemask, calcbarangle
 # this is just for display flight decisions will be elsewhere
 def drawroute(route, centrex, centrey):
     global frame
-    for i, j in enumerate(route):
-        if i < len(route) - 1:
+    for k, l in enumerate(route):
+        if k < len(route) - 1:
             cv2.line(frame, (j[0], j[1]), (route[i + 1][0], route[i + 1][1]),
                      (0, 255, 70), thickness=2, lineType=8, shift=0)
         else:
@@ -148,7 +146,6 @@ def getdirection(kte):
                 # handle when both directions are non-empty
             if dirX != "" and dirY != "":
                 kte.direction = "{}-{}".format(dirY, dirX)
-
                 # otherwise, only one direction is non-empty
             else:
                 kte.direction = dirX if dirX != "" else dirY
@@ -176,7 +173,7 @@ def display_base():
     return
 
 
-def display_line(angle, cx,cy, radius, colour):
+def display_line(angle, cx, cy, radius, colour):
     pointx, pointy = get_angled_corners(cx + radius, cy, angle, cx, cy)
     pointx = int(pointx)
     pointy = int(pointy)
@@ -194,7 +191,7 @@ source = 2  # change back to 1 to get prompt
 # wind
 masklimit = 1000
 # config = 'yellowballs'  # alternative when base not present will also possibly be combo
-#KITETYPE = 'indoorkite'  # need to comment out for external
+# KITETYPE = 'indoorkite'  # need to comment out for external
 KITETYPE = 'kite1'
 
 # so thinking we have kite and controls, the video frame, posible sensor class
@@ -202,7 +199,7 @@ KITETYPE = 'kite1'
 # controsl setup self.inputmodes = ('Standard', 'SetFlight', 'ManFly')
 
 
-#config = Config(setup='Manfly', source=1)
+# config = Config(setup='Manfly', source=1)
 config = Config(setup='Standard', source=2)
 
 while config.source not in {1, 2}:
@@ -214,10 +211,10 @@ if config.source == 1:
     # camera=cv2.VideoCapture('IMG_0464.MOV')
 else:
     # TODO at some point will change this to current directory and append file - not urgent
-    #camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
+    # camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
     camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/newkite1.mp4')
     # camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/orig2605.avi')
-    #camera = cv2.VideoCapture(r'/home/donald/Downloads/IMG_1545.MOV')
+    # camera = cv2.VideoCapture(r'/home/donald/Downloads/IMG_1545.MOV')
     print('video:', camera.grab())
 
 width = int(camera.get(3))
@@ -286,7 +283,7 @@ while True:  # Main module loop
         drawkite(kite)
         kite.found = True
 
-       # identify the kite
+    # identify the kite
     if control.config != "Manfly" and config.setup == 'Standard':  # not detecting if in manual mode
         kite.found = False
         maxmask = -1
@@ -325,15 +322,13 @@ while True:  # Main module loop
     else:
         tempstr = "Found: No"
 
-    #read sensors
+    # read sensors
     base.barangle = get_barangle(kite, base, control)
-
 
     # Establish route
     if kite.changezone or kite.changephase or kite.routechange:
         kite.update_target(control.routepoints[0][0], control.routepoints[0][1],
                            control.centrex, control.maxy, control.routepoints[3][0], control.routepoints[3][1])
-
 
     # start direction and analysis - this will be a routine based on class
     getdirection(kite)
@@ -344,14 +339,13 @@ while True:  # Main module loop
     kite.update_phase()
     base.targetbarangle = calcbarangle(kite, base, control)
 
-
     if kite.zone == 'Centre' or kite.phase == 'Xwind':
         kite.targetangle = get_heading_points((kite.x, kite.y), (kite.targetx, kite.targety))
     # display output
     # show the movement deltas and the direction of movement on the frame
     cv2.putText(frame, kite.direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
     cv2.putText(frame, "dx: {}, dy: {}".format(kite.dX, kite.dY),
-                        (10, height - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 1)
+                (10, height - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 1)
     cv2.putText(frame, "x: {}, y: {}".format(mankite.x, mankite.y),
                 (180, height - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 1)
 
