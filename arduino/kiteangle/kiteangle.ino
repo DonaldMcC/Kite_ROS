@@ -36,12 +36,12 @@ ros::Publisher kiteangle("kiteangle", &msg);
 // with 100-199 being left and 200-299 being right
 void callback (const std_msgs::Int16&int_msg)
 { 
-   if  (int_msg.data = 0)
+  if (int_msg.data == 0)
     stop();
   else if (int_msg.data < 200)
-    left();
-  else
-    right();
+      left();
+    else
+      right();
 
 } 
 

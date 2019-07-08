@@ -136,16 +136,16 @@ def checklimits(angle, maxleft, maxright):
     return angle
 
 
-def getangle(resistance, maxleft=-45, maxright=45, resistleft=0.0, resistright=300.0):
+def getangle(resistance, maxleft=-45, maxright=45, resistleft=340.0, resistright=740.0):
     """
     :param resistance:
     :return angle:
 
-    >>> getangle(0)
+    >>> getangle(340)
     -45
-    >>> getangle(150)
+    >>> getangle(540)
     0
-    >>> getangle(300)
+    >>> getangle(740)
     45
     """
 
