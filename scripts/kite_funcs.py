@@ -67,7 +67,7 @@ def calcbarangle(kite, base, controls):
     >>> b=Base(barangle=15, kitebarratio=2)
     >>> c=Controls(1)
     >>> calcbarangle(k,b,c)
-    35
+    10
 
     >>> k=Kite(400, phase='TurnR', targetangle=10)
     >>> b=Base(barangle=15, kitebarratio=2)
@@ -90,8 +90,7 @@ def setangle(kite, base, controls):
     >>> b=Base(barangle=15, kitebarratio=2)
     >>> c=Controls(1)
     >>> setangle(k,b,c)
-    35
-
+    10
     """
 
     # targetbarangle = checklimits((kite.targetangle * base.kitebarratio), base.maxleft, base.maxright)
@@ -117,7 +116,6 @@ def setangleturn(kite, base):
 
 def checklimits(angle, maxleft, maxright):
     """
-
     :param angle:
     :param maxleft:
     :param maxright:
@@ -138,6 +136,34 @@ def checklimits(angle, maxleft, maxright):
     return angle
 
 
+def getangle(resistance, maxleft=-45, maxright=45, resistleft=0.0, resistright=300.0):
+    """
+    :param resistance:
+    :return angle:
+
+    >>> getangle(0)
+    -45
+    >>> getangle(150)
+    0
+    >>> getangle(300)
+    45
+    """
+
+    # calibration is based on 0 being the centre and maxleft and maxright being
+    # defined in degrees - the corrsesponding values of the resistor should be taken
+    # for all of these and we will for now assume resistor is linear
+    if resistance >= resistleft and resistance <= resistright:
+        angle = maxleft + ((resistance-resistleft)/(resistright-resistleft) * (maxright-maxleft))
+    else:
+        angle = 0
+    return int(angle)
+
+
 def _test():
     import doctest
     doctest.testmod(verbose=False)
+
+
+if __name__ == '__main__':
+    'Can run with -v option if you want to confirm tests were run'
+    _test()

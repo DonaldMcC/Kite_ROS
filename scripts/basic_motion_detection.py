@@ -5,15 +5,17 @@
 # will display and also allow direct updating of the proposed route
 
 # inputs
-# the module will support main input either input from a single webcam or from a video file initially - this may
+# the module will support main input either input from a single webcam or from a video file - this may
 # extend to rosbag files in future and support for a second camera now seems required as cameras I have do not
 # provide coverage of a sufficiently large angle of the sky - possibly building in capability to angle cameras
 # during operation should be looked at
+# there will also be input from a resistor which is linked to the kitebar and will need to be calibrated in
+# advance - this will be received as kiteangle.data generally from arduino 
 #
 # outputs
 # the main output will be a ROS message reporting the x and y coordinates of the kite the current angle of the
 # control bar and the motor instruction to change the angle of the bar.  It should also be
-# possible to record the input if required
+# possible to record the input if required - the motor instruction is on motormsg.data
 #
 # initial configuration
 # file can be started with arguments and should then not prompt for input
@@ -40,7 +42,7 @@ from mainclasses import Kite, Controls, Base, Config
 from move_func import get_angle
 from talker import kite_pos, kiteimage
 from cvwriter import initwriter, writeframe
-from basic_listen_barangle import listen_kitebase, get_barangle
+from basic_listen_barangle import listen_kiteangle, get_barangle
 from kite_funcs import kitemask, calcbarangle
 
 
@@ -118,7 +120,6 @@ def drawkite(kite):
              colour, thickness=thickness, lineType=8, shift=0)
     cv2.line(frame, (startverx, startvery), (starthorx, starthory),
              colour, thickness=thickness, lineType=8, shift=0)
-
     return
 
 
@@ -154,7 +155,6 @@ def getdirection(kte):
             kte.thickness = int(np.sqrt(32 / float(i + 1)) * 2.5)
             cv2.line(frame, kte.pts[i - 1], kte.pts[i], (0, 0, 255), kte.thickness)
             continue
-
     return
 
 
@@ -196,8 +196,7 @@ KITETYPE = 'kite1'
 
 # so thinking we have kite and controls, the video frame, posible sensor class
 # and perhaps a configuration class
-# controsl setup self.inputmodes = ('Standard', 'SetFlight', 'ManFly')
-
+# controls setup self.inputmodes = ('Standard', 'SetFlight', 'ManFly')
 
 # config = Config(setup='Manfly', source=1)
 config = Config(setup='Standard', source=2)
@@ -238,7 +237,7 @@ counter = 0
 foundcounter = 0
 
 if config.setup == 'Standard':  # otherwise not present
-    listen_kitebase()
+    listen_kiteangle()
 writer = None
 cv2.startWindowThread()
 cv2.namedWindow('contours')
