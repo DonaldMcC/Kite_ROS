@@ -385,7 +385,8 @@ while True:  # Main module loop
         writeframe(writer, frame, height, width)
 
     # change to -1 for debugging
-    key = cv2.waitKey(1) & 0xff
+    # 10 seems to work better than 1 on virtualbox - not sure what the issue is
+    key = cv2.waitKey(10) & 0xff
     # think there will be a mode option in here as well
     # one key changes mode and we would show the possible keys somewhere
     if key == ord("q"):
@@ -401,6 +402,5 @@ while True:  # Main module loop
 print("[INFO] cleaning up...")
 cv2.destroyAllWindows()
 camera.release()
-# vs.stop() - no idea what this was
 if writer is not None:
     writer.release()
