@@ -321,9 +321,7 @@ while True:  # Main module loop
     else:
         tempstr = "Found: No"
 
-    # update if not using sensors
-    if config.setup != 'Standard':
-        base.barangle = get_barangle(kite, base, control)
+    base.barangle = get_barangle(kite, base, control)
 
     # Establish route
     if kite.changezone or kite.changephase or kite.routechange:

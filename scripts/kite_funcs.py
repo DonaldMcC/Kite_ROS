@@ -31,17 +31,17 @@ def kitemask(c, frame, kitecolours='kite1'):
 
     else:
         boundaries = [([0, 0, 0], [30, 30, 30]),
-                    ([10, 10, 100], [100, 100, 255]),
-                    ([0, 50, 100], [120, 220, 255])
-                    ]
+                      ([10, 10, 100], [100, 100, 255]),
+                      ([0, 50, 100], [120, 220, 255])
+                      ]
         # iphone
         boundaries = [([0, 0, 100], [100, 100, 255]),
-                  ([0, 50, 150], [120, 220, 255])
-                  ]
+                      ([0, 50, 150], [120, 220, 255])
+                      ]
         # wind 64,111,106
         boundaries = [([0, 0, 100], [100, 100, 255]),
-                  ([0, 50, 100], [120, 220, 255])
-                  ]
+                      ([0, 50, 100], [120, 220, 255])
+                      ]
 
     totmask = 1
 
@@ -153,7 +153,7 @@ def getangle(resistance, maxleft=-45, maxright=45, resistleft=340.0, resistright
     # defined in degrees - the corrsesponding values of the resistor should be taken
     # for all of these and we will for now assume resistor is linear
     if resistance >= resistleft and resistance <= resistright:
-        angle = maxleft + ((resistance-resistleft)/(resistright-resistleft) * (maxright-maxleft))
+        angle = maxleft + ((resistance - resistleft) / (resistright - resistleft) * (maxright - maxleft))
     else:
         angle = 0
     return int(angle)

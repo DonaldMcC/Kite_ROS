@@ -10,7 +10,7 @@ def callback(data):
     global barangle
     resistance = data.data
     barangle = getangle(resistance)
-    #print(resistance, barangle)
+    print(resistance, barangle)
     return
 
 
@@ -18,7 +18,6 @@ def listen_kiteangle():
     rospy.init_node('kiteangle_listen', anonymous=False)
     print('initing')
     rospy.Subscriber('kiteangle', Int16, callback)
-    rospy.spin()
 
 
 def get_barangle(kite, base, control):
@@ -35,3 +34,4 @@ def get_barangle(kite, base, control):
 
 if __name__ == '__main__':
     listen_kiteangle()
+    rospy.spin()
