@@ -2,7 +2,7 @@
 # from ros wiki for initial testing
 import rospy
 from std_msgs.msg import String
-from kite_ros.msg import Kitepos
+#from kite_ros.msg import Kitepos
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 
@@ -19,20 +19,24 @@ def talker():
     return
 
 
-def kite_pos(posx, posy, kiteangle, dirx, diry, routepoints, priorpos):
-    pub = rospy.Publisher('kite_position', Kitepos, queue_size=10)
-    rospy.init_node('custom_talker', anonymous=True)
-    rate = rospy.Rate(10)  # 10hz
-    msg = Kitepos()
-    msg.name = "Kite Position"
-    msg.posx = posx
-    msg.posy = posy
-    msg.kiteangle = kiteangle
-    msg.dirx = dirx
-    msg.diry = diry
-    rospy.loginfo(msg)
-    pub.publish(msg)
+#def kite_pos(posx, posy, kiteangle, dirx, diry, routepoints, priorpos):
+#    pub = rospy.Publisher('kite_position', Kitepos, queue_size=10)
+#    rospy.init_node('custom_talker', anonymous=True)
+#    rate = rospy.Rate(10)  # 10hz
+#    msg = Kitepos()
+#    msg.name = "Kite Position"
+#    msg.posx = posx
+#    msg.posy = posy
+#    msg.kiteangle = kiteangle
+#    msg.dirx = dirx
+#    msg.diry = diry
+#    rospy.loginfo(msg)
+#    pub.publish(msg)
+#
+#    return
 
+def kite_pos(posx, posy, kiteangle, dirx, diry, routepoints, priorpos):
+    pass
     return
 
 

@@ -51,10 +51,10 @@ def drawroute(route, centrex, centrey):
     global frame
     for k, l in enumerate(route):
         if k < len(route) - 1:
-            cv2.line(frame, (j[0], j[1]), (route[i + 1][0], route[i + 1][1]),
+            cv2.line(frame, (l[0], l[1]), (route[k + 1][0], route[k + 1][1]),
                      (0, 255, 70), thickness=2, lineType=8, shift=0)
         else:
-            cv2.line(frame, (j[0], j[1]), (route[0][0], route[0][1]),
+            cv2.line(frame, (l[0], l[1]), (route[0][0], route[0][1]),
                      (0, 255, 70), thickness=2, lineType=8, shift=0)
     cv2.line(frame, (centrex, 0), (centrex, centrey * 2),
              (255, 0, 0), thickness=2, lineType=8, shift=0)
@@ -210,8 +210,8 @@ if config.source == 1:
     # camera=cv2.VideoCapture('IMG_0464.MOV')
 else:
     # TODO at some point will change this to current directory and append file - not urgent
-    # camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
-    camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/newkite1.mp4')
+    camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
+    #camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/newkite1.mp4')
     # camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/orig2605.avi')
     # camera = cv2.VideoCapture(r'/home/donald/Downloads/IMG_1545.MOV')
     print('video:', camera.grab())
@@ -237,7 +237,7 @@ counter = 0
 foundcounter = 0
 
 if config.setup == 'Standard':  # otherwise not present
-    listen_kiteangle()
+    listen_kiteangle() # this then updates base.barangle via the callback function
 writer = None
 cv2.startWindowThread()
 cv2.namedWindow('contours')
@@ -321,8 +321,9 @@ while True:  # Main module loop
     else:
         tempstr = "Found: No"
 
-    # read sensors
-    base.barangle = get_barangle(kite, base, control)
+    # update if not using sensors
+    if config.setup != 'Standard':
+        base.barangle = get_barangle(kite, base, control)
 
     # Establish route
     if kite.changezone or kite.changephase or kite.routechange:

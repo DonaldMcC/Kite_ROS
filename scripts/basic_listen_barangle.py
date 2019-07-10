@@ -4,19 +4,21 @@
 import rospy
 from std_msgs.msg import Int16
 from kite_funcs import getangle
-barangle = 0
-
+barangle=0
 
 def callback(data):
     global barangle
     resistance = data.data
     barangle = getangle(resistance)
-    print(barangle)
+    #print(resistance, barangle)
     return
 
 
 def listen_kiteangle():
+    rospy.init_node('kiteangle_listen', anonymous=False)
+    print('initing')
     rospy.Subscriber('kiteangle', Int16, callback)
+    rospy.spin()
 
 
 def get_barangle(kite, base, control):
@@ -32,7 +34,4 @@ def get_barangle(kite, base, control):
 
 
 if __name__ == '__main__':
-    rospy.init_node('kiteangle_listen', anonymous=True)
-    # spin() simply keeps python from exiting until this node is stopped
-    rospy.spin()
     listen_kiteangle()
