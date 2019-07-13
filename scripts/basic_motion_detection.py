@@ -199,13 +199,13 @@ KITETYPE = 'kite1'
 # controls setup self.inputmodes = ('Standard', 'SetFlight', 'ManFly')
 
 # config = Config(setup='Manfly', source=1)
-config = Config(setup='Standard', source=2)
+config = Config(setup='Standard', source=1)
 
 while config.source not in {1, 2}:
     config.source = input('Key 1 for camera or 2 for source')
 # should define source here
 if config.source == 1:
-    camera = cv2.VideoCapture(0)
+    camera = cv2.VideoCapture(4)
     config.logging = 1
     # camera=cv2.VideoCapture('IMG_0464.MOV')
 else:
