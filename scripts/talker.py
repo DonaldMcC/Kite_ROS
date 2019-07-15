@@ -39,17 +39,25 @@ def kite_pos(posx, posy, kiteangle, dirx, diry, routepoints, priorpos):
     pass
     return
 
+def init_ros():
+    rospy.init_node('kite_main', anonymous=True)
+
+
+def init_motor_msg():
+    global pub, rate
+    pub = rospy.Publisher('motormsg', Int16, queue_size=10)
+    rate = rospy.Rate(10)  # 10hz
 
 def motor_msg(barangle, targetbarangle):
-    #pub = rospy.Publisher('motormsg', Int16, queue_size=10)
-    #rospy.init_node('motormsg_pub', anonymous=True)
-    #rate = rospy.Rate(10)  # 10hz
-    #while not rospy.is_shutdown():
-    #    rospy.loginfo(150)
-    #    pub.publish(150)
-    #    rate.sleep()
-    #pub.publish(100)
-    pass
+    global pub, rate
+    # rospy.loginfo(150)
+    if barangle > targetbarangle:
+        pub.publish(299)
+    elif barangle < targetbarangle:
+        pub.publish(199)
+    else:
+        pub.publish(0)
+    # rate.sleep()
     return
 
 class kiteimage:
@@ -69,6 +77,8 @@ if __name__ == '__main__':
     # talker()
     try:
         # kite_pos(100, 200, 45, 1, 0, 0, 0)
+        rospy.init_node('kite_main', anonymous=False)
+        init_motor_msg()
         motor_msg(200,300)
     except rospy.ROSInterruptException:
         pass

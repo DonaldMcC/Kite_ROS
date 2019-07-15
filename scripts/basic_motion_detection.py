@@ -45,7 +45,7 @@ import imutils
 from move_func import get_heading_points, get_angled_corners
 from mainclasses import Kite, Controls, Base, Config
 from move_func import get_angle
-from talker import kite_pos, kiteimage, motor_msg
+from talker import kite_pos, kiteimage, motor_msg, init_motor_msg, init_ros
 from cvwriter import initwriter, writeframe
 from basic_listen_barangle import listen_kiteangle, get_barangle
 from kite_funcs import kitemask, calcbarangle
@@ -240,6 +240,8 @@ es = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
 kernel = np.ones((5, 5), np.uint8)
 background = None
 imagemessage = kiteimage()
+init_ros()
+init_motor_msg()
 
 # initialize the list of tracked points, the frame counter,
 # and the coordinate deltas
@@ -261,7 +263,7 @@ else:
 
 while True:  # Main module loop
     # Read Frame
-    if config.numcams==1:
+    if config.numcams == 1:
         ret, frame = camera.stream.read()
         # change above for videostream from pyimagagesearch
         # ret, frame = camera.read()
@@ -427,7 +429,7 @@ while True:  # Main module loop
 
     # change to -1 for debugging
     # 10 seems to work better than 1 on virtualbox - not sure what the issue is
-    key = cv2.waitKey(10) & 0xff
+    key = cv2.waitKey(20) & 0xff
     # think there will be a mode option in here as well
     # one key changes mode and we would show the possible keys somewhere
     if key == ord("q"):

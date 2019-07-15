@@ -15,7 +15,6 @@ def callback(data):
 
 
 def listen_kiteangle():
-    rospy.init_node('kiteangle_listen', anonymous=False)
     print('initing')
     rospy.Subscriber('kiteangle', Int16, callback)
 
@@ -33,5 +32,6 @@ def get_barangle(kite, base, control):
 
 
 if __name__ == '__main__':
+    rospy.init_node('kite_main', anonymous=False)
     listen_kiteangle()
     rospy.spin()
