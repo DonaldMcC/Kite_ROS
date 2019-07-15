@@ -38,6 +38,7 @@ import cv2
 
 #pyimagesearch imports
 from imutils.video import VideoStream
+from panorama import Stitcher
 import imutils
 
 # kite_ros imports
@@ -211,20 +212,22 @@ while config.source not in {1, 2}:
 if config.source == 1:
     #camera = cv2.VideoCapture(-1)
     # probably need to go below route to do stitching but need to understand differences first
-    camera = VideoStream(src=-1).start()
+    if config.numcams == 1:
+        camera = VideoStream(src=-1).start()
+    else:
+        leftStream = VideoStream(src=2).start() # think this is the top part to check
+        rightStream = VideoStream(src=4).start()
+        time.sleep(2.0)
+        stitcher = Stitcher()
+
     config.logging = 1
-    # camera=cv2.VideoCapture('IMG_0464.MOV')
 else:
     # TODO at some point will change this to current directory and append file - not urgent
     camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
-    #camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/newkite1.mp4')
+    # camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/newkite1.mp4')
     # camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/orig2605.avi')
     # camera = cv2.VideoCapture(r'/home/donald/Downloads/IMG_1545.MOV')
     print('video:', camera.grab())
-
-# width = int(camera.stream.get(3))
-# height = int(camera.stream.get(4))
-
 
 # initiate class instances
 control = Controls(config.setup)
@@ -258,9 +261,34 @@ else:
 
 while True:  # Main module loop
     # Read Frame
-    ret, frame = camera.stream.read()
-    # change above for videostream from pyimagagesearch
-    # ret, frame = camera.read()
+    if config.numcams==1:
+        ret, frame = camera.stream.read()
+        # change above for videostream from pyimagagesearch
+        # ret, frame = camera.read()
+    else:
+        left = leftStream.read()
+        right = rightStream.read()
+        # below is because opencv only stitches horizontally
+        left = cv2.transpose(left)
+        right = cv2.transpose(right)
+
+        # resize the frames
+        left = imutils.resize(left, width=640)
+        right = imutils.resize(right, width=640)
+
+        # stitch the frames together to form the panorama
+        # IMPORTANT: you might have to change this line of code
+        # depending on how your cameras are oriented; frames
+        # should be supplied in left-to-right order
+        result = stitcher.stitch([left, right])
+        # reverse the transposition to get images back above one another
+        camera = cv2.flip(cv2.transpose(result), 1)
+
+        # no homograpy could be computed
+        if camera is None:
+            print("[INFO] homography could not be computed")
+            break
+
     if background is None:
         background = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         background = cv2.GaussianBlur(background, (21, 21), 0)
