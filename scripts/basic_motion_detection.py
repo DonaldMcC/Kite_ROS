@@ -36,11 +36,15 @@ import numpy as np
 import time
 import cv2
 
+#pyimagesearch imports
+from imutils.video import VideoStream
+import imutils
+
 # kite_ros imports
 from move_func import get_heading_points, get_angled_corners
 from mainclasses import Kite, Controls, Base, Config
 from move_func import get_angle
-from talker import kite_pos, kiteimage
+from talker import kite_pos, kiteimage, motor_msg
 from cvwriter import initwriter, writeframe
 from basic_listen_barangle import listen_kiteangle, get_barangle
 from kite_funcs import kitemask, calcbarangle
@@ -205,7 +209,9 @@ while config.source not in {1, 2}:
     config.source = input('Key 1 for camera or 2 for source')
 # should define source here
 if config.source == 1:
-    camera = cv2.VideoCapture(4)
+    #camera = cv2.VideoCapture(-1)
+    # probably need to go below route to do stitching but need to understand differences first
+    camera = VideoStream(src=-1).start()
     config.logging = 1
     # camera=cv2.VideoCapture('IMG_0464.MOV')
 else:
@@ -216,8 +222,9 @@ else:
     # camera = cv2.VideoCapture(r'/home/donald/Downloads/IMG_1545.MOV')
     print('video:', camera.grab())
 
-width = int(camera.get(3))
-height = int(camera.get(4))
+# width = int(camera.stream.get(3))
+# height = int(camera.stream.get(4))
+
 
 # initiate class instances
 control = Controls(config.setup)
@@ -251,7 +258,9 @@ else:
 
 while True:  # Main module loop
     # Read Frame
-    ret, frame = camera.read()
+    ret, frame = camera.stream.read()
+    # change above for videostream from pyimagagesearch
+    # ret, frame = camera.read()
     if background is None:
         background = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         background = cv2.GaussianBlur(background, (21, 21), 0)
@@ -260,6 +269,7 @@ while True:  # Main module loop
     if config.logging and writer is None:
         # h, w = frame.shape[:2]
         # height, width = 480, 640 - removed should now be set above
+        height, width, channels = frame.shape
         writer = initwriter("record.avi", height, width, fps)
         origwriter = initwriter("origrecord.avi", height, width, fps)
 
@@ -371,6 +381,9 @@ while True:  # Main module loop
     display_base()
 
     kite_pos(kite.x, kite.y, kite.kiteangle, kite.dX, kite.dY, 0, 0)
+
+    motor_msg(base.barangle, base.targetbarangle)
+
     # cv2.imshow("roi", finalframe)
     # cv2.imshow("mask", mask)
     cv2.imshow("contours", frame)
@@ -401,6 +414,6 @@ while True:  # Main module loop
 
 print("[INFO] cleaning up...")
 cv2.destroyAllWindows()
-camera.release()
+camera.stop()
 if writer is not None:
     writer.release()

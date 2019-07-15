@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # from ros wiki for initial testing
 import rospy
-from std_msgs.msg import String
+from std_msgs.msg import String, Int16
 #from kite_ros.msg import Kitepos
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
@@ -40,6 +40,18 @@ def kite_pos(posx, posy, kiteangle, dirx, diry, routepoints, priorpos):
     return
 
 
+def motor_msg(barangle, targetbarangle):
+    #pub = rospy.Publisher('motormsg', Int16, queue_size=10)
+    #rospy.init_node('motormsg_pub', anonymous=True)
+    #rate = rospy.Rate(10)  # 10hz
+    #while not rospy.is_shutdown():
+    #    rospy.loginfo(150)
+    #    pub.publish(150)
+    #    rate.sleep()
+    #pub.publish(100)
+    pass
+    return
+
 class kiteimage:
 
     def __init__(self):
@@ -56,6 +68,7 @@ class kiteimage:
 if __name__ == '__main__':
     # talker()
     try:
-        kite_pos(100, 200, 45, 1, 0, 0, 0)
+        # kite_pos(100, 200, 45, 1, 0, 0, 0)
+        motor_msg(200,300)
     except rospy.ROSInterruptException:
         pass
