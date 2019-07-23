@@ -204,7 +204,7 @@ KITETYPE = 'kite1'
 # controls setup self.inputmodes = ('Standard', 'SetFlight', 'ManFly')
 
 # config = Config(setup='Manfly', source=1)
-config = Config(setup='Standard', source=1)
+config = Config(setup='Standard', source=1, numcams=1, input='keyboard')
 
 while config.source not in {1, 2}:
     config.source = input('Key 1 for camera or 2 for source')
@@ -427,17 +427,19 @@ while True:  # Main module loop
     if config.logging:  # not saving this either as it errors on other screen
         writeframe(writer, frame, height, width)
 
-    # change to -1 for debugging
-    # 10 seems to work better than 1 on virtualbox - not sure what the issue is
-    key = cv2.waitKey(20) & 0xff
-    # think there will be a mode option in here as well
-    # one key changes mode and we would show the possible keys somewhere
-    if key == ord("q"):
-        break
-    elif key != -1:
-        routepoints = control.keyhandler(key, kite, base)
+    if config.input == 'keyboard' or config.input=='both':
+        # change to -1 for debugging
+        # 20 seems to work better than 1 on virtualbox - not sure what the issue is
+        key = cv2.waitKey(20) & 0xff
+        if key == ord("q"):
+            break
+        elif key != -1:
+            routepoints = control.keyhandler(key, kite, base)
+
+    if config.input == 'joystick' or config.input=='both':
+        routepoints = control.joyhandler(key, kite, base)
+
     time.sleep(control.slow)
-    print(counter)
     # if counter > 633: # turn off expiry after so many frames
     #     print('found:', foundcounter)
     #     break

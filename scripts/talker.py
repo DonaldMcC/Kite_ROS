@@ -2,10 +2,10 @@
 # from ros wiki for initial testing
 import rospy
 from std_msgs.msg import String, Int16
-#from kite_ros.msg import Kitepos
+from kite_ros.msg import Kitepos
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
-
+pub=0
 
 def talker():
     pub = rospy.Publisher('chatter', String, queue_size=10)
@@ -19,48 +19,45 @@ def talker():
     return
 
 
-#def kite_pos(posx, posy, kiteangle, dirx, diry, routepoints, priorpos):
-#    pub = rospy.Publisher('kite_position', Kitepos, queue_size=10)
-#    rospy.init_node('custom_talker', anonymous=True)
-#    rate = rospy.Rate(10)  # 10hz
-#    msg = Kitepos()
-#    msg.name = "Kite Position"
-#    msg.posx = posx
-#    msg.posy = posy
-#    msg.kiteangle = kiteangle
-#    msg.dirx = dirx
-#    msg.diry = diry
-#    rospy.loginfo(msg)
-#    pub.publish(msg)
-#
-#    return
-
 def kite_pos(posx, posy, kiteangle, dirx, diry, routepoints, priorpos):
-    pass
+    pub = rospy.Publisher('kite_position', Kitepos, queue_size=10)
+    msg = Kitepos()
+    msg.name = "Kite Position"
+    msg.posx = posx
+    msg.posy = posy
+    msg.kiteangle = kiteangle
+    msg.dirx = dirx
+    msg.diry = diry
+    rospy.loginfo(msg)
+    pub.publish(msg)
     return
+
+#def kite_pos(posx, posy, kiteangle, dirx, diry, routepoints, priorpos):
+#    pass
+#    return
 
 def init_ros():
     rospy.init_node('kite_main', anonymous=True)
 
 
 def init_motor_msg():
-    global pub, rate
+    global pub
     pub = rospy.Publisher('motormsg', Int16, queue_size=10)
-    rate = rospy.Rate(10)  # 10hz
+
 
 def motor_msg(barangle, targetbarangle):
-    global pub, rate
-    # rospy.loginfo(150)
-    if barangle > targetbarangle:
+    global pub
+    diff = barangle - targetbarangle
+    if diff > 1:
         pub.publish(299)
-    elif barangle < targetbarangle:
+    elif diff < -1:
         pub.publish(199)
     else:
         pub.publish(0)
-    # rate.sleep()
     return
 
-class kiteimage:
+
+class KiteImage:
 
     def __init__(self):
         self.image_pub = rospy.Publisher('kite_image', Image, queue_size=10)
@@ -79,6 +76,6 @@ if __name__ == '__main__':
         # kite_pos(100, 200, 45, 1, 0, 0, 0)
         rospy.init_node('kite_main', anonymous=False)
         init_motor_msg()
-        motor_msg(200,300)
+        motor_msg(200, 300)
     except rospy.ROSInterruptException:
         pass

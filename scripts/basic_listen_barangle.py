@@ -10,7 +10,6 @@ def callback(data):
     global barangle
     resistance = data.data
     barangle = getangle(resistance)
-    print(resistance, barangle)
     return
 
 
