@@ -2,20 +2,22 @@
 # from ros wiki for initial testing
 
 import rospy
-from std_msgs.msg import Int16
+from sensor_msgs.msg import Joy
 joybuttons=[]
 joyaxis=[]
 
 
+def listen_joystick():
+    rospy.Subscriber('joy', Joy, callback)
+
+
 def callback(data):
     global joybuttons, joyaxis
-    resistance = data.data
-    print(joybuttons)
+    joybuttons = data.buttons
+    joyaxis = data.axis
+    print('but', joybuttons)
+    print('axe', joyaxis)
     return
-
-
-def listen_joystick():
-    rospy.Subscriber('joy', Int16, callback)
 
 
 def get_joystick():
