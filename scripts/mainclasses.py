@@ -305,35 +305,58 @@ class Controls(object):
         return
 
 
-    def joyhandler(self, key, kite, base=None):
-        # this will now support a change of flight mode and operating mode so different keys will
-        # do different things depending on inputmode,
+    def joyhandler(self, joybuttons, joyaxes):
+        # Using https://github.com/arnaud-ramey/rosxwiimote as a ros package to capture
+        # the joystick message this was because std one tried to do bluetooth
+        # connection to wiimote via python and it didn't work perhaps as only
+        # seems to expect early versions of wiimote
 
-        if self.inputmode == 0:  # Standard
-            if key == ord("l"):  # left
+        # The axes messages is as follows:
+        # 0. left - right rocker(3 possible values: -1 = left 0 = released 1 = right)
+        # 1. up - down rocker(3 possible values: -1 = left 0 = released 1 = right)
+        # 2. nunchuk left - right joystick(floating value in the range - 1 = left..1 = right)
+        # 3. nunchuk down - up joystick(floating value in the range - 1 = down.. 1 = up)
+
+        # 0. XWII_KEY_A - maybe the pause button
+        # 1. XWII_KEY_B - this should toggle the rockers between move and stretch squashc
+        # 2. XWII_KEY_PLUS - probably the faster button and poss some other things
+        # 3. XWII_KEY_MINUS - probably the slower button and poss some other things
+        # 4. XWII_KEY_HOME this should be the quit key
+        # 5. XWII_KEY_ONE  this will do an input mode change
+        # 6. XWII_KEY_TWO  and this will do a flight mode change
+        # 7. XWII_KEY_C - so this will be left or anticlockwise flight depending on key b
+        # 8. XWII_KEY_Z   and this will be right or clockwise kite depending on key b
+
+        # in terms of what we do with this the basic idea is that the nunchuk flies the kite
+        # and the rockers support the route moving about
+
+        if joybuttons[1] == 0:  # Standard
+            if joyaxes[0] == -1:  # left
                 self.centrex -= self.step
-            elif key == ord("r"):  # right
+            elif joyaxes[0] == 1:  # right
                 self.centrex += self.step
-            elif key == ord("u"):  # up
+            elif joyaxes[1] == 1:  # up
                 self.centrey -= self.step
-            elif key == ord("d"):  # down
+            elif joyaxes[1] == -1:  # down
                 self.centrey += self.step
-            elif key == ord("w"):  # wider
+        elif joybuttons[1] == 1:  # Standard
+            if joyaxes[0] == -1:  # left
                 self.halfwidth += self.step
-            elif key == ord("n"):  # narrower
+            elif joyaxes[0] == 1:  # right
                 self.halfwidth -= 1
-            elif key == ord("e"):  # expand
+            elif joyaxes[1] == 1:  # up
                 self.radius += self.step
-            elif key == ord("c"):  # contract
+            elif joyaxes[1] == -1:  # down
                 self.radius -= self.step
-            elif key == ord("s"):  # slow
+
+        elif key == ord("s"):  # slow
                 self.slow += 0.1
             elif key == ord("f"):  # fast
                 self.slow = 0.0
             elif key == ord("p"):  # pause - this may apply in all modes
                 time.sleep(10)
             # kite.routechange = True - don't want this triggered every time
-        elif self.inputmode == 1:  # SetFlight
+        if self.inputmode == 1:  # SetFlight
             if key == ord("p"):  # park
                 kite.mode = 'Park'
             elif key == ord("w") and kite.zone == 'Centre':  # must be in central zone to change mode
@@ -361,7 +384,7 @@ class Controls(object):
                 kite.kiteangle -= self.step
             elif key == ord("c"):  # clockwise
                 kite.kiteangle += self.step
-            elif key == ord("p"):  # pause - this may apply in all moades
+            elif key == ord("p"):  # pause - this may apply in all modes
                 time.sleep(10)
 
         if key == ord("m"):  # modechange

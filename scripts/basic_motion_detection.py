@@ -48,6 +48,7 @@ from move_func import get_angle
 from talker import kite_pos, kiteimage, motor_msg, init_motor_msg, init_ros
 from cvwriter import initwriter, writeframe
 from basic_listen_barangle import listen_kiteangle, get_barangle
+from listen_joystick import listen_joystick, get_joystick
 from kite_funcs import kitemask, calcbarangle
 
 
@@ -250,6 +251,10 @@ foundcounter = 0
 
 if config.setup == 'Standard':  # otherwise not present
     listen_kiteangle() # this then updates base.barangle via the callback function
+
+if config.input == 'joystick' or config.input == 'both':
+    listen_joystick() # subscribe to joystick messages
+
 writer = None
 cv2.startWindowThread()
 cv2.namedWindow('contours')
@@ -437,7 +442,8 @@ while True:  # Main module loop
             routepoints = control.keyhandler(key, kite, base)
 
     if config.input == 'joystick' or config.input=='both':
-        routepoints = control.joyhandler(key, kite, base)
+        joybuttons, joyaxes = get_joystick()
+        routepoints = control.joyhandler(joybuttons, joyaxes)
 
     time.sleep(control.slow)
     # if counter > 633: # turn off expiry after so many frames
