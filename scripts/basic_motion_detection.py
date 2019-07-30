@@ -36,7 +36,7 @@ import numpy as np
 import time
 import cv2
 
-#pyimagesearch imports
+# pyimagesearch imports
 from imutils.video import VideoStream
 from panorama import Stitcher
 import imutils
@@ -48,6 +48,7 @@ from move_func import get_angle
 from talker import kite_pos, kiteimage, motor_msg, init_motor_msg, init_ros
 from cvwriter import initwriter, writeframe
 from basic_listen_barangle import listen_kiteangle, get_barangle
+from listen_joystick import listen_joystick, get_joystick
 from kite_funcs import kitemask, calcbarangle
 
 
@@ -204,18 +205,18 @@ KITETYPE = 'kite1'
 # controls setup self.inputmodes = ('Standard', 'SetFlight', 'ManFly')
 
 # config = Config(setup='Manfly', source=1)
-config = Config(setup='Standard', source=1)
+config = Config(setup='Standard', source=1, numcams=1, input='keyboard')
 
 while config.source not in {1, 2}:
     config.source = input('Key 1 for camera or 2 for source')
 # should define source here
 if config.source == 1:
-    #camera = cv2.VideoCapture(-1)
+    # camera = cv2.VideoCapture(-1)
     # probably need to go below route to do stitching but need to understand differences first
     if config.numcams == 1:
         camera = VideoStream(src=-1).start()
     else:
-        leftStream = VideoStream(src=2).start() # think this is the top part to check
+        leftStream = VideoStream(src=2).start()  # think this is the top part to check
         rightStream = VideoStream(src=4).start()
         time.sleep(2.0)
         stitcher = Stitcher()
@@ -230,7 +231,7 @@ else:
     print('video:', camera.grab())
 
 # initiate class instances
-control = Controls(config.setup)
+control = Controls(config.setup, step=16)
 actkite = Kite(control.centrex, control.centrey)
 mankite = Kite(300, 400)
 base = Base(updatemode=1, kitebarratio=3)
@@ -249,7 +250,11 @@ counter = 0
 foundcounter = 0
 
 if config.setup == 'Standard':  # otherwise not present
-    listen_kiteangle() # this then updates base.barangle via the callback function
+    listen_kiteangle()  # this then updates base.barangle via the callback function
+
+if config.input == 'joystick' or config.input == 'both':
+    listen_joystick()  # subscribe to joystick messages
+
 writer = None
 cv2.startWindowThread()
 cv2.namedWindow('contours')
@@ -427,17 +432,20 @@ while True:  # Main module loop
     if config.logging:  # not saving this either as it errors on other screen
         writeframe(writer, frame, height, width)
 
-    # change to -1 for debugging
-    # 10 seems to work better than 1 on virtualbox - not sure what the issue is
-    key = cv2.waitKey(20) & 0xff
-    # think there will be a mode option in here as well
-    # one key changes mode and we would show the possible keys somewhere
-    if key == ord("q"):
-        break
-    elif key != -1:
-        routepoints = control.keyhandler(key, kite, base)
+    if config.input == 'keyboard' or config.input == 'both':
+        # change to -1 for debugging
+        # 20 seems to work better than 1 on virtualbox - not sure what the issue is
+        key = cv2.waitKey(20) & 0xff
+        if key == ord("q"):
+            break
+        elif key != -1:
+            routepoints = control.keyhandler(key, kite, base)
+
+    if config.input == 'joystick' or config.input == 'both':
+        joybuttons, joyaxes = get_joystick()
+        routepoints = control.joyhandler(joybuttons, joyaxes, kite, base)
+
     time.sleep(control.slow)
-    print(counter)
     # if counter > 633: # turn off expiry after so many frames
     #     print('found:', foundcounter)
     #     break

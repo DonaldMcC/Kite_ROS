@@ -6,11 +6,11 @@ from std_msgs.msg import Int16
 from kite_funcs import getangle
 barangle=0
 
+
 def callback(data):
     global barangle
     resistance = data.data
     barangle = getangle(resistance)
-    print(resistance, barangle)
     return
 
 
