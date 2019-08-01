@@ -205,7 +205,7 @@ KITETYPE = 'kite1'
 # controls setup self.inputmodes = ('Standard', 'SetFlight', 'ManFly')
 
 # config = Config(setup='Manfly', source=1)
-config = Config(setup='Standard', source=1, numcams=1, input='joystick')
+config = Config(setup='Manfly', source=1, numcams=1, input='joystick')
 
 while config.source not in {1, 2}:
     config.source = input('Key 1 for camera or 2 for source')
