@@ -431,55 +431,46 @@ class Controls(object):
                 self.radius += self.step
             elif joyaxes[1] == -1:  # down
                 self.radius -= self.step
+        if joybuttons[3] == 1:  # slow
+            self.slow += 0.1
+        elif joybuttons[2] == 1:  # fast
+            self.slow = 0.0
+        elif joybuttons[0] == 1:  # pause - this may apply in all modes
+            time.sleep(10)
 
-        elif key == ord("s"):  # slow
-                self.slow += 0.1
-            elif key == ord("f"):  # fast
-                self.slow = 0.0
-            elif key == ord("p"):  # pause - this may apply in all modes
-                time.sleep(10)
-            # kite.routechange = True - don't want this triggered every time
+        # kite.routechange = True - don't want this triggered every time
         if self.inputmode == 1:  # SetFlight
-            if key == ord("p"):  # park
-                kite.mode = 'Park'
-            elif key == ord("w") and kite.zone == 'Centre':  # must be in central zone to change mode
-                kite.mode = 'Wiggle'
-            elif key == ord("f") and kite.zone == 'Centre':  # must be in central zone to change mode
-                kite.mode = 'Fig8'
-            elif key == ord("s"):  # simulation
-                self.mode = 1
-            elif key == ord("n"):  # normal with kite being present
-                self.mode = 0
+            if joybuttons[6] == 1:  # move mode forward
+                if kite.mode == 'Park':
+                    kite.mode = 'Wiggle'
+                elif kite.mode == 'Wiggle':
+                    kite.mode = 'Fig8'
+                else:
+                    kite.mode = 'Park'
+            # TODO Figure out what below idea is all about and if required on wiimote
+                # elif key == ord("s"):  # simulation
+                # self.mode = 1
+                # elif key == ord("n"):  # normal with kite being present
+                # self.mode = 0
         elif self.inputmode == 2:  # ManFlight - maybe switch to arrows
-            if key == ord("l"):  # left
-                kite.x -= self.step  # this will change
-            elif key == ord("r"):  # right
-                kite.x += self.step
-            elif key == ord("u"):  # up
-                kite.y -= self.step
-            elif key == ord("d"):  # down
-                kite.y += self.step
-            elif key == ord("g"):  # bar gauche
-                base.barangle -= self.step
-            elif key == ord("h"):  # bar rigHt
-                base.barangle += self.step
-            elif key == ord("a"):  # anti clockwise
-                kite.kiteangle -= self.step
-            elif key == ord("c"):  # clockwise
-                kite.kiteangle += self.step
-            elif key == ord("p"):  # pause - this may apply in all modes
-                time.sleep(10)
+            if joybuttons[7] == 0 and joybuttons[8] == 0:
+                kite.x += (self.step * joyaxes[2])
+                kite.y -= (self.step * joyaxes[3])
+            elif joybuttons[7] == 1:
+                base.barangle += (self.step * joyaxes[2])
+            else: # z button pressed
+                kite.kiteangle += (self.step * joyaxes[2])
 
-        if key == ord("m"):  # modechange
-            print (self.inputmode)
+        if joybuttons[5] == 1:  # modechange
             self.inputmode += 1
             if self.inputmode == 3:  # simple toggle around 3 modes
                 self.inputmode = 0
             self.modestring = self.getmodestring()
 
         # see above to be changed to only calc if required
-        #self.routepoints = calc_route(self.centrex, self.centrey, self.halfwidth, self.radius)
+        # self.routepoints = calc_route(self.centrex, self.centrey, self.halfwidth, self.radius)
         return
+
 
 
 def calc_route(centrex=400, centrey=300, halfwidth=200, radius=100):
