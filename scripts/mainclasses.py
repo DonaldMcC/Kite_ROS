@@ -301,7 +301,9 @@ class Controls(object):
 
         #TODO what is this doing and why calc every loop???
         self.routepoints = calc_route(self.centrex, self.centrey, self.halfwidth, self.radius)
-        return
+
+        return key == ord("q") # quit pressed
+
 
     def joyhandler(self, joybuttons, joyaxes, kite, base):
         # Using https://github.com/arnaud-ramey/rosxwiimote as a ros package to capture
@@ -341,92 +343,7 @@ class Controls(object):
             if joyaxes[0] == -1:  # left
                 self.halfwidth += self.step
             elif joyaxes[0] == 1:  # right
-                self.halfwidth -= 1
-            elif joyaxes[1] == 1:  # up
-                self.radius += self.step
-            elif joyaxes[1] == -1:  # down
-                self.radius -= self.step
-
-        if joybuttons[3] == 1:  # slow
-            self.slow += 0.1
-        elif joybuttons[2] == 1:  # fast
-            self.slow = 0.0
-        elif joybuttons[0] == 1:  # pause - this may apply in all modes
-            time.sleep(10)
-
-        # kite.routechange = True - don't want this triggered every time
-        if self.inputmode == 1:  # SetFlight
-            if joybuttons[6] == 1:  # move mode forward
-                if kite.mode == 'Park':
-                    kite.mode = 'Wiggle'
-                elif kite.mode == 'Wiggle':
-                    kite.mode = 'Fig8'
-                else:
-                    kite.mode = 'Park'
-            # TODO Figure out what below idea is all about and if required on wiimote
-                # elif key == ord("s"):  # simulation
-                # self.mode = 1
-                # elif key == ord("n"):  # normal with kite being present
-                # self.mode = 0
-        elif self.inputmode == 2:  # ManFlight - maybe switch to arrows
-            if joybuttons[7] == 0 and joybuttons[8] == 0:
-                kite.x += (self.step * joyaxes[2])
-                kite.y -= (self.step * joyaxes[3])
-            elif joybuttons[7] == 1:
-                base.barangle += (self.step * joyaxes[2])
-            else: # z button pressed
-                kite.kiteangle += (self.step * joyaxes[2])
-
-        if joybuttons[5] == 1:  # modechange
-            self.inputmode += 1
-            if self.inputmode == 3:  # simple toggle around 3 modes
-                self.inputmode = 0
-            self.modestring = self.getmodestring()
-
-        # see above to be changed to only calc if required
-        # self.routepoints = calc_route(self.centrex, self.centrey, self.halfwidth, self.radius)
-        return
-
-
-    def joyhandler(self, joybuttons, joyaxes):
-        # Using https://github.com/arnaud-ramey/rosxwiimote as a ros package to capture
-        # the joystick message this was because std one tried to do bluetooth
-        # connection to wiimote via python and it didn't work perhaps as only
-        # seems to expect early versions of wiimote
-
-        # The axes messages is as follows:
-        # 0. left - right rocker(3 possible values: -1 = left 0 = released 1 = right)
-        # 1. up - down rocker(3 possible values: -1 = left 0 = released 1 = right)
-        # 2. nunchuk left - right joystick(floating value in the range - 1 = left..1 = right)
-        # 3. nunchuk down - up joystick(floating value in the range - 1 = down.. 1 = up)
-
-        # 0. XWII_KEY_A - maybe the pause button
-        # 1. XWII_KEY_B - this should toggle the rockers between move and stretch squashc
-        # 2. XWII_KEY_PLUS - probably the faster button and poss some other things
-        # 3. XWII_KEY_MINUS - probably the slower button and poss some other things
-        # 4. XWII_KEY_HOME this should be the quit key
-        # 5. XWII_KEY_ONE  this will do an input mode change
-        # 6. XWII_KEY_TWO  and this will do a flight mode change
-        # 7. XWII_KEY_C - so this will be left or anticlockwise flight depending on key b
-        # 8. XWII_KEY_Z   and this will be right or clockwise kite depending on key b
-
-        # in terms of what we do with this the basic idea is that the nunchuk flies the kite
-        # and the rockers support the route moving about
-
-        if joybuttons[1] == 0:  # Standard
-            if joyaxes[0] == -1:  # left
-                self.centrex -= self.step
-            elif joyaxes[0] == 1:  # right
-                self.centrex += self.step
-            elif joyaxes[1] == 1:  # up
-                self.centrey -= self.step
-            elif joyaxes[1] == -1:  # down
-                self.centrey += self.step
-        elif joybuttons[1] == 1:  # Standard
-            if joyaxes[0] == -1:  # left
-                self.halfwidth += self.step
-            elif joyaxes[0] == 1:  # right
-                self.halfwidth -= 1
+                self.halfwidth -= self.step
             elif joyaxes[1] == 1:  # up
                 self.radius += self.step
             elif joyaxes[1] == -1:  # down
@@ -467,10 +384,10 @@ class Controls(object):
                 self.inputmode = 0
             self.modestring = self.getmodestring()
 
-        # see above to be changed to only calc if required
-        # self.routepoints = calc_route(self.centrex, self.centrey, self.halfwidth, self.radius)
-        return
-
+        # TODO see above to be changed to only calc if required
+        #
+        self.routepoints = calc_route(self.centrex, self.centrey, self.halfwidth, self.radius)
+        return joybuttons[4] == 1  # quit
 
 
 def calc_route(centrex=400, centrey=300, halfwidth=200, radius=100):

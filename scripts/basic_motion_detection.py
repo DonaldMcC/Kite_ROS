@@ -45,7 +45,7 @@ import imutils
 from move_func import get_heading_points, get_angled_corners
 from mainclasses import Kite, Controls, Base, Config
 from move_func import get_angle
-from talker import kite_pos, kiteimage, motor_msg, init_motor_msg, init_ros
+from talker import kite_pos, KiteImage, motor_msg, init_motor_msg, init_ros
 from cvwriter import initwriter, writeframe
 from basic_listen_barangle import listen_kiteangle, get_barangle
 from listen_joystick import listen_joystick, get_joystick
@@ -240,7 +240,7 @@ base = Base(updatemode=1, kitebarratio=3)
 es = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
 kernel = np.ones((5, 5), np.uint8)
 background = None
-imagemessage = kiteimage()
+imagemessage = KiteImage()
 init_ros()
 init_motor_msg()
 
@@ -436,14 +436,15 @@ while True:  # Main module loop
         # change to -1 for debugging
         # 20 seems to work better than 1 on virtualbox - not sure what the issue is
         key = cv2.waitKey(20) & 0xff
-        if key == ord("q"):
-            break
-        elif key != -1:
-            routepoints = control.keyhandler(key, kite, base)
+        if key != -1:
+            quitkey = control.keyhandler(key, kite, base)
 
     if config.input == 'joystick' or config.input == 'both':
         joybuttons, joyaxes = get_joystick()
-        routepoints = control.joyhandler(joybuttons, joyaxes, kite, base)
+        quitkey = control.joyhandler(joybuttons, joyaxes, kite, base)
+
+    if quitkey:
+        break
 
     time.sleep(control.slow)
     # if counter > 633: # turn off expiry after so many frames
