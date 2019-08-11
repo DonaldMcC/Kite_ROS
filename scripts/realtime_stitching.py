@@ -18,7 +18,7 @@ leftStream = VideoStream(src=2).start()
 # leftStream = cv2.VideoCapture(4)
 print('got one stream')
 # rightStream = VideoStream(usePiCamera=True).start()
-rightStream = VideoStream(src=4).start()
+rightStream = VideoStream(src=0).start()
 # rightStream = cv2.VideoCapture(2)
 print('got two streams')
 time.sleep(2.0)
@@ -35,8 +35,8 @@ while True:
     left = leftStream.read()
     right = rightStream.read()
 
-    # height, width, channels = left.shape
-    # print('before', height,width)
+    height, width, channels = left.shape
+    print('before', height, width)
 
     left = cv2.transpose(left)
     right = cv2.transpose(right)
@@ -45,8 +45,8 @@ while True:
     # print('after', height,width)
 
     # resize the frames
-    left = imutils.resize(left, width=640)
-    right = imutils.resize(right, width=640)
+    left = imutils.resize(left, width=480)
+    right = imutils.resize(right, width=480)
 
     # stitch the frames together to form the panorama
     # IMPORTANT: you might have to change this line of code
@@ -54,10 +54,13 @@ while True:
     # should be supplied in left-to-right order
     result = stitcher.stitch([left, right])
 
+    height, width, channels = result.shape
+    print('result', height, width)
+
     # no homograpy could be computed
     if result is None:
         print("[INFO] homography could not be computed")
-        break
+        # break
 
     # convert the panorama to grayscale, blur it slightly, update
     # the motion detector
@@ -109,7 +112,7 @@ while True:
     # print('rotated', h, w)
 
     # show the output images
-    cv2.imshow("Result", flipped)
+    cv2.imshow("Result", result)
     cv2.imshow("Left Frame", left)
     cv2.imshow("Right Frame", right)
     key = cv2.waitKey(1) & 0xFF

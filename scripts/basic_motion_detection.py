@@ -204,8 +204,8 @@ KITETYPE = 'kite1'
 # and perhaps a configuration class
 # controls setup self.inputmodes = ('Standard', 'SetFlight', 'ManFly')
 
-# config = Config(setup='Manfly', source=1)
-config = Config(setup='Manfly', source=1, numcams=1, input='joystick')
+# config = Config(setup='Manfly', source=1, input='joystick')
+config = Config(setup='Manfly', source=1, numcams=2, input='keyboard')
 
 while config.source not in {1, 2}:
     config.source = input('Key 1 for camera or 2 for source')
@@ -217,7 +217,7 @@ if config.source == 1:
         camera = VideoStream(src=-1).start()
     else:
         leftStream = VideoStream(src=2).start()  # think this is the top part to check
-        rightStream = VideoStream(src=4).start()
+        rightStream = VideoStream(src=0).start()
         time.sleep(2.0)
         stitcher = Stitcher()
 
@@ -280,8 +280,8 @@ while True:  # Main module loop
         right = cv2.transpose(right)
 
         # resize the frames
-        left = imutils.resize(left, width=640)
-        right = imutils.resize(right, width=640)
+        left = imutils.resize(left, width=480)
+        right = imutils.resize(right, width=480)
 
         # stitch the frames together to form the panorama
         # IMPORTANT: you might have to change this line of code
@@ -295,6 +295,9 @@ while True:  # Main module loop
         if camera is None:
             print("[INFO] homography could not be computed")
             break
+        else:
+            frame=camera
+    print('frame', frame.shape[1])
 
     if background is None:
         background = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
