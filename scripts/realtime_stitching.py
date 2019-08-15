@@ -29,6 +29,13 @@ import time
 import cv2
 import argparse
 
+parser = argparse.ArgumentParser()
+parser.add_argument('--file', type=str, default='cachedH.npy',
+                    help='Filename to load cached matrix')
+parser.add_argument('--load', type=str, default='yes',
+                    help='Do we load cached matrix')
+args = parser.parse_args()
+
 # initialize the video streams and allow them to warmup
 print("[INFO] starting cameras...")
 found1 = False
@@ -65,6 +72,12 @@ else:
 # initialize the image stitcher, motion detector, and total
 # number of frames read
 stitcher = Stitcher()
+
+if args.load == 'yes':
+    try:
+        stitcher.cachedH = np.load(args.file)
+    except (FileNotFoundError, IOError):
+        print("File not found continuing:", args.file)
 
 
 motion = BasicMotionDetector(minArea=500)
@@ -113,6 +126,10 @@ while True:
     cv2.imshow("Left-Top Frame", left)
     cv2.imshow("Right-Bottom Frame", right)
     key = cv2.waitKey(1) & 0xFF
+
+    # if the `r` key was pressed, break from the loop
+    if key == ord("r"):
+        stitcher.cachedH=None
 
     # if the `q` key was pressed, break from the loop
     if key == ord("q"):
