@@ -27,6 +27,7 @@ import datetime
 import imutils
 import time
 import cv2
+import argparse
 
 # initialize the video streams and allow them to warmup
 print("[INFO] starting cameras...")
