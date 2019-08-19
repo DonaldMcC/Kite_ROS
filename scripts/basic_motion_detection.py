@@ -35,6 +35,7 @@
 import numpy as np
 import time
 import cv2
+import argparse
 
 # pyimagesearch imports
 from imutils.video import VideoStream
@@ -190,6 +191,13 @@ def display_line(angle, cx, cy, radius, colour):
 
 
 # MAIN ROUTINE START
+parser = argparse.ArgumentParser()
+parser.add_argument('--file', type=str, default='cachedH.npy',
+                    help='Filename to load cached matrix')
+parser.add_argument('--load', type=str, default='yes',
+                    help='Do we load cached matrix')
+args = parser.parse_args()
+
 # this will need to not happen if arguments are passed
 source = 2  # change back to 1 to get prompt
 # iphone
@@ -220,6 +228,11 @@ if config.source == 1:
         rightStream = VideoStream(src=0).start()
         time.sleep(2.0)
         stitcher = Stitcher()
+        if args.load == 'yes':
+            try:
+                stitcher.cachedH = np.load(args.file)
+            except (FileNotFoundError, IOError):
+                print("File not found continuing:", args.file)
 
     config.logging = 1
 else:
