@@ -223,6 +223,7 @@ if config.source == 1:
     # probably need to go below route to do stitching but need to understand differences first
     if config.numcams == 1:
         camera = VideoStream(src=-1).start()
+        stitcher = None
     else:
         leftStream = VideoStream(src=2).start()  # think this is the top part to check
         rightStream = VideoStream(src=0).start()
@@ -453,14 +454,17 @@ while True:  # Main module loop
         # 20 seems to work better than 1 on virtualbox - not sure what the issue is
         key = cv2.waitKey(20) & 0xff
         if key != -1:
-            quitkey = control.keyhandler(key, kite, base)
+            quitkey, resetH = control.keyhandler(key, kite, base)
 
     if config.input == 'joystick' or config.input == 'both':
         joybuttons, joyaxes = get_joystick()
-        quitkey = control.joyhandler(joybuttons, joyaxes, kite, base)
+        quitkey, resetH = control.joyhandler(joybuttons, joyaxes, kite, base)
 
     if quitkey:
         break
+
+    if resetH and stitcher:
+        stitcher.cachedH=None
 
     time.sleep(control.slow)
     # if counter > 633: # turn off expiry after so many frames
