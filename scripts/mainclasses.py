@@ -236,7 +236,7 @@ class Controls(object):
     def keyhandler(self, key, kite, base=None):
         # this will now support a change of flight mode and operating mode so different keys will
         # do different things depending on inputmode,
-
+        reset_stitcher = False
         if self.inputmode == 0:  # Standard
             if key == ord("l"):  # left
                 self.centrex -= self.step
@@ -264,6 +264,8 @@ class Controls(object):
         elif self.inputmode == 1:  # SetFlight
             if key == ord("p"):  # park
                 kite.mode = 'Park'
+            elif key == ord("r"): # reset stitcher
+                reset_stitcher=True
             elif key == ord("w") and kite.zone == 'Centre':  # must be in central zone to change mode
                 kite.mode = 'Wiggle'
             elif key == ord("f") and kite.zone == 'Centre':  # must be in central zone to change mode
@@ -302,7 +304,7 @@ class Controls(object):
         #TODO what is this doing and why calc every loop???
         self.routepoints = calc_route(self.centrex, self.centrey, self.halfwidth, self.radius)
 
-        return key == ord("q") # quit pressed
+        return (key == ord("q"), reset_stitcher) # quit pressed
 
 
     def joyhandler(self, joybuttons, joyaxes, kite, base):
@@ -329,7 +331,7 @@ class Controls(object):
 
         # in terms of what we do with this the basic idea is that the nunchuk flies the kite
         # and the rockers support the route moving about
-
+        reset_stitcher=False
         if joybuttons[1] == 0:  # Standard
             if joyaxes[0] == -1:  # left
                 self.centrex -= self.step
@@ -387,7 +389,7 @@ class Controls(object):
         # TODO see above to be changed to only calc if required
         #
         self.routepoints = calc_route(self.centrex, self.centrey, self.halfwidth, self.radius)
-        return joybuttons[4] == 1  # quit
+        return (joybuttons[4] == 1, reset_stitcher)  # quit
 
 
 def calc_route(centrex=400, centrey=300, halfwidth=200, radius=100):
