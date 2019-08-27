@@ -473,6 +473,11 @@ while True:  # Main module loop
 
 print("[INFO] cleaning up...")
 cv2.destroyAllWindows()
-camera.stop()
+if config.numcams == 1:
+    camera.stop()
+else:
+    leftStream.stop()
+    rightStream.stop()
+    
 if writer is not None:
     writer.release()
