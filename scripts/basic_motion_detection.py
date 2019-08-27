@@ -478,6 +478,6 @@ if config.numcams == 1:
 else:
     leftStream.stop()
     rightStream.stop()
-    
+
 if writer is not None:
     writer.release()
