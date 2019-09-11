@@ -192,10 +192,14 @@ def display_line(angle, cx, cy, radius, colour):
 
 # MAIN ROUTINE START
 parser = argparse.ArgumentParser()
-parser.add_argument('--file', type=str, default='cachedH.npy',
+parser.add_argument('-f', '--file', type=str, default='cachedH.npy',
                     help='Filename to load cached matrix')
-parser.add_argument('--load', type=str, default='yes',
+parser.add_argument('-l', '--load', type=str, default='yes',
                     help='Do we load cached matrix')
+parser.add_argument('-s', '--setup', type=str, default='Standard',
+                    help='Setup either Standard or Manfly')
+parser.add_argument('-i', '--input', type=str, default='Keyboard',
+                    help='Input either Keyboard, Joystick or Both')
 args = parser.parse_args()
 
 # this will need to not happen if arguments are passed
@@ -211,9 +215,11 @@ KITETYPE = 'kite1'
 # so thinking we have kite and controls, the video frame, posible sensor class
 # and perhaps a configuration class
 # controls setup self.inputmodes = ('Standard', 'SetFlight', 'ManFly')
+# setup options are Manfly, Standard
+# input options are Keyboard, Joystick or Both
 
 # config = Config(setup='Manfly', source=1, input='joystick')
-config = Config(setup='Manfly', source=1, numcams=2, input='keyboard')
+config = Config(setup=args.setup, source=1, numcams=2, input=args.input)
 
 while config.source not in {1, 2}:
     config.source = input('Key 1 for camera or 2 for source')
@@ -449,14 +455,14 @@ while True:  # Main module loop
     if config.logging:  # not saving this either as it errors on other screen
         writeframe(writer, frame, height, width)
 
-    if config.input == 'keyboard' or config.input == 'both':
+    if config.input == 'Keyboard' or config.input == 'Both':
         # change to -1 for debugging
         # 20 seems to work better than 1 on virtualbox - not sure what the issue is
         key = cv2.waitKey(20) & 0xff
         if key != -1:
             quitkey, resetH = control.keyhandler(key, kite, base)
 
-    if config.input == 'joystick' or config.input == 'both':
+    if config.input == 'Joystick' or config.input == 'Both':
         joybuttons, joyaxes = get_joystick()
         quitkey, resetH = control.joyhandler(joybuttons, joyaxes, kite, base)
 
