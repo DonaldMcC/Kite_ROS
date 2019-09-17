@@ -218,8 +218,8 @@ KITETYPE = 'kite1'
 # setup options are Manfly, Standard
 # input options are Keyboard, Joystick or Both
 
-# config = Config(setup='Manfly', source=1, input='joystick')
-config = Config(setup=args.setup, source=1, numcams=2, input=args.input)
+# config = Config(setup='Manfly', source=1, input='Joystick')
+config = Config(setup=args.setup, source=1, numcams=1, input=args.input)
 
 while config.source not in {1, 2}:
     config.source = input('Key 1 for camera or 2 for source')
@@ -272,7 +272,7 @@ foundcounter = 0
 if config.setup == 'Standard':  # otherwise not present
     listen_kiteangle()  # this then updates base.barangle via the callback function
 
-if config.input == 'joystick' or config.input == 'both':
+if config.input == 'Joystick' or config.input == 'Both':
     listen_joystick()  # subscribe to joystick messages
 
 writer = None
