@@ -7,6 +7,7 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 pub=0
 
+
 def talker():
     pub = rospy.Publisher('chatter', String, queue_size=10)
     rospy.init_node('talker', anonymous=True)
@@ -32,9 +33,6 @@ def kite_pos(posx, posy, kiteangle, dirx, diry, routepoints, priorpos):
     pub.publish(msg)
     return
 
-#def kite_pos(posx, posy, kiteangle, dirx, diry, routepoints, priorpos):
-#    pass
-#    return
 
 def init_ros():
     rospy.init_node('kite_main', anonymous=True)
@@ -45,12 +43,12 @@ def init_motor_msg():
     pub = rospy.Publisher('motormsg', Int16, queue_size=10)
 
 
-def motor_msg(barangle, targetbarangle):
+def motor_msg(barangle, targetbarangle, tolerance=10):
     global pub
     diff = barangle - targetbarangle
-    if diff > 1:
+    if (diff - tolerance) > 0:
         pub.publish(299)
-    elif diff < -1:
+    elif (diff + tolerance) < 0:
         pub.publish(199)
     else:
         pub.publish(0)
