@@ -196,9 +196,11 @@ parser.add_argument('-f', '--file', type=str, default='cachedH.npy',
                     help='Filename to load cached matrix')
 parser.add_argument('-l', '--load', type=str, default='yes',
                     help='Do we load cached matrix')
-parser.add_argument('-s', '--setup', type=str, default='Standard',
+# parser.add_argument('-s', '--setup', type=str, default='Standard',
+#                     help='Setup either Standard or Manfly')
+parser.add_argument('-s', '--setup', type=str, default='Manfly',
                     help='Setup either Standard or Manfly')
-parser.add_argument('-i', '--input', type=str, default='Keyboard',
+parser.add_argument('-i', '--input', type=str, default='Both',
                     help='Input either Keyboard, Joystick or Both')
 args = parser.parse_args()
 
@@ -349,9 +351,7 @@ while True:  # Main module loop
             kite.kiteangle = base.barangle * base.kitebarratio
         drawkite(kite)
         kite.found = True
-
-    # identify the kite
-    if control.config != "Manfly" and config.setup == 'Standard':  # not detecting if in manual mode
+    elif config.setup == 'Standard':  # not detecting if in manual mode
         kite.found = False
         maxmask = -1
         index = -1
@@ -440,7 +440,7 @@ while True:  # Main module loop
 
     kite_pos(kite.x, kite.y, kite.kiteangle, kite.dX, kite.dY, 0, 0)
 
-    motor_msg(base.barangle, base.targetbarangle)
+    motor_msg(base.barangle, base.targetbarangle, 5)
 
     # cv2.imshow("roi", finalframe)
     # cv2.imshow("mask", mask)
@@ -462,7 +462,7 @@ while True:  # Main module loop
         if key != -1:
             quitkey, resetH = control.keyhandler(key, kite, base)
 
-    if config.input == 'Joystick' or config.input == 'Both':
+    if config.input == 'Joystick' or config.input == 'Both' and key== -1:
         joybuttons, joyaxes = get_joystick()
         quitkey, resetH = control.joyhandler(joybuttons, joyaxes, kite, base)
 
