@@ -203,7 +203,7 @@ class Kite(object):
 
 class Controls(object):
 
-    def __init__(self, config ='Standard', inputmode=0, step=8):
+    def __init__(self, config ='Standard', step=8):
         try:  # this will fail on windows but don't need yet and not convinced I need to set parameters separately
             self.centrex = rospy.get_param('centrex', 400)
             self.centrey = rospy.get_param('centrey', 300)
@@ -218,7 +218,10 @@ class Controls(object):
         self.routepoints = calc_route(self.centrex, self.centrey, self.halfwidth, self.radius)
         # possible config ('Standard', 'SetFlight', 'ManFly')
         self.config = config
-        self.inputmode = inputmode
+        if self.config == 'Standard':
+            self.inputmode = 0
+        else: # Manfly
+            self.inputmode = 2
         self.step = step
         self.modestring = self.getmodestring()
         self.route = False
@@ -371,14 +374,14 @@ class Controls(object):
                 # self.mode = 1
                 # elif key == ord("n"):  # normal with kite being present
                 # self.mode = 0
-        elif self.inputmode == 2:  # ManFlight - maybe switch to arrows
+        elif self.inputmode == 2:  # ManFlight - maybe switch to arrows - let's do this all
             if joybuttons[7] == 0 and joybuttons[8] == 0:
                 kite.x += (self.step * joyaxes[2])
                 kite.y -= (self.step * joyaxes[3])
-            elif joybuttons[7] == 1:
-                base.barangle += (self.step * joyaxes[2])
+            elif joybuttons[7] == 1: # c button pressed - but not working - as calced from kite
+                base.barangle += (self.step/2 * joyaxes[2])
             else: # z button pressed
-                kite.kiteangle += (self.step * joyaxes[2])
+                kite.kiteangle += (self.step/2 * joyaxes[2])
 
         if joybuttons[5] == 1:  # modechange
             self.inputmode += 1
