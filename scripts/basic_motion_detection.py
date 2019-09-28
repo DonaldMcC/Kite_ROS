@@ -44,7 +44,7 @@ import imutils
 
 # kite_ros imports
 from move_func import get_heading_points, get_angled_corners
-from mainclasses import Kite, Controls, Base, Config
+from mainclasses import Kite, Controls, Base, Config, calc_route
 from move_func import get_angle
 from talker import kite_pos, KiteImage, motor_msg, init_motor_msg, init_ros
 from cvwriter import initwriter, writeframe
@@ -200,7 +200,7 @@ parser.add_argument('-l', '--load', type=str, default='yes',
 #                     help='Setup either Standard or Manfly')
 parser.add_argument('-s', '--setup', type=str, default='Manfly',
                     help='Setup either Standard or Manfly')
-parser.add_argument('-i', '--input', type=str, default='Both',
+parser.add_argument('-i', '--input', type=str, default='Joystick',
                     help='Input either Keyboard, Joystick or Both')
 args = parser.parse_args()
 
@@ -318,7 +318,7 @@ while True:  # Main module loop
             print("[INFO] homography could not be computed")
             break
         else:
-            frame=camera
+            frame = camera
     print('frame', frame.shape[1])
 
     if background is None:
@@ -393,6 +393,7 @@ while True:  # Main module loop
 
     # Establish route
     if kite.changezone or kite.changephase or kite.routechange:
+        control.routepoints = calc_route(control.centrex, control.centrey, control.halfwidth, control.radius)
         kite.update_target(control.routepoints[0][0], control.routepoints[0][1],
                            control.centrex, control.maxy, control.routepoints[3][0], control.routepoints[3][1])
 
