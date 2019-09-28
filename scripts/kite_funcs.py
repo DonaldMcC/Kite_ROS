@@ -2,7 +2,6 @@ import numpy as np
 import cv2
 
 from mainclasses import Kite, Controls, Base
-
 # http://www.pyimagesearch.com/2014/08/04/opencv-python-color-detection/
 # define the list of boundaries
 # boundaries = [([0, 0, 0], [40, 40, 40])]
@@ -138,6 +137,7 @@ def checklimits(angle, maxleft, maxright):
 
 def getangle(resistance, maxleft=-45, maxright=45, resistleft=340.0, resistright=740.0):
     """
+    :param maxleft:
     :param resistance:
     :return angle:
 

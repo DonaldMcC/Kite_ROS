@@ -94,7 +94,6 @@ class Kite(object):
         'Centre'
 
         :param leftx:
-        :param centrex:
         :param rightx:
         :return:
         """
@@ -127,7 +126,7 @@ class Kite(object):
                 if self.turncomplete or self.kiteangle < (0-self.turncomplete_angle):
                     self.phase = 'Xwind'
                     self.turncomplete = True
-                    self.routchange = True
+                    self.routechange = True
                 else:
                     self.phase = 'Turnleft'
         return
@@ -220,7 +219,7 @@ class Controls(object):
         self.config = config
         if self.config == 'Standard':
             self.inputmode = 0
-        else: # Manfly
+        else:  # Manfly
             self.inputmode = 2
         self.step = step
         self.modestring = self.getmodestring()
@@ -270,8 +269,8 @@ class Controls(object):
         elif self.inputmode == 1:  # SetFlight
             if key == ord("p"):  # park
                 kite.mode = 'Park'
-            elif key == ord("r"): # reset stitcher
-                reset_stitcher=True
+            elif key == ord("r"):  # reset stitcher
+                reset_stitcher = True
             elif key == ord("w") and kite.zone == 'Centre':  # must be in central zone to change mode
                 kite.mode = 'Wiggle'
             elif key == ord("f") and kite.zone == 'Centre':  # must be in central zone to change mode
@@ -307,8 +306,7 @@ class Controls(object):
                 self.inputmode = 0
             self.modestring = self.getmodestring()
 
-        return (key == ord("q"), reset_stitcher) # quit pressed
-
+        return key == ord("q"), reset_stitcher  # quit pressed
 
     def joyhandler(self, joybuttons, joyaxes, kite, base):
         # Using https://github.com/arnaud-ramey/rosxwiimote as a ros package to capture
@@ -334,7 +332,7 @@ class Controls(object):
 
         # in terms of what we do with this the basic idea is that the nunchuk flies the kite
         # and the rockers support the route moving about
-        reset_stitcher=False
+        reset_stitcher = False
         if joybuttons[1] == 0:  # Standard
             if joyaxes[0] == -1:  # left
                 self.centrex -= self.step
@@ -382,9 +380,9 @@ class Controls(object):
             if joybuttons[7] == 0 and joybuttons[8] == 0:
                 kite.x += (self.step * joyaxes[2])
                 kite.y -= (self.step * joyaxes[3])
-            elif joybuttons[7] == 1: # c button pressed - but not working - as calced from kite
+            elif joybuttons[7] == 1:  # c button pressed - but not working - as calced from kite
                 base.barangle += (self.step/2 * joyaxes[2])
-            else: # z button pressed
+            else:  # z button pressed
                 kite.kiteangle += (self.step/2 * joyaxes[2])
 
         if joybuttons[5] == 1:  # modechange
@@ -393,7 +391,7 @@ class Controls(object):
                 self.inputmode = 0
             self.modestring = self.getmodestring()
 
-        return (joybuttons[4] == 1, reset_stitcher)  # quit
+        return joybuttons[4] == 1, reset_stitcher  # quit
 
 
 def calc_route(centrex=400, centrey=300, halfwidth=200, radius=100):

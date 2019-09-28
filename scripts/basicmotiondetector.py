@@ -1,5 +1,7 @@
 # import the necessary packages
 # from https://www.pyimagesearch.com/2016/01/25/real-time-panorama-and-image-stitching-with-opencv/
+# this was part of 2 camera image stitching but probably not now used
+
 import imutils
 import cv2
 
