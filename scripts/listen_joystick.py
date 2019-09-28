@@ -3,12 +3,11 @@
 
 import rospy
 from sensor_msgs.msg import Joy
-joybuttons=[]
-joyaxes=[]
+joybuttons = []
+joyaxes = []
 
 
 def listen_joystick():
-    #print('initing')
     rospy.Subscriber('xwiimote_node/joy', Joy, callback)
 
 
@@ -16,8 +15,8 @@ def callback(data):
     global joybuttons, joyaxes
     joybuttons = data.buttons
     joyaxes = data.axes
-    #print('but', joybuttons)
-    #print('axe', joyaxes)
+    # print('but', joybuttons)
+    # print('axe', joyaxes)
     return
 
 

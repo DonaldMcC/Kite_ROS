@@ -51,7 +51,7 @@ for i in range(0, 7):
     else:
         print(i)
 
-for j in range(i+1,9):
+for j in range(i+1, 9):
     # rightStream = VideoStream(usePiCamera=True).start()
     rightStream = VideoStream(src=j).start()
     right = rightStream.read()
@@ -63,7 +63,7 @@ for j in range(i+1,9):
         print(j)
 # rightStream = cv2.VideoCapture(2)
 if found1 and found2:
-    print('got two streams:',i, j)
+    print('got two streams:', i, j)
 
 else:
     print('Not got 2 streams so cannot continue - check your cameras are connected')
@@ -108,15 +108,14 @@ while True:
     result = stitcher.stitch([left, right])
 
     # no homograpy could be computed
-    if result is None and total>32:
+    if result is None and total > 32:
         print("[INFO] homography could not be computed")
         # break
     if result is not None:
         # timestamp on the image
         timestamp = datetime.datetime.now()
         ts = timestamp.strftime("%A %d %B %Y %I:%M:%S%p")
-        cv2.putText(result, ts, (10, result.shape[0] - 10),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
+        cv2.putText(result, ts, (10, result.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
         flipped = cv2.flip(cv2.transpose(result), 1)
         # show the output images
         cv2.imshow("Result", result)
@@ -129,7 +128,7 @@ while True:
 
     # if the `r` key was pressed, break from the loop
     if key == ord("r"):
-        stitcher.cachedH=None
+        stitcher.cachedH = None
 
     # if the `q` key was pressed, break from the loop
     if key == ord("q"):
