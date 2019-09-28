@@ -243,12 +243,16 @@ class Controls(object):
         if self.inputmode == 0:  # Standard
             if key == ord("l"):  # left
                 self.centrex -= self.step
+                kite.routechange = True
             elif key == ord("r"):  # right
                 self.centrex += self.step
+                kite.routechange = True
             elif key == ord("u"):  # up
                 self.centrey -= self.step
+                kite.routechange = True
             elif key == ord("d"):  # down
                 self.centrey += self.step
+                kite.routechange = True
             elif key == ord("w"):  # wider
                 self.halfwidth += self.step
             elif key == ord("n"):  # narrower
@@ -263,7 +267,6 @@ class Controls(object):
                 self.slow = 0.0
             elif key == ord("p"):  # pause - this may apply in all modes
                 time.sleep(10)
-            # kite.routechange = True - don't want this triggered every time
         elif self.inputmode == 1:  # SetFlight
             if key == ord("p"):  # park
                 kite.mode = 'Park'
@@ -304,9 +307,6 @@ class Controls(object):
                 self.inputmode = 0
             self.modestring = self.getmodestring()
 
-        #TODO what is this doing and why calc every loop???
-        self.routepoints = calc_route(self.centrex, self.centrey, self.halfwidth, self.radius)
-
         return (key == ord("q"), reset_stitcher) # quit pressed
 
 
@@ -338,12 +338,16 @@ class Controls(object):
         if joybuttons[1] == 0:  # Standard
             if joyaxes[0] == -1:  # left
                 self.centrex -= self.step
+                kite.routechange = True
             elif joyaxes[0] == 1:  # right
                 self.centrex += self.step
+                kite.routechange = True
             elif joyaxes[1] == 1:  # up
                 self.centrey -= self.step
+                kite.routechange = True
             elif joyaxes[1] == -1:  # down
                 self.centrey += self.step
+                kite.routechange = True
         elif joybuttons[1] == 1:  # Standard
             if joyaxes[0] == -1:  # left
                 self.halfwidth += self.step
@@ -389,9 +393,6 @@ class Controls(object):
                 self.inputmode = 0
             self.modestring = self.getmodestring()
 
-        # TODO see above to be changed to only calc if required
-        #
-        self.routepoints = calc_route(self.centrex, self.centrey, self.halfwidth, self.radius)
         return (joybuttons[4] == 1, reset_stitcher)  # quit
 
 
