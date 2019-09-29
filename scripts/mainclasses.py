@@ -38,7 +38,7 @@ class Config(object):
 class Base(object):
 
     def __init__(self, barangle=0, parkangle=0, maxright=45, maxleft=-45, lag=1,
-                 targetbarangle=0, kitebarratio=1, updatemode=2):
+                 targetbarangle=0, kitebarratio=1, updatemode='Standard'):
         self.barangle = barangle
         self.parkangle = parkangle
         self.maxright = maxright
@@ -47,7 +47,8 @@ class Base(object):
         self.barangles = deque(maxlen=16)
         self.targetbarangle = targetbarangle
         self.kitebarratio = kitebarratio  # this will be the rate of change of barangle to kite angle
-        self.updatemode = updatemode  # 0 will be unconnected and 1 will bar angles kite 2 is kite angles bar
+        self.updatemode = updatemode  # Standard will be unconnected and
+                                      # Manbar will be bar angles kite Manfly is kite angles bar
 
 
 class Kite(object):
@@ -219,8 +220,10 @@ class Controls(object):
         self.config = config
         if self.config == 'Standard':
             self.inputmode = 0
-        else:  # Manfly
+        elif self.config == 'Manfly':  # Manfly
             self.inputmode = 2
+        else:
+            self.inputmode = 3  #Manbar
         self.step = step
         self.modestring = self.getmodestring()
         self.route = False
@@ -232,8 +235,10 @@ class Controls(object):
             return 'STD: Left Right Up Down Wider Narrow Expand Contract Pause Mode Quit'
         elif self.inputmode == 1:
             return 'SETFLIGHTMODE: Park Fig8 Simulate Normal Mode Quit'
-        else:
+        elif self.inputmode == 2:
             return 'MANFLIGHT: Left Right Up Down Pause Anti Clock Gauche rigHt Mode Quit'
+        else:
+            return 'MANBAR: Left Right Up Down Pause Mode Quit'
 
     def keyhandler(self, key, kite, base=None):
         # this will now support a change of flight mode and operating mode so different keys will
@@ -296,6 +301,17 @@ class Controls(object):
                 kite.kiteangle -= self.step
             elif key == ord("c"):  # clockwise
                 kite.kiteangle += self.step
+            elif key == ord("p"):  # pause - this may apply in all moades
+                time.sleep(10)
+        elif self.inputmode == 3:  # Manbar - maybe switch to arrows
+            if key == ord("l"):  # left
+                kite.x -= self.step  # this will change
+            elif key == ord("r"):  # right
+                kite.x += self.step
+            elif key == ord("u"):  # up
+                kite.y -= self.step
+            elif key == ord("d"):  # down
+                kite.y += self.step
             elif key == ord("p"):  # pause - this may apply in all moades
                 time.sleep(10)
 
@@ -384,10 +400,14 @@ class Controls(object):
                 base.barangle += (self.step/2 * joyaxes[2])
             else:  # z button pressed
                 kite.kiteangle += (self.step/2 * joyaxes[2])
+        elif self.inputmode == 3:  # ManBar - maybe switch to arrows - let's do this all
+            if joybuttons[7] == 0 and joybuttons[8] == 0:
+                kite.x += (self.step * joyaxes[2])
+                kite.y -= (self.step * joyaxes[3])
 
         if joybuttons[5] == 1:  # modechange
             self.inputmode += 1
-            if self.inputmode == 3:  # simple toggle around 3 modes
+            if self.inputmode == 4:  # simple toggle around 3 modes
                 self.inputmode = 0
             self.modestring = self.getmodestring()
 

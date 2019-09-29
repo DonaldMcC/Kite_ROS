@@ -199,7 +199,7 @@ parser.add_argument('-l', '--load', type=str, default='yes',
 # parser.add_argument('-s', '--setup', type=str, default='Standard',
 #                     help='Setup either Standard or Manfly')
 parser.add_argument('-s', '--setup', type=str, default='Manfly',
-                    help='Setup either Standard or Manfly')
+                    help='Setup either Standard or Manfly or Manbar')
 parser.add_argument('-i', '--input', type=str, default='Joystick',
                     help='Input either Keyboard, Joystick or Both')
 args = parser.parse_args()
@@ -256,7 +256,7 @@ else:
 control = Controls(config.setup, step=16)
 actkite = Kite(control.centrex, control.centrey)
 mankite = Kite(300, 400)
-base = Base(updatemode=1, kitebarratio=3)
+base = Base(updatemode=config.setup, kitebarratio=3)
 
 # Initialisation steps
 es = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
@@ -313,7 +313,7 @@ while True:  # Main module loop
         # reverse the transposition to get images back above one another
         camera = cv2.flip(cv2.transpose(result), 1)
 
-        # no homograpy could be computed
+        # no homography could be computed
         if camera is None:
             print("[INFO] homography could not be computed")
             break
@@ -345,10 +345,12 @@ while True:  # Main module loop
     diff = cv2.dilate(diff, es, iterations=2)
     image, cnts, hierarchy = cv2.findContours(diff.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
+
+    base.barangle = get_barangle(kite, base, control)
+    if base.updatemode == 'Manbar': # not getting kiteangle from picture
+        kite.kiteangle = base.barangle * base.kitebarratio
     # lets draw and move cross for manual flying
-    if control.config == "Manfly":
-        if base.updatemode == 1:
-            kite.kiteangle = base.barangle * base.kitebarratio
+    if control.config == 'Manfly' or control.config == 'Manbar':
         drawkite(kite)
         kite.found = True
     elif config.setup == 'Standard':  # not detecting if in manual mode
@@ -388,8 +390,6 @@ while True:  # Main module loop
         tempstr = "Found: Yes"
     else:
         tempstr = "Found: No"
-
-    base.barangle = get_barangle(kite, base, control)
 
     # Establish route
     if kite.changezone or kite.changephase or kite.routechange:

@@ -19,14 +19,15 @@ def listen_kiteangle():
     rospy.Subscriber('kiteangle', Int16, callback)
 
 
+# this should always return barangle for Manbar or Standard operation Manfly should set
 def get_barangle(kite, base, control):
     global barangle
-    if control.config == 'Manfly':
-        if base.updatemode < 2:
+    if control.config == 'Manfly' :
+        if base.updatemode == 'Manbar':
             return base.barangle
         else:  # when kiteangle is driving the barangle
             # TO DO add kitebar ratio to this
-            return kite.kiteangle
+            return kite.kiteangle / base.kitebarratio
     else:  # automated flight reading from some sort of sensor via ROS
         return barangle
 
