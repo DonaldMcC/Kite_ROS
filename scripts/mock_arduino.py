@@ -2,42 +2,37 @@
 # from ros wiki for initial testing
 
 import rospy
-import rospy
 from std_msgs.msg import String, Int16
-pub=0
-
+motorvalue = 0
 
 def listen_motormsg():
     rospy.Subscriber('motor_msg', Int16, callback)
 
 def callback(data):
-    global joybuttons, joyaxes
-    joybuttons = data.buttons
-    joyaxes = data.axes
+    global motorvalue
+    print ('got data', data)
+    motorvalue = data
     return
 
 
-def init_ros():
-    rospy.init_node('mock_arduino', anonymous=True)
-
-
-def init_kiteangle():
-    global pub
-    pub = rospy.Publisher('kiteangle', Int16, queue_size=10)
-
 
 def kiteangle(barangle):
-    global pub
-    pub.publish(barangle)
+    pub = rospy.Publisher('kiteangle', Int16, queue_size=3)
+    rospy.init_node('mock_arduino', anonymous=False)
+    rate = rospy.Rate(5)  # 5hz
+    while not rospy.is_shutdown():
+        print('motorv', motorvalue)
+        rospy.loginfo(barangle)
+        pub.publish(barangle)
+        rate.sleep()
+        barangle += 1
+        if barangle >= 1005:
+            barangle = 674
     return
 
 
 if __name__ == '__main__':
-    # talker()
     try:
-        # kite_pos(100, 200, 45, 1, 0, 0, 0)
-        rospy.init_node('mock_arduino', anonymous=False)
-        init_kiteangle()
-        kiteangle(0)
+        kiteangle(100)
     except rospy.ROSInterruptException:
         pass
