@@ -316,9 +316,8 @@ class Controls(object):
                 time.sleep(10)
 
         if key == ord("m"):  # modechange
-            print(self.inputmode)
             self.inputmode += 1
-            if self.inputmode == 3:  # simple toggle around 3 modes
+            if self.inputmode == 4:  # simple toggle around 3 modes
                 self.inputmode = 0
             self.modestring = self.getmodestring()
 
