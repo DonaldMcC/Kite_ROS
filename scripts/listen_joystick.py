@@ -15,8 +15,6 @@ def callback(data):
     global joybuttons, joyaxes
     joybuttons = data.buttons
     joyaxes = data.axes
-    # print('but', joybuttons)
-    # print('axe', joyaxes)
     return
 
 

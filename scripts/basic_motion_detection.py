@@ -171,6 +171,7 @@ def display_base():
     radius = 60
     cv2.putText(frame, 'Base', (outx, centy-40), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
     cv2.circle(frame, (centx, centy), radius, (0, 255, 255), 2)
+    print(base.barangle)
     cv2.putText(frame, 'Act:' + '{:5.1f}'.format(base.barangle), (outx + 85, centy + 100), cv2.FONT_HERSHEY_SIMPLEX,
                 0.65, (0, 255, 0), 2)
     cv2.putText(frame, 'Tgt:' + '{:5.1f}'.format(base.targetbarangle), (outx - 15, centy + 100),
@@ -198,7 +199,7 @@ parser.add_argument('-l', '--load', type=str, default='yes',
                     help='Do we load cached matrix')
 # parser.add_argument('-s', '--setup', type=str, default='Standard',
 #                     help='Setup either Standard or Manfly')
-parser.add_argument('-s', '--setup', type=str, default='Manfly',
+parser.add_argument('-s', '--setup', type=str, default='Standard',
                     help='Setup either Standard or Manfly or Manbar')
 parser.add_argument('-i', '--input', type=str, default='Joystick',
                     help='Input either Keyboard, Joystick or Both')
@@ -459,7 +460,7 @@ while True:  # Main module loop
     if config.input == 'Keyboard' or config.input == 'Both':
         # change to -1 for debugging
         # 20 seems to work better than 1 on virtualbox - not sure what the issue is
-        key = cv2.waitKey(20) & 0xff
+        key = cv2.waitKey(50) & 0xff
         if key != -1:
             quitkey, resetH = control.keyhandler(key, kite, base)
 
@@ -467,6 +468,7 @@ while True:  # Main module loop
         joybuttons, joyaxes = get_joystick()
         quitkey, resetH = control.joyhandler(joybuttons, joyaxes, kite, base)
 
+    print('mode', control.inputmode)
     if quitkey:
         break
 
