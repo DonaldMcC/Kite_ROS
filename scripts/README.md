@@ -1,6 +1,5 @@
 # Kite_ROS
-This project aims to provide an open source robot controlled flying traction kite utilising python, ROS and OpenCV as
-the principal components.  The kite will initially be tethered to a wooden frame with two line kite hooked up to an
+This project aims to provide open source software to for ar robot controlled flying traction kite utilising python, ROS and OpenCV.  The kite will initially be tethered to a wooden frame with two line kite hooked up to an
 arm with a central bearing to allow control.  The navigation approach will be to do this the way people fly kites
 ie by seeing where the kite is and steering as desired
 

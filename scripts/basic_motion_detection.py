@@ -3,54 +3,65 @@
 # for seeing and reporting back on the position and angle of
 # the kite - it will also be the only video output from the package and consequently
 # will display and also allow direct updating of the proposed route
-# however there will also be a separate ros node that will allow setting the route
-# and flying mode of the kit in due course and these will communicate via ROS messages
 
 # inputs
-# the module will support main input either input from a single webcam or from a video file initially - this may
-# extend to rosbag files in future
+# the module will support main input either input from a single webcam or from a video file - this may
+# extend to rosbag files in future and support for a second camera now seems required as cameras I have do not
+# provide coverage of a sufficiently large angle of the sky - possibly building in capability to angle cameras
+# during operation should be looked at
+# there will also be input from a resistor which is linked to the kitebar and will need to be calibrated in
+# advance - this will be received as kiteangle.data generally from arduino 
 #
 # outputs
-# the main output will be  a ROS message reporting the x and y coordinates of the kite and it should also be
-# possible to record the input if required
+# the main output will be a ROS message reporting the x and y coordinates of the kite the current angle of the
+# control bar and the motor instruction to change the angle of the bar.  It should also be
+# possible to record the input if required - the motor instruction is on motormsg.data
 #
 # initial configuration
 # file can be started with arguments and should then not prompt for input
 # if started without arguments it should ask if webcam or file to be loaded
 #
 # while in flow it should be possible to
-# 1 amend the flight mode
-# 2 switch from sending actual kite position to manually controlled one - think this
-# should be a new object
+# 1 amend the flight mode - which is the flight path we are looking for the kite to try and follow
+# 2 switch from sending actual kite position to manually controlled one
 # 3 adjust the routing - it should default when the flight mode is changed
 # 4 on playback it should be possible to go into slow motion
 
-# standard library imports
+# Currently working on option to support auxiliary camera - conceptually think this is ok
+# but should be optional and if present we will switch to that when kite goes above top of main
+# image ie for now auxiliary camera is always above and we try not to fly off the sides
 
-# library imports
+# standard library imports
 import numpy as np
 import time
 import cv2
-from move_func import get_heading_points, get_angled_corners
+import argparse
 
-# modules
-from mainclasses import Kite, Controls, Base
+# pyimagesearch imports
+from imutils.video import VideoStream
+from panorama import Stitcher
+import imutils
+
+# kite_ros imports
+from move_func import get_heading_points, get_angled_corners
+from mainclasses import Kite, Controls, Base, Config, calc_route
 from move_func import get_angle
-from talker import kite_pos, kiteimage
+from talker import kite_pos, KiteImage, motor_msg, init_motor_msg, init_ros
 from cvwriter import initwriter, writeframe
-from basic_listen_barangle import listen_kitebase, get_barangle
+from basic_listen_barangle import listen_kiteangle, get_barangle
+from listen_joystick import listen_joystick, get_joystick
 from kite_funcs import kitemask, calcbarangle
 
 
 # this is just for display flight decisions will be elsewhere
 def drawroute(route, centrex, centrey):
     global frame
-    for i, j in enumerate(route):
-        if i < len(route) - 1:
-            cv2.line(frame, (j[0], j[1]), (route[i + 1][0], route[i + 1][1]),
+    for k, l in enumerate(route):
+        if k < len(route) - 1:
+            cv2.line(frame, (l[0], l[1]), (route[k + 1][0], route[k + 1][1]),
                      (0, 255, 70), thickness=2, lineType=8, shift=0)
         else:
-            cv2.line(frame, (j[0], j[1]), (route[0][0], route[0][1]),
+            cv2.line(frame, (l[0], l[1]), (route[0][0], route[0][1]),
                      (0, 255, 70), thickness=2, lineType=8, shift=0)
     cv2.line(frame, (centrex, 0), (centrex, centrey * 2),
              (255, 0, 0), thickness=2, lineType=8, shift=0)
@@ -116,7 +127,6 @@ def drawkite(kite):
              colour, thickness=thickness, lineType=8, shift=0)
     cv2.line(frame, (startverx, startvery), (starthorx, starthory),
              colour, thickness=thickness, lineType=8, shift=0)
-
     return
 
 
@@ -144,7 +154,6 @@ def getdirection(kte):
                 # handle when both directions are non-empty
             if dirX != "" and dirY != "":
                 kte.direction = "{}-{}".format(dirY, dirX)
-
                 # otherwise, only one direction is non-empty
             else:
                 kte.direction = dirX if dirX != "" else dirY
@@ -153,7 +162,6 @@ def getdirection(kte):
             kte.thickness = int(np.sqrt(32 / float(i + 1)) * 2.5)
             cv2.line(frame, kte.pts[i - 1], kte.pts[i], (0, 0, 255), kte.thickness)
             continue
-
     return
 
 
@@ -163,6 +171,7 @@ def display_base():
     radius = 60
     cv2.putText(frame, 'Base', (outx, centy-40), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
     cv2.circle(frame, (centx, centy), radius, (0, 255, 255), 2)
+    print(base.barangle)
     cv2.putText(frame, 'Act:' + '{:5.1f}'.format(base.barangle), (outx + 85, centy + 100), cv2.FONT_HERSHEY_SIMPLEX,
                 0.65, (0, 255, 0), 2)
     cv2.putText(frame, 'Tgt:' + '{:5.1f}'.format(base.targetbarangle), (outx - 15, centy + 100),
@@ -172,7 +181,7 @@ def display_base():
     return
 
 
-def display_line(angle, cx,cy, radius, colour):
+def display_line(angle, cx, cy, radius, colour):
     pointx, pointy = get_angled_corners(cx + radius, cy, angle, cx, cy)
     pointx = int(pointx)
     pointy = int(pointy)
@@ -182,7 +191,20 @@ def display_line(angle, cx,cy, radius, colour):
     return
 
 
-# Main routine start
+# MAIN ROUTINE START
+parser = argparse.ArgumentParser()
+parser.add_argument('-f', '--file', type=str, default='cachedH.npy',
+                    help='Filename to load cached matrix')
+parser.add_argument('-l', '--load', type=str, default='yes',
+                    help='Do we load cached matrix')
+# parser.add_argument('-s', '--setup', type=str, default='Standard',
+#                     help='Setup either Standard or Manfly')
+parser.add_argument('-s', '--setup', type=str, default='Standard',
+                    help='Setup either Standard or Manfly or Manbar')
+parser.add_argument('-i', '--input', type=str, default='Joystick',
+                    help='Input either Keyboard, Joystick or Both')
+args = parser.parse_args()
+
 # this will need to not happen if arguments are passed
 source = 2  # change back to 1 to get prompt
 # iphone
@@ -190,54 +212,60 @@ source = 2  # change back to 1 to get prompt
 # wind
 masklimit = 1000
 # config = 'yellowballs'  # alternative when base not present will also possibly be combo
-#KITETYPE = 'indoorkite'  # need to comment out for external
+# KITETYPE = 'indoorkite'  # need to comment out for external
 KITETYPE = 'kite1'
 
 # so thinking we have kite and controls, the video frame, posible sensor class
 # and perhaps a configuration class
-# controsl setup self.inputmodes = ('Standard', 'SetFlight', 'ManFly')
+# controls setup self.inputmodes = ('Standard', 'SetFlight', 'ManFly')
+# setup options are Manfly, Standard
+# input options are Keyboard, Joystick or Both
 
-
-class Config(object):
-    def __init__(self, source=2,  setup='Standard', masklimit=10000, logging=0):
-        self.source = source
-        self.setup = setup
-        self.masklimit = masklimit
-        self.logging = logging
-
-
-#config = Config(setup='Manfly', source=1)
-config = Config(setup='Standard', source=2)
+# config = Config(setup='Manfly', source=1, input='Joystick')
+config = Config(setup=args.setup, source=1, numcams=1, input=args.input)
 
 while config.source not in {1, 2}:
     config.source = input('Key 1 for camera or 2 for source')
 # should define source here
 if config.source == 1:
-    camera = cv2.VideoCapture(0)
+    # camera = cv2.VideoCapture(-1)
+    # probably need to go below route to do stitching but need to understand differences first
+    if config.numcams == 1:
+        camera = VideoStream(src=-1).start()
+        stitcher = None
+    else:
+        leftStream = VideoStream(src=2).start()  # think this is the top part to check
+        rightStream = VideoStream(src=0).start()
+        time.sleep(2.0)
+        stitcher = Stitcher()
+        if args.load == 'yes':
+            try:
+                stitcher.cachedH = np.load(args.file)
+            except (FileNotFoundError, IOError):
+                print("File not found continuing:", args.file)
+
     config.logging = 1
-    # camera=cv2.VideoCapture('IMG_0464.MOV')
 else:
     # TODO at some point will change this to current directory and append file - not urgent
-    #camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
-    camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/newkite1.mp4')
+    camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
+    # camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/newkite1.mp4')
     # camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/orig2605.avi')
-    #camera = cv2.VideoCapture(r'/home/donald/Downloads/IMG_1545.MOV')
+    # camera = cv2.VideoCapture(r'/home/donald/Downloads/IMG_1545.MOV')
     print('video:', camera.grab())
 
-width = int(camera.get(3))
-height = int(camera.get(4))
-
 # initiate class instances
-control = Controls(config.setup)
+control = Controls(config.setup, step=16)
 actkite = Kite(control.centrex, control.centrey)
 mankite = Kite(300, 400)
-base = Base(updatemode=1, kitebarratio=3)
+base = Base(updatemode=config.setup, kitebarratio=3)
 
 # Initialisation steps
 es = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
 kernel = np.ones((5, 5), np.uint8)
 background = None
-imagemessage = kiteimage()
+imagemessage = KiteImage()
+init_ros()
+init_motor_msg()
 
 # initialize the list of tracked points, the frame counter,
 # and the coordinate deltas
@@ -245,7 +273,11 @@ counter = 0
 foundcounter = 0
 
 if config.setup == 'Standard':  # otherwise not present
-    listen_kitebase()
+    listen_kiteangle()  # this then updates base.barangle via the callback function
+
+if config.input == 'Joystick' or config.input == 'Both':
+    listen_joystick()  # subscribe to joystick messages
+
 writer = None
 cv2.startWindowThread()
 cv2.namedWindow('contours')
@@ -259,7 +291,37 @@ else:
 
 while True:  # Main module loop
     # Read Frame
-    ret, frame = camera.read()
+    if config.numcams == 1:
+        ret, frame = camera.stream.read()
+        # change above for videostream from pyimagagesearch
+        # ret, frame = camera.read()
+    else:
+        left = leftStream.read()
+        right = rightStream.read()
+        # below is because opencv only stitches horizontally
+        left = cv2.transpose(left)
+        right = cv2.transpose(right)
+
+        # resize the frames
+        left = imutils.resize(left, width=480)
+        right = imutils.resize(right, width=480)
+
+        # stitch the frames together to form the panorama
+        # IMPORTANT: you might have to change this line of code
+        # depending on how your cameras are oriented; frames
+        # should be supplied in left-to-right order
+        result = stitcher.stitch([left, right])
+        # reverse the transposition to get images back above one another
+        camera = cv2.flip(cv2.transpose(result), 1)
+
+        # no homography could be computed
+        if camera is None:
+            print("[INFO] homography could not be computed")
+            break
+        else:
+            frame = camera
+    print('frame', frame.shape[1])
+
     if background is None:
         background = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         background = cv2.GaussianBlur(background, (21, 21), 0)
@@ -268,6 +330,7 @@ while True:  # Main module loop
     if config.logging and writer is None:
         # h, w = frame.shape[:2]
         # height, width = 480, 640 - removed should now be set above
+        height, width, channels = frame.shape
         writer = initwriter("record.avi", height, width, fps)
         origwriter = initwriter("origrecord.avi", height, width, fps)
 
@@ -283,15 +346,15 @@ while True:  # Main module loop
     diff = cv2.dilate(diff, es, iterations=2)
     image, cnts, hierarchy = cv2.findContours(diff.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
+
+    base.barangle = get_barangle(kite, base, control)
+    if base.updatemode == 'Manbar': # not getting kiteangle from picture
+        kite.kiteangle = base.barangle * base.kitebarratio
     # lets draw and move cross for manual flying
-    if control.config == "Manfly":
-        if base.updatemode == 1:
-            kite.kiteangle = base.barangle * base.kitebarratio
+    if control.config == 'Manfly' or control.config == 'Manbar':
         drawkite(kite)
         kite.found = True
-
-       # identify the kite
-    if control.config != "Manfly" and config.setup == 'Standard':  # not detecting if in manual mode
+    elif config.setup == 'Standard':  # not detecting if in manual mode
         kite.found = False
         maxmask = -1
         index = -1
@@ -329,15 +392,11 @@ while True:  # Main module loop
     else:
         tempstr = "Found: No"
 
-    #read sensors
-    base.barangle = get_barangle(kite, base, control)
-
-
     # Establish route
     if kite.changezone or kite.changephase or kite.routechange:
+        control.routepoints = calc_route(control.centrex, control.centrey, control.halfwidth, control.radius)
         kite.update_target(control.routepoints[0][0], control.routepoints[0][1],
                            control.centrex, control.maxy, control.routepoints[3][0], control.routepoints[3][1])
-
 
     # start direction and analysis - this will be a routine based on class
     getdirection(kite)
@@ -348,14 +407,13 @@ while True:  # Main module loop
     kite.update_phase()
     base.targetbarangle = calcbarangle(kite, base, control)
 
-
     if kite.zone == 'Centre' or kite.phase == 'Xwind':
         kite.targetangle = get_heading_points((kite.x, kite.y), (kite.targetx, kite.targety))
     # display output
     # show the movement deltas and the direction of movement on the frame
     cv2.putText(frame, kite.direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
     cv2.putText(frame, "dx: {}, dy: {}".format(kite.dX, kite.dY),
-                        (10, height - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 1)
+                (10, height - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 1)
     cv2.putText(frame, "x: {}, y: {}".format(mankite.x, mankite.y),
                 (180, height - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 1)
 
@@ -383,6 +441,9 @@ while True:  # Main module loop
     display_base()
 
     kite_pos(kite.x, kite.y, kite.kiteangle, kite.dX, kite.dY, 0, 0)
+
+    motor_msg(base.barangle, base.targetbarangle, 5)
+
     # cv2.imshow("roi", finalframe)
     # cv2.imshow("mask", mask)
     cv2.imshow("contours", frame)
@@ -396,23 +457,36 @@ while True:  # Main module loop
     if config.logging:  # not saving this either as it errors on other screen
         writeframe(writer, frame, height, width)
 
-    # change to -1 for debugging
-    key = cv2.waitKey(1) & 0xff
-    # think there will be a mode option in here as well
-    # one key changes mode and we would show the possible keys somewhere
-    if key == ord("q"):
+    if config.input == 'Keyboard' or config.input == 'Both':
+        # change to -1 for debugging
+        # 20 seems to work better than 1 on virtualbox - not sure what the issue is
+        key = cv2.waitKey(50) & 0xff
+        if key != -1:
+            quitkey, resetH = control.keyhandler(key, kite, base)
+
+    if config.input == 'Joystick' or config.input == 'Both' and key== -1:
+        joybuttons, joyaxes = get_joystick()
+        quitkey, resetH = control.joyhandler(joybuttons, joyaxes, kite, base)
+
+    print('mode', control.inputmode)
+    if quitkey:
         break
-    elif key != -1:
-        routepoints = control.keyhandler(key, kite, base)
+
+    if resetH and stitcher:
+        stitcher.cachedH=None
+
     time.sleep(control.slow)
-    print(counter)
     # if counter > 633: # turn off expiry after so many frames
     #     print('found:', foundcounter)
     #     break
 
 print("[INFO] cleaning up...")
 cv2.destroyAllWindows()
-camera.release()
-# vs.stop() - no idea what this was
+if config.numcams == 1:
+    camera.stop()
+else:
+    leftStream.stop()
+    rightStream.stop()
+
 if writer is not None:
     writer.release()

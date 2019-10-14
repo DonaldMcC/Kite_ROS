@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # from ros wiki for initial testing
 import rospy
-from std_msgs.msg import String
+from std_msgs.msg import String, Int16
 from kite_ros.msg import Kitepos
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
+pub=0
 
 
 def talker():
@@ -21,8 +22,6 @@ def talker():
 
 def kite_pos(posx, posy, kiteangle, dirx, diry, routepoints, priorpos):
     pub = rospy.Publisher('kite_position', Kitepos, queue_size=10)
-    rospy.init_node('custom_talker', anonymous=True)
-    rate = rospy.Rate(10)  # 10hz
     msg = Kitepos()
     msg.name = "Kite Position"
     msg.posx = posx
@@ -32,11 +31,31 @@ def kite_pos(posx, posy, kiteangle, dirx, diry, routepoints, priorpos):
     msg.diry = diry
     rospy.loginfo(msg)
     pub.publish(msg)
-
     return
 
 
-class kiteimage:
+def init_ros():
+    rospy.init_node('kite_main', anonymous=True)
+
+
+def init_motor_msg():
+    global pub
+    pub = rospy.Publisher('motormsg', Int16, queue_size=10)
+
+
+def motor_msg(barangle, targetbarangle, tolerance=10):
+    global pub
+    diff = barangle - targetbarangle
+    if (diff - tolerance) < 0:
+        pub.publish(299)
+    elif (diff + tolerance) > 0:
+        pub.publish(199)
+    else:
+        pub.publish(0)
+    return
+
+
+class KiteImage:
 
     def __init__(self):
         self.image_pub = rospy.Publisher('kite_image', Image, queue_size=10)
@@ -52,6 +71,9 @@ class kiteimage:
 if __name__ == '__main__':
     # talker()
     try:
-        kite_pos(100, 200, 45, 1, 0, 0, 0)
+        # kite_pos(100, 200, 45, 1, 0, 0, 0)
+        rospy.init_node('kite_main', anonymous=False)
+        init_motor_msg()
+        motor_msg(200, 300)
     except rospy.ROSInterruptException:
         pass
