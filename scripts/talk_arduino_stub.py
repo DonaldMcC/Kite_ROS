@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # from ros wiki for initial testing
 # this should just mockup some values into the kite_arduino message to confirm that the kitebar process works
-# as expected -
+# this is not currently working but not required arduino is now just measuring kiteangle - however left
+# in case I need to come back to custom arduino message for this
 import rospy
 from kite_ros.msg import Kite_arduino
 

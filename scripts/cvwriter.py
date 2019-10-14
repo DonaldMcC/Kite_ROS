@@ -2,7 +2,7 @@
 # zeros array
 
 from __future__ import print_function
-#from imutils.video import VideoStream
+# from imutils.video import VideoStream
 import numpy as np
 import cv2
 
@@ -13,11 +13,12 @@ zeros = None
 
 
 # check if the writer is None
+# TODO check why h,w has been converted
 def initwriter(output, h, w, fps):
     # store the image dimensions, initialzie the video writer,
     # and construct the zeros array
-    #(h, w) = frame.shape[:2]
-    writer = cv2.VideoWriter(output, fourcc, fps,(w, h), True)
+    # (h, w) = frame.shape[:2]
+    writer = cv2.VideoWriter(output, fourcc, fps, (w, h), True)
     return writer
 
 
@@ -25,11 +26,7 @@ def writeframe(writer, frame, h, w):
     # grab the frame from the video stream and resize it to have a
     # maximum width of 300 pixels
     # frame = imutils.resize(frame, width=300)
-
     output = np.zeros((h, w, 3), dtype="uint8")
     output[0:h, 0:w] = frame
     # write the output frame to file
     writer.write(output)
-
-
-
