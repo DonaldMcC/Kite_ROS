@@ -152,11 +152,39 @@ def getangle(resistance, maxleft=-45, maxright=45, resistleft=340, resistright=7
     # calibration is based on 0 being the centre and maxleft and maxright being
     # defined in degrees - the corrsesponding values of the resistor should be taken
     # for all of these and we will for now assume resistor is linear
+
     if resistance >= resistleft and resistance <= resistright:
-        angle = maxleft + ((resistance - resistleft) / (resistright - resistleft) * (maxright - maxleft))
+        angle = maxleft + ((resistance - resistleft) * (maxright - maxleft) / (resistright - resistleft))
+        #angle = -45 + ((resistance - resistleft)/ 400.0)
     else:
         angle = 0
     return int(angle)
+
+
+def getresist(angle, maxleft=-45, maxright=45, resistleft=340, resistright=740):
+    """
+    :param maxleft:
+    :param angle:
+    :return angle:
+
+    >>> getresist(-45)
+    340
+    >>> getresist(0)
+    540
+    >>> getresist(45)
+    740
+    """
+
+    # calibration is based on 0 being the centre and maxleft and maxright being
+    # defined in degrees - the corrsesponding values of the resistor should be taken
+    # for all of these and we will for now assume resistor is linear
+
+    if angle >= maxleft and angle <= maxright:
+        resistance = resistleft + ((angle - maxleft) * (resistright - resistleft)/ (maxright - maxleft) )
+    else:
+        resistance = (resistleft + resistright) / 2
+
+    return int(resistance)
 
 
 def _test():

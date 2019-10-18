@@ -1,8 +1,11 @@
 #!/usr/bin/env python
-# from ros wiki for initial testing
+# this should receive motor msg which is currenlty just left or right based on 299 or 199 or stop at 0
+# however was trying to send back an actual angle and it shouldn't
+# it should send back the actual resistance
 
 import rospy
 from std_msgs.msg import String, Int16
+from kite_funcs import getangle
 motorvalue = 0
 
 
