@@ -147,6 +147,8 @@ def getangle(resistance, maxleft=-45, maxright=45, resistleft=340, resistright=7
     0
     >>> getangle(740)
     45
+    >>> getangle(350)
+    0
     """
 
     # calibration is based on 0 being the centre and maxleft and maxright being

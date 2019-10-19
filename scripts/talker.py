@@ -46,12 +46,12 @@ def init_motor_msg():
 def motor_msg(barangle, targetbarangle, tolerance=10):
     global pub
     diff = barangle - targetbarangle
-    if (diff - tolerance) < 0:
-        pub.publish(299)
-    elif (diff + tolerance) > 0:
+    if abs(diff) < tolerance:
+        pub.publish(0)
+    elif diff > 0:
         pub.publish(199)
     else:
-        pub.publish(0)
+        pub.publish(299)
     return
 
 
