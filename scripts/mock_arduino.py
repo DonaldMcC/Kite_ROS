@@ -29,7 +29,7 @@ def kiteangle(barangle):
     global motorvalue
     pub = rospy.Publisher('kiteangle', Int16, queue_size=3)
     rospy.init_node('mock_arduino', anonymous=False)
-    bar_speed = 50
+    bar_speed = 500
     rate = rospy.Rate(5)  # 5hz
     listen_motormsg()
     while not rospy.is_shutdown():
