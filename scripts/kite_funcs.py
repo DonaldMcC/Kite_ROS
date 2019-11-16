@@ -72,7 +72,7 @@ def calcbarangle(kite, base, controls):
     >>> b=Base(barangle=15, kitebarratio=2)
     >>> c=Controls(1)
     >>> calcbarangle(k,b,c)
-    45
+    40
 
     """
     if kite.phase == "TurnR" or kite.phase == "TurnL":
@@ -104,7 +104,7 @@ def setangleturn(kite, base):
     >>> k=Kite(400)
     >>> b=Base(400)
     >>> setangleturn(k,b)
-    -45
+    -40
     """
     if kite.phase == "TurnR":
         targetbarangle = base.maxright
@@ -135,46 +135,46 @@ def checklimits(angle, maxleft, maxright):
     return angle
 
 
-def getangle(resistance, maxleft=-45, maxright=45, resistleft=340, resistright=740):
+def getangle(resistance, maxleft=-45, maxright=45, resistleft=740, resistright=340):
     """
     :param maxleft:
     :param resistance:
     :return angle:
 
-    >>> getangle(340)
+    >>> getangle(740)
     -45
     >>> getangle(540)
     0
-    >>> getangle(740)
+    >>> getangle(340)
     45
     >>> getangle(350)
-    0
+    42
     """
 
     # calibration is based on 0 being the centre and maxleft and maxright being
     # defined in degrees - the corrsesponding values of the resistor should be taken
     # for all of these and we will for now assume resistor is linear
 
-    if resistance >= resistleft and resistance <= resistright:
-        angle = maxleft + ((resistance - resistleft) * (maxright - maxleft) / (resistright - resistleft))
+    if resistance <= resistleft and resistance >= resistright:
+        angle = maxright - ((resistance - resistright) * (maxright - maxleft) / (resistleft - resistright))
         #angle = -45 + ((resistance - resistleft)/ 400.0)
     else:
         angle = 0
     return int(angle)
 
 
-def getresist(angle, maxleft=-45, maxright=45, resistleft=340, resistright=740):
+def getresist(angle, maxleft=-45, maxright=45, resistleft=740, resistright=340):
     """
     :param maxleft:
     :param angle:
     :return angle:
 
     >>> getresist(-45)
-    340
+    740
     >>> getresist(0)
     540
     >>> getresist(45)
-    740
+    340
     """
 
     # calibration is based on 0 being the centre and maxleft and maxright being

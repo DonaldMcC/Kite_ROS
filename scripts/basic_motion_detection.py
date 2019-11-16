@@ -442,7 +442,7 @@ while True:  # Main module loop
 
     kite_pos(kite.x, kite.y, kite.kiteangle, kite.dX, kite.dY, 0, 0)
 
-    motor_msg(base.barangle, base.targetbarangle, 5)
+    motor_msg(base.barangle, base.targetbarangle, 1)
 
     # cv2.imshow("roi", finalframe)
     # cv2.imshow("mask", mask)

@@ -37,7 +37,7 @@ class Config(object):
 
 class Base(object):
 
-    def __init__(self, barangle=0, parkangle=0, maxright=45, maxleft=-45, lag=1,
+    def __init__(self, barangle=0, parkangle=0, maxright=40, maxleft=-40, lag=1,
                  targetbarangle=0, kitebarratio=1, updatemode='Standard'):
         self.barangle = barangle
         self.parkangle = parkangle
