@@ -3,10 +3,12 @@
 # however was trying to send back an actual angle and it shouldn't
 # it should send back the actual resistance
 
-import time
+import time, math
 import rospy
 from std_msgs.msg import String, Int16
 from kite_funcs import getangle
+from move_func import get_coord
+
 motorvalue = 0
 
 
@@ -53,7 +55,7 @@ def kiteangle(barangle):
         rate.sleep()
     return
 
-def test_kiteangle():
+def test_kiteangle(barangle):
     """So our setup is currently 2 actuators that should move in opposite directions and a central guide rail
     for a wooden bar which will hold the kite by means of putting velcro on the handles - so basically just a
     lever with short distance to the actuator - using ones designed for automatic doors and longer distance
@@ -66,7 +68,7 @@ def test_kiteangle():
     speed_act is speed of actuator in mm per second 30mm/sec is current setup
     force_act is max force of actuator (without leverage) 200N in my case
     speed_handle is speed of handle in meters per second which I would like to be at least 30cm per sec as and lets
-    aim for 50cm of dist_handle and 5cm of dist_act as starting point as seems to make the maths easy so got 2 * 200N
+    aim for 35cm of dist_handle and 3.5cm of dist_act as starting point as seems to make the maths easy so got 2 * 200N
     of force which I think is enough as we are only changing the bar angle the main kite pull force should still be on
     the frame
 
@@ -76,12 +78,35 @@ def test_kiteangle():
     but I think work on centre span needs first
 
     """
-
+    resistleft = 340
+    resistright = 740
+    global motorvalue
     rospy.init_node('mock_arduino', anonymous=False)
     bar_speed = 500
     rate = rospy.Rate(5)  # 5hz
+    motorvalue = 100 #   so always go left to start with
+
+    DIST_ACT = 35.0   # mm
+    DIST_HANDLE = 350.0  # mm
+    SPEED_ACT = 30.0  # mm/sec
+    FORCE_ACT = 200 # N but not sure if will actually use this
+
+    CIRC_ACT = 2 * math.pi * DIST_ACT
+    # left_act_pos = get_coord(0-DIST_ACT, 0, barangle) not convinced this serves purpose
+    loop_time = time.time()
+
     while not rospy.is_shutdown():
-        print(time.time())
+        elapsed_time = time.time() - loop_time
+        loop_time = time.time()
+        if motorvalue:
+            if motorvalue < 200:
+                act_dist = 0 - (SPEED_ACT * elapsed_time)
+            else:
+                act_dist = SPEED_ACT * elapsed_time
+            anglechange = (360 * act_dist) / CIRC_ACT
+            # left_act_pos = get_coord(left_act_pos[0], left_act_pos[1], anglechange)
+            barangle += anglechange
+        print(time.time(), barangle)
         rate.sleep()
 
 
@@ -89,6 +114,6 @@ def test_kiteangle():
 if __name__ == '__main__':
     try:
         # kiteangle(0) will revert to this once working again
-        test_kiteangle()
+        test_kiteangle(0)
     except rospy.ROSInterruptException:
         pass
