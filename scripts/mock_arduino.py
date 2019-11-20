@@ -6,8 +6,7 @@
 import time, math
 import rospy
 from std_msgs.msg import String, Int16
-from kite_funcs import getangle
-from move_func import get_coord
+from kite_funcs import getangle, getresist
 
 motorvalue = 0
 
@@ -28,6 +27,10 @@ def get_motorv():
 
 
 def kiteangle(barangle):
+    """This now attempts to simulate how we believe the bar should responde to messages sent to
+    the actuator given known distance from 'fulcrum' to mounting points and speed of the actuator.
+    Motorvalue is received for left and right and resistance is sent back as kitenagle message."""
+
     resistleft = 340
     resistright = 740
     global motorvalue
@@ -35,25 +38,41 @@ def kiteangle(barangle):
     rospy.init_node('mock_arduino', anonymous=False)
     bar_speed = 500
 
+    DIST_ACT = 35.0   # mm
+    DIST_HANDLE = 350.0  # mm
+    SPEED_ACT = 30.0  # mm/sec
+    FORCE_ACT = 200 # N but not sure if will actually use this
+    CIRC_ACT = 2 * math.pi * DIST_ACT
+
+    loop_time = time.time()
     rate = rospy.Rate(5)  # 5hz
     listen_motormsg()
     while not rospy.is_shutdown():
         get_motorv()
-        print('motorv', motorvalue)
-        rospy.loginfo(barangle)
-        pub.publish(barangle)
-        rate.sleep()
+
+        elapsed_time = time.time() - loop_time
+        loop_time = time.time()
         if motorvalue:
             if motorvalue < 200:
-                barangle = barangle - (bar_speed/100.0)
+                act_dist = 0 - (SPEED_ACT * elapsed_time)
             else:
-                barangle = barangle + (bar_speed/100.0)
-        if barangle < resistleft:
-            barangle = resistleft
-        if barangle > resistright:
-            barangle = resistright
+                act_dist = SPEED_ACT * elapsed_time
+            anglechange = (360 * act_dist) / CIRC_ACT
+            # left_act_pos = get_coord(left_act_pos[0], left_act_pos[1], anglechange)
+            barangle += anglechange
+
+        resistance = getresist(barangle)
+        if resistance < resistleft:
+            resistance = resistleft
+        if resistance > resistright:
+            resistance = resistright
+
+        print('motorv', motorvalue, barangle, resistance)
+        rospy.loginfo(resistance)
+        pub.publish(resistance)
         rate.sleep()
     return
+
 
 def test_kiteangle(barangle):
     """So our setup is currently 2 actuators that should move in opposite directions and a central guide rail
@@ -78,11 +97,9 @@ def test_kiteangle(barangle):
     but I think work on centre span needs first
 
     """
-    resistleft = 340
-    resistright = 740
     global motorvalue
+    pub = rospy.Publisher('kiteangle', Int16, queue_size=3)
     rospy.init_node('mock_arduino', anonymous=False)
-    bar_speed = 500
     rate = rospy.Rate(5)  # 5hz
     motorvalue = 100 #   so always go left to start with
 
@@ -96,6 +113,7 @@ def test_kiteangle(barangle):
     loop_time = time.time()
 
     while not rospy.is_shutdown():
+        print('motorv', motorvalue)
         elapsed_time = time.time() - loop_time
         loop_time = time.time()
         if motorvalue:
@@ -106,14 +124,21 @@ def test_kiteangle(barangle):
             anglechange = (360 * act_dist) / CIRC_ACT
             # left_act_pos = get_coord(left_act_pos[0], left_act_pos[1], anglechange)
             barangle += anglechange
-        print(time.time(), barangle)
+        # should then oscillate
+        if barangle < -40:
+            motorvalue = 250
+        elif barangle > 40:
+            motorvalue = 100
+        resistance = getresist(barangle)
+        rospy.loginfo(barangle)
+        pub.publish(resistance)
+        print(time.time(), barangle, resistance)
         rate.sleep()
-
 
 
 if __name__ == '__main__':
     try:
-        # kiteangle(0) will revert to this once working again
-        test_kiteangle(0)
+        kiteangle(0)
+        # test_kiteangle(0) this was just for testing new approach
     except rospy.ROSInterruptException:
         pass
