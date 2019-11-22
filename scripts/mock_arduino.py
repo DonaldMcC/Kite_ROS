@@ -45,7 +45,7 @@ def kiteangle(barangle):
     CIRC_ACT = 2 * math.pi * DIST_ACT
 
     loop_time = time.time()
-    rate = rospy.Rate(5)  # 5hz
+    rate = rospy.Rate(10)  # 10hz
     listen_motormsg()
     while not rospy.is_shutdown():
         get_motorv()
