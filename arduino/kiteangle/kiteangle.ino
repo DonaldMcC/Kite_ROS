@@ -35,16 +35,25 @@ ros::Publisher kiteangle("kiteangle", &msg);
 // of speeds so we will go with first digit being direction and final two being speed 
 // with 100-199 being left and 200-299 being right
 void callback (const std_msgs::Int16&int_msg)
-{ 
-  if (int_msg.data == 0)
-    stop();
-  else if (int_msg.data < 200)
+{
+switch (int_msg.data) {
+    case 1:
+      forward();
+      break;
+    case 2:
+      backward();
+      break;
+    case 3:
       left();
-    else
+      break;
+    case 3:
       right();
-
-} 
-
+      break;
+    default:
+        stop();
+    break;
+  }
+}
 
 // Defining Subscriber 
 ros::Subscriber<std_msgs::Int16> 

@@ -48,7 +48,7 @@ from mainclasses import Kite, Controls, Base, Config, calc_route
 from move_func import get_angle
 from talker import kite_pos, KiteImage, motor_msg, init_motor_msg, init_ros
 from cvwriter import initwriter, writeframe
-from basic_listen_barangle import listen_kiteangle, get_barangle
+from basic_listen_barangle import listen_kiteangle, get_barangle, check_kite
 from listen_joystick import listen_joystick, get_joystick
 from kite_funcs import kitemask, calcbarangle
 
@@ -274,6 +274,15 @@ foundcounter = 0
 
 if config.setup == 'Standard':  # otherwise not present
     listen_kiteangle()  # this then updates base.barangle via the callback function
+    result = ""
+    while result != "Ok":
+        result = check_kite(actkite, base, control)
+        print(result)
+        if result != "Ok":
+            go_on = input("Contine (Y/N)")
+            if go_on == "Y":
+                break
+
 
 if config.input == 'Joystick' or config.input == 'Both':
     listen_joystick()  # subscribe to joystick messages

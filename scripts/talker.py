@@ -43,15 +43,18 @@ def init_motor_msg():
     pub = rospy.Publisher('motormsg', Int16, queue_size=10)
 
 
-def motor_msg(barangle, targetbarangle, tolerance=10):
+def motor_msg(barangle, targetbarangle, tolerance=10, action=None):
     global pub
+    if action:
+        pub.publish(action) # 1 for forward and 2 for backward
+        return
     diff = barangle - targetbarangle
     if abs(diff) < tolerance:
         pub.publish(0)
     elif diff > 0:
-        pub.publish(199)
+        pub.publish(3)   # Left
     else:
-        pub.publish(299)
+        pub.publish(4)   # Right
     return
 
 
