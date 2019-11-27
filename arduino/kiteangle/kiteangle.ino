@@ -129,7 +129,7 @@ void stop()//
 {
      digitalWrite(speedpinA,LOW);// Unenable the pin, to stop the motor. this should be done to avid damaging the motor. 
      digitalWrite(speedpinB,LOW);
-     delay(1000);
+     //delay(1000);  remove not clear why this was here
  
 }
 

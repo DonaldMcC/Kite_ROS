@@ -53,8 +53,6 @@ def check_kite(kite, base, control):
         return "Out of Tolerance "
 
 
-
-
 if __name__ == '__main__':
     rospy.init_node('kite_main', anonymous=False)
     listen_kiteangle()

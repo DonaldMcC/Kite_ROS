@@ -53,13 +53,15 @@ def kiteangle(barangle):
         elapsed_time = time.time() - loop_time
         loop_time = time.time()
         if motorvalue:
-            if motorvalue < 200:
-                act_dist = 0 - (SPEED_ACT * elapsed_time)
+            if motorvalue == 1 or motorvalue == 2:
+                barangle = 0
             else:
-                act_dist = SPEED_ACT * elapsed_time
-            anglechange = (360 * act_dist) / CIRC_ACT
-            # left_act_pos = get_coord(left_act_pos[0], left_act_pos[1], anglechange)
-            barangle += anglechange
+                if motorvalue == 3:  # Left
+                    act_dist = 0 - (SPEED_ACT * elapsed_time)
+                elif motorvalue == 4:  # Right
+                    act_dist = SPEED_ACT * elapsed_time
+                anglechange = (360 * act_dist) / CIRC_ACT
+                barangle += anglechange
 
         resistance = getresist(barangle)
         if resistance < resistleft:
