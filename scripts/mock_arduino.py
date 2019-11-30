@@ -27,7 +27,7 @@ def get_motorv():
 
 
 def kiteangle(barangle):
-    """This now attempts to simulate how we believe the bar should responde to messages sent to
+    """This now attempts to simulate how we believe the bar should respond to messages sent to
     the actuator given known distance from 'fulcrum' to mounting points and speed of the actuator.
     Motorvalue is received for left and right and resistance is sent back as kitenagle message."""
 

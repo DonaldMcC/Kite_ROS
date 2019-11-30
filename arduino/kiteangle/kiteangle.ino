@@ -46,7 +46,7 @@ switch (int_msg.data) {
     case 3:
       left();
       break;
-    case 3:
+    case 4:
       right();
       break;
     default:

@@ -24,12 +24,14 @@ def get_actbarangle():
     global barangle
     return barangle
 
+
 # this should always return barangle for Manbar or Standard operation Manfly should set
 def get_barangle(kite, base, control):
     global barangle
     print ('barangle', barangle)
-    if control.config == 'Manfly' :
+    if control.config == 'Manfly' or control.config == 'Manbar':
         if base.updatemode == 'Manbar':
+            print('got here')
             return base.barangle
         else:  # when kiteangle is driving the barangle
             # TO DO add kitebar ratio to this

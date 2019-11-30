@@ -355,7 +355,6 @@ while True:  # Main module loop
     diff = cv2.dilate(diff, es, iterations=2)
     image, cnts, hierarchy = cv2.findContours(diff.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
-
     base.barangle = get_barangle(kite, base, control)
     if base.updatemode == 'Manbar': # not getting kiteangle from picture
         kite.kiteangle = base.barangle * base.kitebarratio
@@ -477,7 +476,7 @@ while True:  # Main module loop
         joybuttons, joyaxes = get_joystick()
         quitkey, resetH = control.joyhandler(joybuttons, joyaxes, kite, base)
 
-    print('mode', control.inputmode)
+    print('mode', control.inputmode, base.updatemode)
     if quitkey:
         break
 

@@ -305,13 +305,9 @@ class Controls(object):
                 time.sleep(10)
         elif self.inputmode == 3:  # Manbar - maybe switch to arrows
             if key == ord("l"):  # left
-                kite.x -= self.step  # this will change
+                base.barangle -= self.step  # this will change
             elif key == ord("r"):  # right
-                kite.x += self.step
-            elif key == ord("u"):  # up
-                kite.y -= self.step
-            elif key == ord("d"):  # down
-                kite.y += self.step
+                base.barangle += self.step
             elif key == ord("p"):  # pause - this may apply in all moades
                 time.sleep(10)
 
@@ -401,8 +397,7 @@ class Controls(object):
                 kite.kiteangle += (self.step/2 * joyaxes[2])
         elif self.inputmode == 3:  # ManBar - maybe switch to arrows - let's do this all
             if joybuttons[7] == 0 and joybuttons[8] == 0:
-                kite.x += (self.step * joyaxes[2])
-                kite.y -= (self.step * joyaxes[3])
+                base.barangle += (self.step/2 * joyaxes[2])
 
         if joybuttons[5] == 1:  # modechange
             self.inputmode += 1
