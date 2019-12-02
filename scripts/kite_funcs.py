@@ -2,6 +2,7 @@ import numpy as np
 import cv2
 
 from mainclasses import Kite, Controls, Base
+
 # http://www.pyimagesearch.com/2014/08/04/opencv-python-color-detection/
 # define the list of boundaries
 # boundaries = [([0, 0, 0], [40, 40, 40])]
@@ -137,6 +138,9 @@ def checklimits(angle, maxleft, maxright):
 
 def getangle(resistance, maxleft=-45, maxright=45, resistleft=740, resistright=340):
     """
+    :param resistright:
+    :param resistleft:
+    :param maxright:
     :param maxleft:
     :param resistance:
     :return angle:
@@ -155,9 +159,9 @@ def getangle(resistance, maxleft=-45, maxright=45, resistleft=740, resistright=3
     # defined in degrees - the corrsesponding values of the resistor should be taken
     # for all of these and we will for now assume resistor is linear
 
-    if resistance <= resistleft and resistance >= resistright:
+    if resistleft >= resistance >= resistright:
         angle = maxright - ((resistance - resistright) * (maxright - maxleft) / (resistleft - resistright))
-        #angle = -45 + ((resistance - resistleft)/ 400.0)
+        # angle = -45 + ((resistance - resistleft)/ 400.0)
     else:
         angle = 0
     return int(angle)
@@ -165,6 +169,9 @@ def getangle(resistance, maxleft=-45, maxright=45, resistleft=740, resistright=3
 
 def getresist(angle, maxleft=-45, maxright=45, resistleft=740, resistright=340):
     """
+    :param resistright:
+    :param resistleft:
+    :param maxright:
     :param maxleft:
     :param angle:
     :return angle:
@@ -181,8 +188,8 @@ def getresist(angle, maxleft=-45, maxright=45, resistleft=740, resistright=340):
     # defined in degrees - the corrsesponding values of the resistor should be taken
     # for all of these and we will for now assume resistor is linear
 
-    if angle >= maxleft and angle <= maxright:
-        resistance = resistleft + ((angle - maxleft) * (resistright - resistleft)/ (maxright - maxleft) )
+    if maxleft <= angle <= maxright:
+        resistance = resistleft + ((angle - maxleft) * (resistright - resistleft) / (maxright - maxleft))
     else:
         resistance = (resistleft + resistright) / 2
 

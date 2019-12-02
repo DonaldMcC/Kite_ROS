@@ -47,8 +47,8 @@ class Base(object):
         self.barangles = deque(maxlen=16)
         self.targetbarangle = targetbarangle
         self.kitebarratio = kitebarratio  # this will be the rate of change of barangle to kite angle
-        self.updatemode = updatemode  # Standard will be unconnected and
-                                      # Manbar will be bar angles kite Manfly is kite angles bar
+        self.updatemode = updatemode  # Standard will be unconnected and Manbar will be bar angles kite
+        # Manfly is kite angles bar
 
 
 class Kite(object):
@@ -223,7 +223,7 @@ class Controls(object):
         elif self.config == 'Manfly':  # Manfly
             self.inputmode = 2
         else:
-            self.inputmode = 3  #Manbar
+            self.inputmode = 3  # Manbar
         self.step = step
         self.modestring = self.getmodestring()
         self.route = False

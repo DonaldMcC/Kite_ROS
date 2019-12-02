@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # from ros wiki for initial testing
+# this gets the barangle from the arduino board and now also got an initialisation which
+# should retract the actuators
 
 import time
 import rospy
@@ -20,6 +22,7 @@ def listen_kiteangle():
     print('initing')
     rospy.Subscriber('kiteangle', Int16, callback)
 
+
 def get_actbarangle():
     global barangle
     return barangle
@@ -28,7 +31,7 @@ def get_actbarangle():
 # this should always return barangle for Manbar or Standard operation Manfly should set
 def get_barangle(kite, base, control):
     global barangle
-    print ('barangle', barangle)
+    print('barangle', barangle)
     if control.config == 'Manfly' or control.config == 'Manbar':
         if base.updatemode == 'Manbar':
             print('got here')
@@ -43,11 +46,11 @@ def get_barangle(kite, base, control):
 def check_kite(kite, base, control):
     # this will now generally be called when motion_detection starts - it will do the following things
     # fully retract both actuators and once done confirm barangle is approximately zero
-    MAX_RETRACT_TIME=10
+    MAX_RETRACT_TIME = 10
     TOLERANCE = 10
-    motor_msg(0,0,0,2) # send backward signal
-    time.sleep(MAX_RETRACT_TIME) # assumed to be time for motors to fully retract
-    motor_msg(0,0,0,0) # stop
+    motor_msg(0, 0, 0, 2)  # send backward signal
+    time.sleep(MAX_RETRACT_TIME)  # assumed to be time for motors to fully retract
+    motor_msg(0, 0, 0, 0)  # stop
     actangle = get_barangle(kite, base, control)
     if abs(actangle) < TOLERANCE:
         return "OK"
