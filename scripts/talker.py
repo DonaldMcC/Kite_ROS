@@ -44,17 +44,22 @@ def init_motor_msg():
 
 
 def motor_msg(barangle, targetbarangle, tolerance=10, action=None):
+    MAXLEFT = -20 # These are to try and avoid breaking the bar
+    MAXRIGHT= 20  # similarly to protect bar as attached close to pivot
+
     global pub
     if action:
         pub.publish(action) # 1 for forward and 2 for backward
         return
     diff = barangle - targetbarangle
     if abs(diff) < tolerance:
-        pub.publish(0)
-    elif diff > 0:
+        pub.publish(0)  # stop
+    elif diff > 0 and barangle > MAXLEFT:
         pub.publish(3)   # Left
-    else:
+    elif diff < 0 and barangle < MAXRIGHT:
         pub.publish(4)   # Right
+    else:
+        pub.publish(0)
     return
 
 
@@ -72,11 +77,12 @@ class KiteImage:
 
 
 if __name__ == '__main__':
-    # talker()
     try:
-        # kite_pos(100, 200, 45, 1, 0, 0, 0)
         rospy.init_node('kite_main', anonymous=False)
         init_motor_msg()
-        motor_msg(200, 300)
+        rate = rospy.Rate(10)  # 10hz
+        while not rospy.is_shutdown():
+            motor_msg(0, 0, 0, 1)
+            rate.sleep()
     except rospy.ROSInterruptException:
         pass

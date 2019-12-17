@@ -48,9 +48,9 @@ def check_kite(kite, base, control):
     # fully retract both actuators and once done confirm barangle is approximately zero
     MAX_RETRACT_TIME = 10
     TOLERANCE = 10
-    motor_msg(0, 0, 0, 2)  # send backward signal
+    motor_msg(0, 0, 0, 1)  # send backward signal
     time.sleep(MAX_RETRACT_TIME)  # assumed to be time for motors to fully retract
-    motor_msg(0, 0, 0, 0)  # stop
+    motor_msg(0, 0, 0, 5)  # stop
     actangle = get_barangle(kite, base, control)
     if abs(actangle) < TOLERANCE:
         return "OK"

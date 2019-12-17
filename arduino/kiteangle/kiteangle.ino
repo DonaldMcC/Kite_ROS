@@ -38,10 +38,10 @@ void callback (const std_msgs::Int16&int_msg)
 {
 switch (int_msg.data) {
     case 1:
-      forward();
+      backward();
       break;
     case 2:
-      backward();
+      forward();
       break;
     case 3:
       left();
@@ -66,7 +66,7 @@ int speedpinA=9;//enable motor A
 int pinI3=12;//define I3 interface 
 int pinI4=13;//define I4 interface 
 int speedpinB=10;//enable motor B
-int spead=255;//define the spead of motor as fast as pooss
+int spead=255;//define the spead of motor as fast as poss
 
 int sensorPin = A0;    // select the input pin for the potentiometer
 int sensorValue = 0;  // variable to store the value coming from the sensor
@@ -85,7 +85,7 @@ void setup()
 }
 
 
-void forward()
+void backward()
 {
      analogWrite(speedpinA,spead);//input a simulation value to set the speed
      analogWrite(speedpinB,spead);
@@ -95,7 +95,7 @@ void forward()
      digitalWrite(pinI1,HIGH);
 }
 
-void backward()//
+void forward()//
 {
      analogWrite(speedpinA,spead);//input a simulation value to set the speed
      analogWrite(speedpinB,spead);
