@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-# this should receive motor msg which is currenlty just left or right based on 299 or 199 or stop at 0
-# however was trying to send back an actual angle and it shouldn't
-# it should send back the actual resistance
+# this should receive motor msg which is currenlty just left or right based on 3 or 4 or stop at 0
+# 1 and 2 are forward and back for initialisation
+
 
 import time, math
 import rospy
