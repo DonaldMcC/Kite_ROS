@@ -33,6 +33,7 @@
 
 # standard library imports
 import numpy as np
+import PySimpleGUI as sg
 import time
 import cv2
 import argparse
@@ -220,7 +221,7 @@ KITETYPE = 'kite1'
 # input options are Keyboard, Joystick or Both
 
 # config = Config(setup='Manfly', source=1, input='Joystick')
-config = Config(setup=args.setup, source=2, numcams=1, input=args.input)
+config = Config(setup=args.setup, source=1, numcams=1, input=args.input)
 
 while config.source not in {1, 2}:
     config.source = input('Key 1 for camera or 2 for source')
@@ -285,11 +286,32 @@ if config.setup == 'Standard' and config.source ==1:  # otherwise not present
 if config.input == 'Joystick' or config.input == 'Both':
     listen_joystick()  # subscribe to joystick messages
 
+
+#
+
+sg.theme('Black')
+
+# ---===--- define the window layout --- #
+layout = [[sg.Text('OpenCV Demo', size=(15, 1), font='Helvetica 20')],
+              [sg.Image(filename='', key='-image-')],
+              [sg.Button('Exit', size=(7, 1), pad=((600, 0), 3), font='Helvetica 14')]]
+
+# create the window and show it without the plot
+window = sg.Window('Demo Application - OpenCV Integration',
+                       layout,
+                       no_titlebar=False,
+                       location=(0,0))
+
+# locate the elements we'll be updating. Does the search only 1 time
+image_elem = window['-image-']
+
+
 writer = None
 cv2.startWindowThread()
 cv2.namedWindow('contours')
 fps = 15
 # fps = camera.get(cv2.CV_CAP_PROP_FPS)
+
 
 if control.config == "Manfly":
     kite = mankite
@@ -298,6 +320,7 @@ else:
 
 while True:  # Main module loop
     # Read Frame
+    event, values = window.read(timeout=0)
     if config.numcams == 1:
         if config.source == 1:
             ret, frame = camera.stream.read()
@@ -452,7 +475,12 @@ while True:  # Main module loop
     kite_pos(kite.x, kite.y, kite.kiteangle, kite.dX, kite.dY, 0, 0)
 
     motor_msg(base.barangle, base.targetbarangle, 5)
+    #window.FindElement('image').Update(data=cv2.imencode('.png', cap.read()[1])[1].tobytes())  # Update image in window
+    #image_elem.Update(data=cv2.imencode('.png', frame[1])[1].tobytes())  # Update image in window
+    image_elem.Update(data=cv2.imencode('.png', frame[1])[1].tobytes())  # Update image in window
 
+    #imgbytes=frame.tobytes()
+    #image_elem.update(data=frame)
     # cv2.imshow("roi", finalframe)
     # cv2.imshow("mask", mask)
     cv2.imshow("contours", frame)
