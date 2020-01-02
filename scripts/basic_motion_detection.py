@@ -201,12 +201,10 @@ parser.add_argument('-l', '--load', type=str, default='yes',
 #                     help='Setup either Standard or Manfly')
 parser.add_argument('-s', '--setup', type=str, default='Standard',
                     help='Setup either Standard or Manfly or Manbar')
-parser.add_argument('-i', '--input', type=str, default='Joystick',
+parser.add_argument('-i', '--input', type=str, default='Keyboard',
                     help='Input either Keyboard, Joystick or Both')
 args = parser.parse_args()
 
-# this will need to not happen if arguments are passed
-source = 2  # change back to 1 to get prompt
 # iphone
 # masklimit = 10000
 # wind
@@ -222,7 +220,7 @@ KITETYPE = 'kite1'
 # input options are Keyboard, Joystick or Both
 
 # config = Config(setup='Manfly', source=1, input='Joystick')
-config = Config(setup=args.setup, source=1, numcams=1, input=args.input)
+config = Config(setup=args.setup, source=2, numcams=1, input=args.input)
 
 while config.source not in {1, 2}:
     config.source = input('Key 1 for camera or 2 for source')
@@ -248,10 +246,10 @@ if config.source == 1:
 else:
     # TODO at some point will change this to current directory and append file - not urgent
     camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
-    # camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/newkite1.mp4')
-    # camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/orig2605.avi')
-    # camera = cv2.VideoCapture(r'/home/donald/Downloads/IMG_1545.MOV')
-    print('video:', camera.grab())
+    # Videostream seems to create errors with playbakc
+    #camera = VideoStream(src=r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4').start()
+    #camera = VideoStream(src=r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4').start()
+    #print('video:', camera.grab())
 
 # initiate class instances
 control = Controls(config.setup, step=16)
@@ -272,7 +270,7 @@ init_motor_msg()
 counter = 0
 foundcounter = 0
 
-if config.setup == 'Standard':  # otherwise not present
+if config.setup == 'Standard' and config.source ==1:  # otherwise not present
     listen_kiteangle()  # this then updates base.barangle via the callback function
     result = ""
     while result != "Ok":
@@ -301,9 +299,11 @@ else:
 while True:  # Main module loop
     # Read Frame
     if config.numcams == 1:
-        ret, frame = camera.stream.read()
+        if config.source == 1:
+            ret, frame = camera.stream.read()
         # change above for videostream from pyimagagesearch
-        # ret, frame = camera.read()
+        else:  # from file
+            ret, frame = camera.read()
     else:
         left = leftStream.read()
         right = rightStream.read()
@@ -330,6 +330,7 @@ while True:  # Main module loop
         else:
             frame = camera
     print('frame', frame.shape[1])
+    height, width, channels = frame.shape
 
     if background is None:
         background = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -339,7 +340,7 @@ while True:  # Main module loop
     if config.logging and writer is None:
         # h, w = frame.shape[:2]
         # height, width = 480, 640 - removed should now be set above
-        height, width, channels = frame.shape
+        # height, width, channels = frame.shape
         writer = initwriter("record.avi", height, width, fps)
         origwriter = initwriter("origrecord.avi", height, width, fps)
 
