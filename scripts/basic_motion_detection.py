@@ -509,16 +509,19 @@ while True:  # Main module loop
     # elif event == 'Left':
     #    sg.popup('Left')
 
-    if config.input == 'Keyboard' or config.input == 'Both':
+    #if config.input == 'Keyboard' or config.input == 'Both':
         # change to -1 for debugging
         # 20 seems to work better than 1 on virtualbox - not sure what the issue is
-        key = cv2.waitKey(50) & 0xff
-        if key != -1:
-            quitkey, resetH = control.keyhandler(key, kite, base, event)
+    #    key = cv2.waitKey(50) & 0xff
+    #    if key != -1:
+    #        quitkey, resetH = control.keyhandler(key, kite, base, event)
 
-    if config.input == 'Joystick' or config.input == 'Both' and key== -1:
-        joybuttons, joyaxes = get_joystick()
-        quitkey, resetH = control.joyhandler(joybuttons, joyaxes, kite, base)
+    #if config.input == 'Joystick' or config.input == 'Both' and key== -1:
+    #    joybuttons, joyaxes = get_joystick()
+     #   quitkey, resetH = control.joyhandler(joybuttons, joyaxes, kite, base)
+
+    joybuttons, joyaxes = get_joystick()
+    quitkey, resetH = control.joyhandler(joybuttons, joyaxes, kite, base, event)
 
     print('mode', control.inputmode, base.updatemode)
     if quitkey:

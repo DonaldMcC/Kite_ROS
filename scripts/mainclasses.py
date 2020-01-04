@@ -330,7 +330,7 @@ class Controls(object):
 
         return key == ord("q"), reset_stitcher  # quit pressed
 
-    def joyhandler(self, joybuttons, joyaxes, kite, base):
+    def joyhandler(self, joybuttons, joyaxes, kite, base, event=None):
         # Using https://github.com/arnaud-ramey/rosxwiimote as a ros package to capture
         # the joystick message this was because std one tried to do bluetooth
         # connection to wiimote via python and it didn't work perhaps as only
@@ -355,49 +355,48 @@ class Controls(object):
         # in terms of what we do with this the basic idea is that the nunchuk flies the kite
         # and the rockers support the route moving about
         reset_stitcher = False
-        if joybuttons and joybuttons[1] == 0:  # Standard
-            if joyaxes[0] == -1:  # left
+        if self.inputmode == 0:  # Standard
+            if (joybuttons and joyaxes[0] == -1) or event == 'Left':  # left:  # left
                 self.centrex -= self.step
                 kite.routechange = True
-            elif joyaxes[0] == 1:  # right
+            elif (joybuttons and joyaxes[0] == 1) or event == 'Right':  # right
                 self.centrex += self.step
                 kite.routechange = True
-            elif joyaxes[1] == 1:  # up
+            elif (joybuttons and joyaxes[1] == 1) or event == 'Up':  # up
                 self.centrey -= self.step
                 kite.routechange = True
-            elif joyaxes[1] == -1:  # down
+            elif (joybuttons and joyaxes[1] == -1) or event == 'Down':  # down
                 self.centrey += self.step
                 kite.routechange = True
-        elif joybuttons and joybuttons[1] == 1:  # Standard
-            if joyaxes[0] == -1:  # left
+            elif event == 'Wider':  # wider
                 self.halfwidth += self.step
-            elif joyaxes[0] == 1:  # right
-                self.halfwidth -= self.step
-            elif joyaxes[1] == 1:  # up
+            elif event == 'Narrower':  # narrower
+                self.halfwidth -= 1
+            elif event == 'Expand':  # expand
                 self.radius += self.step
-            elif joyaxes[1] == -1:  # down
+            elif event == 'Contract':  # contract
                 self.radius -= self.step
-        if joybuttons and joybuttons[3] == 1:  # slow
-            self.slow += 0.1
-        elif joybuttons and joybuttons[2] == 1:  # fast
-            self.slow = 0.0
-        elif joybuttons and joybuttons[0] == 1:  # pause - this may apply in all modes
-            time.sleep(10)
+            elif (joybuttons and joybuttons[3] == 1) or event == 'Slow':  # slow
+                self.slow += 0.1
+            elif (joybuttons and joybuttons[2] == 1) or event == 'Fast':  # fast
+                self.slow = 0.0
+            elif (joybuttons and joybuttons[0] == 1) or event == 'Pause':  # pause - this may apply in all modes
+                time.sleep(10)
 
         # kite.routechange = True - don't want this triggered every time
         if self.inputmode == 1:  # SetFlight
-            if joybuttons and joybuttons[6] == 1:  # move mode forward
+            if (joybuttons and joybuttons[6] == 1):  # move mode forward
                 if kite.mode == 'Park':
                     kite.mode = 'Wiggle'
                 elif kite.mode == 'Wiggle':
                     kite.mode = 'Fig8'
                 else:
                     kite.mode = 'Park'
-            # TODO Figure out what below idea is all about and if required on wiimote
-                # elif key == ord("s"):  # simulation
-                # self.mode = 1
-                # elif key == ord("n"):  # normal with kite being present
-                # self.mode = 0
+            #TODO redo this to cover all bases
+            if event == 'Wider':
+                kite.mode == 'Park'
+            elif event == 'Narrower':
+                kite.mode = 'Wiggle'
         elif self.inputmode == 2:  # ManFlight - maybe switch to arrows - let's do this all
             if joybuttons and joybuttons[7] == 0 and joybuttons[8] == 0:
                 kite.x += (self.step * joyaxes[2])
@@ -406,6 +405,19 @@ class Controls(object):
                 base.barangle += (self.step/2 * joyaxes[2])
             else:  # z button pressed
                 kite.kiteangle += (self.step/2 * joyaxes[2])
+            if event == 'Left':  # left
+                kite.centrex -= self.step
+                kite.routechange = True
+            elif event == 'Right':  # right
+                kite.centrex += self.step
+                kite.routechange = True
+            elif event == 'Up':  # up
+                kite.centrey -= self.step
+                kite.routechange = True
+            elif event == 'Down':  # down
+                kite.centrey += self.step
+                kite.routechange = True
+
         elif self.inputmode == 3:  # ManBar - maybe switch to arrows - let's do this all
             if joybuttons and joybuttons[7] == 0 and joybuttons[8] == 0:
                 base.barangle += (self.step/2 * joyaxes[2])
