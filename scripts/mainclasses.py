@@ -240,18 +240,18 @@ class Controls(object):
         else:
             return 'MANBAR: Left Right Up Down Pause Mode Quit'
 
-    def keyhandler(self, key, kite, base=None):
+    def keyhandler(self, key, kite, base=None, event=None):
         # this will now support a change of flight mode and operating mode so different keys will
         # do different things depending on inputmode,
         reset_stitcher = False
         if self.inputmode == 0:  # Standard
-            if key == ord("l"):  # left
+            if key == ord("l") or event == 'Left':  # left
                 self.centrex -= self.step
                 kite.routechange = True
-            elif key == ord("r"):  # right
+            elif key == ord("r") or event == 'Right':  # right
                 self.centrex += self.step
                 kite.routechange = True
-            elif key == ord("u"):  # up
+            elif key == ord("u") or event == 'Up':  # up
                 self.centrey -= self.step
                 kite.routechange = True
             elif key == ord("d"):  # down

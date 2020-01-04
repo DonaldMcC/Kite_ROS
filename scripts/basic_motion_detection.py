@@ -297,20 +297,20 @@ sg.theme('Black')
 
 button_list = control.modestring.split()[1:]
 sgmodestring = 'Mode: ' + control.modestring.split()[0]
-buttons =  [sg.Button(x, size=(4, 2), key=i, pad=(4,0),  font='Helvetica 14')
+buttons =  [sg.Button(x, size=(7, 3), pad=(4,0),  font='Helvetica 14')
             for i, x in enumerate(button_list)]
 
 # ---===--- define the intial window layout --- #
 #layout = [[sg.Text('OpenCV Demo', size=(15, 1), font='Helvetica 20')],
-#              [sg.Button('Exit', size=(7, 1), pad=((600, 0), 3), font='Helvetica 14')]]
+#              [sg.Button('Quit', size=(7, 1), pad=((600, 0), 3), font='Helvetica 14')]]
 
-layout = [[sg.Text(sgmodestring, size=(15, 1), font='Helvetica 20')],buttons]
+layout = [[sg.Text(sgmodestring, size=(15, 1), font='Helvetica 20')], buttons]
 
 # create the window and show it without the plot
 window = sg.Window('Kite ROS - Automated Flying',
                        layout,
                        no_titlebar=False,
-                       location=(500,1000))
+                       location=(50,1000))
 
 writer = None
 cv2.startWindowThread()
@@ -325,9 +325,6 @@ else:
 
 while True:  # Main module loop
     # Read Frame
-    event, values = window.read(timeout=0)
-    if event in ('Exit', None):
-        break
 
     if config.numcams == 1:
         if config.source == 1:
@@ -499,12 +496,19 @@ while True:  # Main module loop
     if config.logging:  # not saving this either as it errors on other screen
         writeframe(writer, frame, height, width)
 
+    # read pysimplegui events
+    event, values = window.read(timeout=0)
+    if event in ('Quit', None):
+        break
+    # elif event == 'Left':
+    #    sg.popup('Left')
+
     if config.input == 'Keyboard' or config.input == 'Both':
         # change to -1 for debugging
         # 20 seems to work better than 1 on virtualbox - not sure what the issue is
         key = cv2.waitKey(50) & 0xff
         if key != -1:
-            quitkey, resetH = control.keyhandler(key, kite, base)
+            quitkey, resetH = control.keyhandler(key, kite, base, event)
 
     if config.input == 'Joystick' or config.input == 'Both' and key== -1:
         joybuttons, joyaxes = get_joystick()
