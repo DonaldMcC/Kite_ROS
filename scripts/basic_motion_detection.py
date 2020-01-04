@@ -221,7 +221,7 @@ KITETYPE = 'kite1'
 # input options are Keyboard, Joystick or Both
 
 # config = Config(setup='Manfly', source=1, input='Joystick')
-config = Config(setup=args.setup, source=1, numcams=1, input=args.input)
+config = Config(setup=args.setup, source=2, numcams=1, input=args.input)
 
 while config.source not in {1, 2}:
     config.source = input('Key 1 for camera or 2 for source')
@@ -287,24 +287,30 @@ if config.input == 'Joystick' or config.input == 'Both':
     listen_joystick()  # subscribe to joystick messages
 
 
-#
-
+#Pysimplegui setup
 sg.theme('Black')
 
-# ---===--- define the window layout --- #
-layout = [[sg.Text('OpenCV Demo', size=(15, 1), font='Helvetica 20')],
-              [sg.Image(filename='', key='-image-')],
-              [sg.Button('Exit', size=(7, 1), pad=((600, 0), 3), font='Helvetica 14')]]
+# control.modestring = 'STD: Left Right Up Down Wider Narrow Expand Contract Pause Mode Quit'
+# So think we parse this to a list and then convert this into buttons for elements after the first
+# seems fine to get the initial list but was thinking this is a fixed list and we then update the relevant buttons
+# on modechange and disable ones that are not relevant for that mode
+
+button_list = control.modestring.split()[1:]
+sgmodestring = 'Mode: ' + control.modestring.split()[0]
+buttons =  [sg.Button(x, size=(4, 2), key=i, pad=(4,0),  font='Helvetica 14')
+            for i, x in enumerate(button_list)]
+
+# ---===--- define the intial window layout --- #
+#layout = [[sg.Text('OpenCV Demo', size=(15, 1), font='Helvetica 20')],
+#              [sg.Button('Exit', size=(7, 1), pad=((600, 0), 3), font='Helvetica 14')]]
+
+layout = [[sg.Text(sgmodestring, size=(15, 1), font='Helvetica 20')],buttons]
 
 # create the window and show it without the plot
-window = sg.Window('Demo Application - OpenCV Integration',
+window = sg.Window('Kite ROS - Automated Flying',
                        layout,
                        no_titlebar=False,
-                       location=(0,0))
-
-# locate the elements we'll be updating. Does the search only 1 time
-image_elem = window['-image-']
-
+                       location=(500,1000))
 
 writer = None
 cv2.startWindowThread()
@@ -321,6 +327,9 @@ else:
 while True:  # Main module loop
     # Read Frame
     event, values = window.read(timeout=0)
+    if event in ('Exit', None):
+        break
+
     if config.numcams == 1:
         if config.source == 1:
             ret, frame = camera.stream.read()
@@ -467,6 +476,10 @@ while True:  # Main module loop
     cv2.putText(frame, tempstr, (outx, 160), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
     cv2.putText(frame, 'Mode:' + kite.mode, (outx, 180), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
     cv2.putText(frame, 'Phase:' + kite.phase, (outx, 200), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
+
+    # display buttons
+    # think this will become optional once pysimplegui working but may retain in case issues using this on some
+    # platforms
     cv2.putText(frame, control.modestring, (10, frame.shape[0] - 10),
                 cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
 
@@ -475,14 +488,7 @@ while True:  # Main module loop
     kite_pos(kite.x, kite.y, kite.kiteangle, kite.dX, kite.dY, 0, 0)
 
     motor_msg(base.barangle, base.targetbarangle, 5)
-    #window.FindElement('image').Update(data=cv2.imencode('.png', cap.read()[1])[1].tobytes())  # Update image in window
-    #image_elem.Update(data=cv2.imencode('.png', frame[1])[1].tobytes())  # Update image in window
-    image_elem.Update(data=cv2.imencode('.png', frame[1])[1].tobytes())  # Update image in window
 
-    #imgbytes=frame.tobytes()
-    #image_elem.update(data=frame)
-    # cv2.imshow("roi", finalframe)
-    # cv2.imshow("mask", mask)
     cv2.imshow("contours", frame)
     # below commented due to failing on 18.04
     # kiteimage.pubimage(imagemessage, frame)
@@ -513,9 +519,6 @@ while True:  # Main module loop
         stitcher.cachedH=None
 
     time.sleep(control.slow)
-    # if counter > 633: # turn off expiry after so many frames
-    #     print('found:', foundcounter)
-    #     break
 
 print("[INFO] cleaning up...")
 cv2.destroyAllWindows()
