@@ -225,20 +225,31 @@ class Controls(object):
         else:
             self.inputmode = 3  # Manbar
         self.step = step
-        self.modestring = self.getmodestring()
+        self.modestring, self.newbuttons = self.getmodestring(True)
         self.route = False
         self.maxy = 20  # this should be for top of centre line and sets they y target point for park mode
         self.slow = 0.0
 
-    def getmodestring(self):
+    def getmodestring(self, initial=False):
+        # So now always 11 buttons and first 5 and last 2 are std and iteration through should be std
+        # so we would have a defined transition of names based on which change took place
+        newbuttons=[]
         if self.inputmode == 0:  # Standard
-            return 'STD: Left Right Up Down Wider Narrow Expand Contract Pause Mode Quit'
+            if not initial:
+                newbuttons = [('Mode: STD:','Mode: STD:'),('Anti','Wider'),('Clock','Narrow'),('Gauche','Expand'),
+                ('rigHt','Contract')]
+            return 'STD: Left Right Up Down Pause Wider Narrow Expand Contract Mode Quit', newbuttons
         elif self.inputmode == 1:
-            return 'SETFLIGHTMODE: Park Fig8 Simulate Normal Mode Quit'
+            newbuttons = [('Mode: STD:','Mode: SETFLIGHTMODE:'), ('Wider','Park'), ('Narrow','Fig8'), ('Expand','Simulate'),
+                          ('Contract','Normal')]
+            return 'SETFLIGHTMODE: Left Right Up Down Pause Park Fig8 Simulate Normal Mode Quit', newbuttons
         elif self.inputmode == 2:
-            return 'MANFLIGHT: Left Right Up Down Pause Anti Clock Gauche rigHt Mode Quit'
-        else:
-            return 'MANBAR: Left Right Up Down Pause Mode Quit'
+            newbuttons = [('Mode: STD:', 'Mode: MANFLIGHT'), ('Wider', 'Anti'), ('Narrow', 'Clock'), ('Expand', 'Gauche'),
+                          ('Contract', 'rigHt')]
+            return 'MANFLIGHT: Left Right Up Down Pause Anti Clock Gauche rigHt Mode Quit', newbuttons
+        else:  # inputmode = 3
+            newbuttons = [('Mode: STD:', 'Mode: MANBAR:')]
+            return 'MANBAR: Left Right Up Down Pause Anti Clock Gauche rigHt Mode Quit', newbuttons
 
     def keyhandler(self, key, kite, base=None, event=None):
         # this will now support a change of flight mode and operating mode so different keys will
@@ -254,22 +265,22 @@ class Controls(object):
             elif key == ord("u") or event == 'Up':  # up
                 self.centrey -= self.step
                 kite.routechange = True
-            elif key == ord("d"):  # down
+            elif key == ord("d") or event == 'Down':  # down
                 self.centrey += self.step
                 kite.routechange = True
-            elif key == ord("w"):  # wider
+            elif key == ord("w") or event == 'Wider':  # wider
                 self.halfwidth += self.step
-            elif key == ord("n"):  # narrower
+            elif key == ord("n") or event == 'Narrower':  # narrower
                 self.halfwidth -= 1
-            elif key == ord("e"):  # expand
+            elif key == ord("e") or event == 'Expand':  # expand
                 self.radius += self.step
-            elif key == ord("c"):  # contract
+            elif key == ord("c") or event == 'Contract':  # contract
                 self.radius -= self.step
-            elif key == ord("s"):  # slow
+            elif key == ord("s") or event == 'Slow':  # slow
                 self.slow += 0.1
-            elif key == ord("f"):  # fast
+            elif key == ord("f") or event == 'Fast':  # fast
                 self.slow = 0.0
-            elif key == ord("p"):  # pause - this may apply in all modes
+            elif key == ord("p") or event == 'Pause' :  # pause - this may apply in all modes
                 time.sleep(10)
         elif self.inputmode == 1:  # SetFlight
             if key == ord("p"):  # park
@@ -311,11 +322,11 @@ class Controls(object):
             elif key == ord("p"):  # pause - this may apply in all moades
                 time.sleep(10)
 
-        if key == ord("m"):  # modechange
+        if key == ord("m") or event == 'Mode':  # modechange
             self.inputmode += 1
             if self.inputmode == 4:  # simple toggle around 3 modes
                 self.inputmode = 0
-            self.modestring = self.getmodestring()
+            self.modestring, self.newbuttons = self.getmodestring()
 
         return key == ord("q"), reset_stitcher  # quit pressed
 
@@ -403,7 +414,7 @@ class Controls(object):
             self.inputmode += 1
             if self.inputmode == 4:  # simple toggle around 3 modes
                 self.inputmode = 0
-            self.modestring = self.getmodestring()
+            self.modestring, self.newbuttons = self.getmodestring()
 
         return joybuttons[4] == 1, reset_stitcher  # quit
 

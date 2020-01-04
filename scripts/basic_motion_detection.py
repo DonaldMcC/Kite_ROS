@@ -304,7 +304,7 @@ buttons =  [sg.Button(x, size=(7, 3), pad=(4,0),  font='Helvetica 14')
 #layout = [[sg.Text('OpenCV Demo', size=(15, 1), font='Helvetica 20')],
 #              [sg.Button('Quit', size=(7, 1), pad=((600, 0), 3), font='Helvetica 14')]]
 
-layout = [[sg.Text(sgmodestring, size=(15, 1), font='Helvetica 20')], buttons]
+layout = [[sg.Text(sgmodestring, key=sgmodestring, size=(15, 1), font='Helvetica 20')], buttons]
 
 # create the window and show it without the plot
 window = sg.Window('Kite ROS - Automated Flying',
@@ -498,6 +498,12 @@ while True:  # Main module loop
 
     # read pysimplegui events
     event, values = window.read(timeout=0)
+
+    #window['Left'].update('Notleft')
+    for x in control.newbuttons:
+        # print(control.newbuttons)
+        window[x[0]].Update(x[1])
+
     if event in ('Quit', None):
         break
     # elif event == 'Left':
