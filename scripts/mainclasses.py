@@ -355,7 +355,7 @@ class Controls(object):
         # in terms of what we do with this the basic idea is that the nunchuk flies the kite
         # and the rockers support the route moving about
         reset_stitcher = False
-        if joybuttons[1] == 0:  # Standard
+        if joybuttons and joybuttons[1] == 0:  # Standard
             if joyaxes[0] == -1:  # left
                 self.centrex -= self.step
                 kite.routechange = True
@@ -368,7 +368,7 @@ class Controls(object):
             elif joyaxes[1] == -1:  # down
                 self.centrey += self.step
                 kite.routechange = True
-        elif joybuttons[1] == 1:  # Standard
+        elif joybuttons and joybuttons[1] == 1:  # Standard
             if joyaxes[0] == -1:  # left
                 self.halfwidth += self.step
             elif joyaxes[0] == 1:  # right
@@ -377,16 +377,16 @@ class Controls(object):
                 self.radius += self.step
             elif joyaxes[1] == -1:  # down
                 self.radius -= self.step
-        if joybuttons[3] == 1:  # slow
+        if joybuttons and joybuttons[3] == 1:  # slow
             self.slow += 0.1
-        elif joybuttons[2] == 1:  # fast
+        elif joybuttons and joybuttons[2] == 1:  # fast
             self.slow = 0.0
-        elif joybuttons[0] == 1:  # pause - this may apply in all modes
+        elif joybuttons and joybuttons[0] == 1:  # pause - this may apply in all modes
             time.sleep(10)
 
         # kite.routechange = True - don't want this triggered every time
         if self.inputmode == 1:  # SetFlight
-            if joybuttons[6] == 1:  # move mode forward
+            if joybuttons and joybuttons[6] == 1:  # move mode forward
                 if kite.mode == 'Park':
                     kite.mode = 'Wiggle'
                 elif kite.mode == 'Wiggle':
@@ -399,24 +399,24 @@ class Controls(object):
                 # elif key == ord("n"):  # normal with kite being present
                 # self.mode = 0
         elif self.inputmode == 2:  # ManFlight - maybe switch to arrows - let's do this all
-            if joybuttons[7] == 0 and joybuttons[8] == 0:
+            if joybuttons and joybuttons[7] == 0 and joybuttons[8] == 0:
                 kite.x += (self.step * joyaxes[2])
                 kite.y -= (self.step * joyaxes[3])
-            elif joybuttons[7] == 1:  # c button pressed - but not working - as calced from kite
+            elif joybuttons and joybuttons[7] == 1:  # c button pressed - but not working - as calced from kite
                 base.barangle += (self.step/2 * joyaxes[2])
             else:  # z button pressed
                 kite.kiteangle += (self.step/2 * joyaxes[2])
         elif self.inputmode == 3:  # ManBar - maybe switch to arrows - let's do this all
-            if joybuttons[7] == 0 and joybuttons[8] == 0:
+            if joybuttons and joybuttons[7] == 0 and joybuttons[8] == 0:
                 base.barangle += (self.step/2 * joyaxes[2])
 
-        if joybuttons[5] == 1:  # modechange
+        if joybuttons and joybuttons[5] == 1:  # modechange
             self.inputmode += 1
             if self.inputmode == 4:  # simple toggle around 3 modes
                 self.inputmode = 0
             self.modestring, self.newbuttons = self.getmodestring()
 
-        return joybuttons[4] == 1, reset_stitcher  # quit
+        return joybuttons and joybuttons[4] == 1, reset_stitcher  # quit
 
 
 def calc_route(centrex=400, centrey=300, halfwidth=200, radius=100):

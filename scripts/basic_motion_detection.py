@@ -202,7 +202,7 @@ parser.add_argument('-l', '--load', type=str, default='yes',
 #                     help='Setup either Standard or Manfly')
 parser.add_argument('-s', '--setup', type=str, default='Standard',
                     help='Setup either Standard or Manfly or Manbar')
-parser.add_argument('-i', '--input', type=str, default='Keyboard',
+parser.add_argument('-i', '--input', type=str, default='Joystick',
                     help='Input either Keyboard, Joystick or Both')
 args = parser.parse_args()
 
