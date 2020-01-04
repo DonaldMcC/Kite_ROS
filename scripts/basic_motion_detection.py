@@ -318,7 +318,6 @@ cv2.namedWindow('contours')
 fps = 15
 # fps = camera.get(cv2.CV_CAP_PROP_FPS)
 
-
 if control.config == "Manfly":
     kite = mankite
 else:
