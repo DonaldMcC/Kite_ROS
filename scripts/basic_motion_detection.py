@@ -476,8 +476,8 @@ while True:  # Main module loop
     # display buttons
     # think this will become optional once pysimplegui working but may retain in case issues using this on some
     # platforms
-    cv2.putText(frame, control.modestring, (10, frame.shape[0] - 10),
-                cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
+    # cv2.putText(frame, control.modestring, (10, frame.shape[0] - 10),
+    #           cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
 
     display_base()
 
@@ -506,19 +506,6 @@ while True:  # Main module loop
 
     if event in ('Quit', None):
         break
-    # elif event == 'Left':
-    #    sg.popup('Left')
-
-    #if config.input == 'Keyboard' or config.input == 'Both':
-        # change to -1 for debugging
-        # 20 seems to work better than 1 on virtualbox - not sure what the issue is
-    #    key = cv2.waitKey(50) & 0xff
-    #    if key != -1:
-    #        quitkey, resetH = control.keyhandler(key, kite, base, event)
-
-    #if config.input == 'Joystick' or config.input == 'Both' and key== -1:
-    #    joybuttons, joyaxes = get_joystick()
-     #   quitkey, resetH = control.joyhandler(joybuttons, joyaxes, kite, base)
 
     joybuttons, joyaxes = get_joystick()
     quitkey, resetH = control.joyhandler(joybuttons, joyaxes, kite, base, event)

@@ -240,9 +240,9 @@ class Controls(object):
                 ('rigHt','Contract')]
             return 'STD: Left Right Up Down Pause Wider Narrow Expand Contract Mode Quit', newbuttons
         elif self.inputmode == 1:
-            newbuttons = [('Mode: STD:','Mode: SETFLIGHTMODE:'), ('Wider','Park'), ('Narrow','Fig8'), ('Expand','Simulate'),
+            newbuttons = [('Mode: STD:','Mode: SETFLIGHTMODE:'), ('Wider','Park'), ('Narrow','Wiggle'), ('Expand','Fig8'),
                           ('Contract','Normal')]
-            return 'SETFLIGHTMODE: Left Right Up Down Pause Park Fig8 Simulate Normal Mode Quit', newbuttons
+            return 'SETFLIGHTMODE: Left Right Up Down Pause Park Wiggle Fig8 Normal Mode Quit', newbuttons
         elif self.inputmode == 2:
             newbuttons = [('Mode: STD:', 'Mode: MANFLIGHT'), ('Wider', 'Anti'), ('Narrow', 'Clock'), ('Expand', 'Gauche'),
                           ('Contract', 'rigHt')]
@@ -251,84 +251,6 @@ class Controls(object):
             newbuttons = [('Mode: STD:', 'Mode: MANBAR:')]
             return 'MANBAR: Left Right Up Down Pause Anti Clock Gauche rigHt Mode Quit', newbuttons
 
-    def keyhandler(self, key, kite, base=None, event=None):
-        # this will now support a change of flight mode and operating mode so different keys will
-        # do different things depending on inputmode,
-        reset_stitcher = False
-        if self.inputmode == 0:  # Standard
-            if key == ord("l") or event == 'Left':  # left
-                self.centrex -= self.step
-                kite.routechange = True
-            elif key == ord("r") or event == 'Right':  # right
-                self.centrex += self.step
-                kite.routechange = True
-            elif key == ord("u") or event == 'Up':  # up
-                self.centrey -= self.step
-                kite.routechange = True
-            elif key == ord("d") or event == 'Down':  # down
-                self.centrey += self.step
-                kite.routechange = True
-            elif key == ord("w") or event == 'Wider':  # wider
-                self.halfwidth += self.step
-            elif key == ord("n") or event == 'Narrower':  # narrower
-                self.halfwidth -= 1
-            elif key == ord("e") or event == 'Expand':  # expand
-                self.radius += self.step
-            elif key == ord("c") or event == 'Contract':  # contract
-                self.radius -= self.step
-            elif key == ord("s") or event == 'Slow':  # slow
-                self.slow += 0.1
-            elif key == ord("f") or event == 'Fast':  # fast
-                self.slow = 0.0
-            elif key == ord("p") or event == 'Pause' :  # pause - this may apply in all modes
-                time.sleep(10)
-        elif self.inputmode == 1:  # SetFlight
-            if key == ord("p"):  # park
-                kite.mode = 'Park'
-            elif key == ord("r"):  # reset stitcher
-                reset_stitcher = True
-            elif key == ord("w") and kite.zone == 'Centre':  # must be in central zone to change mode
-                kite.mode = 'Wiggle'
-            elif key == ord("f") and kite.zone == 'Centre':  # must be in central zone to change mode
-                kite.mode = 'Fig8'
-            elif key == ord("s"):  # simulation
-                self.mode = 1
-            elif key == ord("n"):  # normal with kite being present
-                self.mode = 0
-        elif self.inputmode == 2:  # ManFlight - maybe switch to arrows
-            if key == ord("l"):  # left
-                kite.x -= self.step  # this will change
-            elif key == ord("r"):  # right
-                kite.x += self.step
-            elif key == ord("u"):  # up
-                kite.y -= self.step
-            elif key == ord("d"):  # down
-                kite.y += self.step
-            elif key == ord("g"):  # bar gauche
-                base.barangle -= self.step
-            elif key == ord("h"):  # bar rigHt
-                base.barangle += self.step
-            elif key == ord("a"):  # anti clockwise
-                kite.kiteangle -= self.step
-            elif key == ord("c"):  # clockwise
-                kite.kiteangle += self.step
-            elif key == ord("p"):  # pause - this may apply in all moades
-                time.sleep(10)
-        elif self.inputmode == 3:  # Manbar - maybe switch to arrows
-            if key == ord("l"):  # left
-                base.barangle -= self.step  # this will change
-            elif key == ord("r"):  # right
-                base.barangle += self.step
-            elif key == ord("p"):  # pause - this may apply in all moades
-                time.sleep(10)
-
-        if key == ord("m") or event == 'Mode':  # modechange
-            self.inputmode += 1
-            if self.inputmode == 4:  # simple toggle around 3 modes
-                self.inputmode = 0
-            self.modestring, self.newbuttons = self.getmodestring()
-
-        return key == ord("q"), reset_stitcher  # quit pressed
 
     def joyhandler(self, joybuttons, joyaxes, kite, base, event=None):
         # Using https://github.com/arnaud-ramey/rosxwiimote as a ros package to capture
@@ -383,7 +305,6 @@ class Controls(object):
             elif (joybuttons and joybuttons[0] == 1) or event == 'Pause':  # pause - this may apply in all modes
                 time.sleep(10)
 
-        # kite.routechange = True - don't want this triggered every time
         if self.inputmode == 1:  # SetFlight
             if (joybuttons and joybuttons[6] == 1):  # move mode forward
                 if kite.mode == 'Park':
@@ -392,19 +313,24 @@ class Controls(object):
                     kite.mode = 'Fig8'
                 else:
                     kite.mode = 'Park'
-            #TODO redo this to cover all bases
-            if event == 'Wider':
-                kite.mode == 'Park'
-            elif event == 'Narrower':
+            if event == 'Wider':  # park
+                kite.mode = 'Park'
+            elif event == 'Narrow' and kite.zone == 'Centre':  # must be in central zone to change mode
                 kite.mode = 'Wiggle'
+            elif event == 'Expand' and kite.zone == 'Centre':  # must be in central zone to change mode
+                kite.mode = 'Fig8'
+            elif event == 'Contract':  # simulation
+                self.mode = 1
+
         elif self.inputmode == 2:  # ManFlight - maybe switch to arrows - let's do this all
-            if joybuttons and joybuttons[7] == 0 and joybuttons[8] == 0:
-                kite.x += (self.step * joyaxes[2])
-                kite.y -= (self.step * joyaxes[3])
-            elif joybuttons and joybuttons[7] == 1:  # c button pressed - but not working - as calced from kite
-                base.barangle += (self.step/2 * joyaxes[2])
-            else:  # z button pressed
-                kite.kiteangle += (self.step/2 * joyaxes[2])
+            if joybuttons:
+                if joybuttons[7] == 0 and joybuttons[8] == 0:
+                    kite.x += (self.step * joyaxes[2])
+                    kite.y -= (self.step * joyaxes[3])
+                elif joybuttons[7] == 1:  # c button pressed - but not working - as calced from kite
+                    base.barangle += (self.step/2 * joyaxes[2])
+                else:  # z button pressed
+                    kite.kiteangle += (self.step/2 * joyaxes[2])
             if event == 'Left':  # left
                 kite.centrex -= self.step
                 kite.routechange = True
@@ -421,12 +347,19 @@ class Controls(object):
         elif self.inputmode == 3:  # ManBar - maybe switch to arrows - let's do this all
             if joybuttons and joybuttons[7] == 0 and joybuttons[8] == 0:
                 base.barangle += (self.step/2 * joyaxes[2])
+            if event == 'Left':  # left
+                base.barangle -= self.step  # this will change
+            elif event == 'Right':  # right
+                base.barangle += self.step
 
-        if joybuttons and joybuttons[5] == 1:  # modechange
+        if (joybuttons and joybuttons[5] == 1) or event == 'Mode':  # modechange
             self.inputmode += 1
             if self.inputmode == 4:  # simple toggle around 3 modes
                 self.inputmode = 0
             self.modestring, self.newbuttons = self.getmodestring()
+
+        if event == 'Pause':
+            time.sleep(10)
 
         return joybuttons and joybuttons[4] == 1, reset_stitcher  # quit
 
