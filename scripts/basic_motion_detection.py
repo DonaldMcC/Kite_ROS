@@ -473,18 +473,13 @@ while True:  # Main module loop
     cv2.putText(frame, 'Mode:' + kite.mode, (outx, 180), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
     cv2.putText(frame, 'Phase:' + kite.phase, (outx, 200), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
 
-    # display buttons
-    # think this will become optional once pysimplegui working but may retain in case issues using this on some
-    # platforms
+    # display buttons - now in pysimplegui window instead
     # cv2.putText(frame, control.modestring, (10, frame.shape[0] - 10),
     #           cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
 
     display_base()
-
     kite_pos(kite.x, kite.y, kite.kiteangle, kite.dX, kite.dY, 0, 0)
-
     motor_msg(base.barangle, base.targetbarangle, 5)
-
     cv2.imshow("contours", frame)
     # below commented due to failing on 18.04
     # kiteimage.pubimage(imagemessage, frame)
@@ -499,19 +494,14 @@ while True:  # Main module loop
     # read pysimplegui events
     event, values = window.read(timeout=0)
 
-    #window['Left'].update('Notleft')
-    for x in control.newbuttons:
-        # print(control.newbuttons)
+    for x in control.newbuttons:  # change the button labels if mode has change
         window[x[0]].Update(x[1])
-
-    if event in ('Quit', None):
-        break
 
     joybuttons, joyaxes = get_joystick()
     quitkey, resetH = control.joyhandler(joybuttons, joyaxes, kite, base, event)
 
-    print('mode', control.inputmode, base.updatemode)
-    if quitkey:
+    # print('mode', control.inputmode, base.updatemode)
+    if quitkey or event in ('Quit', None): # quit if controls window closed or home key
         break
 
     if resetH and stitcher:
