@@ -166,19 +166,47 @@ def getdirection(kte):
     return
 
 
-def display_base():
+def display_base(width):
+    outx = width - 180
     centx = outx + 60
     centy = 300
     radius = 60
-    cv2.putText(frame, 'Base', (outx, centy-40), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
+    cv2.putText(frame, 'Base', (outx, centy-70), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
     cv2.circle(frame, (centx, centy), radius, (0, 255, 255), 2)
-    print(base.barangle)
-    cv2.putText(frame, 'Act:' + '{:5.1f}'.format(base.barangle), (outx + 85, centy + 100), cv2.FONT_HERSHEY_SIMPLEX,
+    cv2.putText(frame, 'Act: ' + '{:5.1f}'.format(base.barangle), (outx + 15, centy + 100), cv2.FONT_HERSHEY_SIMPLEX,
                 0.65, (0, 255, 0), 2)
-    cv2.putText(frame, 'Tgt:' + '{:5.1f}'.format(base.targetbarangle), (outx - 15, centy + 100),
+    cv2.putText(frame, 'Tgt: ' + '{:5.1f}'.format(base.targetbarangle), (outx + 15, centy + 130),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 255, 255), 2)
     display_line(base.targetbarangle, centx, centy, radius, (0, 255, 255))
     display_line(base.barangle, centx, centy, radius, (0, 255, 0))
+    return
+
+def display_stats():
+    cv2.putText(frame, kite.direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
+    cv2.putText(frame, "dx: {}, dy: {}".format(kite.dX, kite.dY),
+                (10, height - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 1)
+    cv2.putText(frame, "x: {}, y: {}".format(mankite.x, mankite.y),
+                (180, height - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 1)
+    cv2.putText(frame, "Act Angle: " + str(int(kite.kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+    cv2.putText(frame, "Tgt Angle: " + str(int(kite.targetangle)), (10, 70),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+    cv2.putText(frame, "Tgt Heading: " + str(int(kite.targetheading)), (10, 90),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+    cv2.putText(frame, "Mode: " + str(control.config), (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+    cv2.putText(frame, "Area: " + str(kite.contourarea), (10, 130), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+    return
+
+
+def display_flight(width):
+    # output flight values
+    outx = width - 180
+    fontsize = 0.5
+    tempstr = "Found: Yes" if kite.found else "Found: No"
+
+    cv2.putText(frame, 'Zone: ' + kite.zone, (outx, 140), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
+    cv2.putText(frame, tempstr, (outx, 160), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
+    cv2.putText(frame, 'Mode: ' + kite.mode, (outx, 180), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
+    cv2.putText(frame, 'Phase: ' + kite.phase, (outx, 200), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
     return
 
 
@@ -198,12 +226,8 @@ parser.add_argument('-f', '--file', type=str, default='cachedH.npy',
                     help='Filename to load cached matrix')
 parser.add_argument('-l', '--load', type=str, default='yes',
                     help='Do we load cached matrix')
-# parser.add_argument('-s', '--setup', type=str, default='Standard',
-#                     help='Setup either Standard or Manfly')
 parser.add_argument('-s', '--setup', type=str, default='Standard',
                     help='Setup either Standard or Manfly or Manbar')
-parser.add_argument('-i', '--input', type=str, default='Joystick',
-                    help='Input either Keyboard, Joystick or Both')
 args = parser.parse_args()
 
 # iphone
@@ -221,7 +245,7 @@ KITETYPE = 'kite1'
 # input options are Keyboard, Joystick or Both
 
 # config = Config(setup='Manfly', source=1, input='Joystick')
-config = Config(setup=args.setup, source=2, numcams=1, input=args.input)
+config = Config(setup=args.setup, source=2, numcams=1, input='Joystick')
 
 while config.source not in {1, 2}:
     config.source = input('Key 1 for camera or 2 for source')
@@ -282,27 +306,15 @@ if config.setup == 'Standard' and config.source ==1:  # otherwise not present
             if go_on == "Y":
                 break
 
-
-if config.input == 'Joystick' or config.input == 'Both':
+if config.input == 'Joystick':
     listen_joystick()  # subscribe to joystick messages
 
-
-#Pysimplegui setup
-sg.theme('Black')
-
-# control.modestring = 'STD: Left Right Up Down Wider Narrow Expand Contract Pause Mode Quit'
-# So think we parse this to a list and then convert this into buttons for elements after the first
-# seems fine to get the initial list but was thinking this is a fixed list and we then update the relevant buttons
-# on modechange and disable ones that are not relevant for that mode
+sg.theme('Black')  # Pysimplegui setup
 
 button_list = control.modestring.split()[1:]
 sgmodestring = 'Mode: ' + control.modestring.split()[0]
 buttons =  [sg.Button(x, size=(7, 3), pad=(4,0),  font='Helvetica 14')
             for i, x in enumerate(button_list)]
-
-# ---===--- define the intial window layout --- #
-#layout = [[sg.Text('OpenCV Demo', size=(15, 1), font='Helvetica 20')],
-#              [sg.Button('Quit', size=(7, 1), pad=((600, 0), 3), font='Helvetica 14')]]
 
 layout = [[sg.Text(sgmodestring, key=sgmodestring, size=(15, 1), font='Helvetica 20')], buttons]
 
@@ -318,14 +330,9 @@ cv2.namedWindow('contours')
 fps = 15
 # fps = camera.get(cv2.CV_CAP_PROP_FPS)
 
-if control.config == "Manfly":
-    kite = mankite
-else:
-    kite = actkite
+kite = mankite if control.config == "Manfly" else actkite
 
 while True:  # Main module loop
-    # Read Frame
-
     if config.numcams == 1:
         if config.source == 1:
             ret, frame = camera.stream.read()
@@ -424,11 +431,6 @@ while True:  # Main module loop
             kite.kiteangle = get_angle(box, kite.dX, kite.dY)
         # print index, maxmask
 
-    if kite.found:
-        tempstr = "Found: Yes"
-    else:
-        tempstr = "Found: No"
-
     # Establish route
     if kite.changezone or kite.changephase or kite.routechange:
         control.routepoints = calc_route(control.centrex, control.centrey, control.halfwidth, control.radius)
@@ -439,45 +441,20 @@ while True:  # Main module loop
     getdirection(kite)
     kite.targetheading = get_heading_points((kite.x, kite.y), (kite.targetx, kite.targety))
     kite.targetangle = kite.targetheading
-
     kite.update_zone(control)
     kite.update_phase()
     base.targetbarangle = calcbarangle(kite, base, control)
 
     if kite.zone == 'Centre' or kite.phase == 'Xwind':
         kite.targetangle = get_heading_points((kite.x, kite.y), (kite.targetx, kite.targety))
-    # display output
-    # show the movement deltas and the direction of movement on the frame
-    cv2.putText(frame, kite.direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
-    cv2.putText(frame, "dx: {}, dy: {}".format(kite.dX, kite.dY),
-                (10, height - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 1)
-    cv2.putText(frame, "x: {}, y: {}".format(mankite.x, mankite.y),
-                (180, height - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 1)
-
-    cv2.putText(frame, "Act Angle:" + str(int(kite.kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-    cv2.putText(frame, "Tgt Angle:" + str(int(kite.targetangle)), (10, 70),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-    cv2.putText(frame, "Tgt Heading:" + str(int(kite.targetheading)), (10, 90),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-    cv2.putText(frame, "Mode:" + str(control.config), (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-    cv2.putText(frame, "Area:" + str(kite.contourarea), (10, 130), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
 
     drawroute(control.routepoints, control.centrex, control.centrey)
     drawcross(kite.targetx, kite.targety, 'Target', (0, 150, 250))
 
-    # output flight values
-    outx = width - 180
-    fontsize = 0.5
-    cv2.putText(frame, 'Zone:' + kite.zone, (outx, 140), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
-    cv2.putText(frame, tempstr, (outx, 160), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
-    cv2.putText(frame, 'Mode:' + kite.mode, (outx, 180), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
-    cv2.putText(frame, 'Phase:' + kite.phase, (outx, 200), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
+    display_stats()
+    display_flight(width)
+    display_base(width)
 
-    # display buttons - now in pysimplegui window instead
-    # cv2.putText(frame, control.modestring, (10, frame.shape[0] - 10),
-    #           cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
-
-    display_base()
     kite_pos(kite.x, kite.y, kite.kiteangle, kite.dX, kite.dY, 0, 0)
     motor_msg(base.barangle, base.targetbarangle, 5)
     cv2.imshow("contours", frame)
@@ -493,7 +470,6 @@ while True:  # Main module loop
 
     # read pysimplegui events
     event, values = window.read(timeout=0)
-
     for x in control.newbuttons:  # change the button labels if mode has change
         window[x[0]].Update(x[1])
 
@@ -506,7 +482,6 @@ while True:  # Main module loop
 
     if resetH and stitcher:
         stitcher.cachedH=None
-
     time.sleep(control.slow)
 
 print("[INFO] cleaning up...")
