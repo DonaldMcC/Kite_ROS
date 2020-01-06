@@ -38,7 +38,7 @@ class Config(object):
 class Base(object):
 
     def __init__(self, barangle=0, parkangle=0, maxright=40, maxleft=-40, lag=1,
-                 targetbarangle=0, kitebarratio=1, updatemode='Standard'):
+                 targetbarangle=0, kitebarratio=1, updatemode='Standard', inferbarangle=0):
         self.barangle = barangle
         self.parkangle = parkangle
         self.maxright = maxright
@@ -46,9 +46,9 @@ class Base(object):
         self.lag = lag
         self.barangles = deque(maxlen=16)
         self.targetbarangle = targetbarangle
+        self.inferbarangle = inferbarangle
         self.kitebarratio = kitebarratio  # this will be the rate of change of barangle to kite angle
         self.updatemode = updatemode  # Standard will be unconnected and Manbar will be bar angles kite
-        # Manfly is kite angles bar
 
 
 class Kite(object):
@@ -68,7 +68,6 @@ class Kite(object):
         self.zone = "Centre"
         self.targettype = 'Angle'
         self.targetx = 0
-
         self.targety = 0
         self.changezone = True
         self.changephase = False

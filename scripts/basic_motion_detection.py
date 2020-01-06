@@ -51,7 +51,7 @@ from talker import kite_pos, KiteImage, motor_msg, init_motor_msg, init_ros
 from cvwriter import initwriter, writeframe
 from basic_listen_barangle import listen_kiteangle, get_barangle, check_kite
 from listen_joystick import listen_joystick, get_joystick
-from kite_funcs import kitemask, calcbarangle
+from kite_funcs import kitemask, calcbarangle, inferangle
 
 
 # this is just for display flight decisions will be elsewhere
@@ -181,13 +181,15 @@ def display_base(width):
     display_line(base.barangle, centx, centy, radius, (0, 255, 0))
     return
 
+
 def display_stats():
     cv2.putText(frame, kite.direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
     cv2.putText(frame, "dx: {}, dy: {}".format(kite.dX, kite.dY),
                 (10, height - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 1)
     cv2.putText(frame, "x: {}, y: {}".format(mankite.x, mankite.y),
                 (180, height - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 1)
-    cv2.putText(frame, "Act Angle: " + str(int(kite.kiteangle)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+    cv2.putText(frame, "Act Angle: " + str(int(kite.kiteangle)),
+                (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
     cv2.putText(frame, "Tgt Angle: " + str(int(kite.targetangle)), (10, 70),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
     cv2.putText(frame, "Tgt Heading: " + str(int(kite.targetheading)), (10, 90),
@@ -272,9 +274,9 @@ else:
     # TODO at some point will change this to current directory and append file - not urgent
     camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
     # Videostream seems to create errors with playbakc
-    #camera = VideoStream(src=r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4').start()
-    #camera = VideoStream(src=r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4').start()
-    #print('video:', camera.grab())
+    # camera = VideoStream(src=r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4').start()
+    # camera = VideoStream(src=r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4').start()
+    # print('video:', camera.grab())
 
 # initiate class instances
 control = Controls(config.setup, step=16)
@@ -295,7 +297,7 @@ init_motor_msg()
 counter = 0
 foundcounter = 0
 
-if config.setup == 'Standard' and config.source ==1:  # otherwise not present
+if config.setup == 'Standard' and config.source == 1:  # otherwise not present
     listen_kiteangle()  # this then updates base.barangle via the callback function
     result = ""
     while result != "Ok":
@@ -313,16 +315,13 @@ sg.theme('Black')  # Pysimplegui setup
 
 button_list = control.modestring.split()[1:]
 sgmodestring = 'Mode: ' + control.modestring.split()[0]
-buttons =  [sg.Button(x, size=(7, 3), pad=(4,0),  font='Helvetica 14')
+buttons =  [sg.Button(x, size=(7, 3), pad=(4,0), font='Helvetica 14')
             for i, x in enumerate(button_list)]
 
 layout = [[sg.Text(sgmodestring, key=sgmodestring, size=(15, 1), font='Helvetica 20')], buttons]
 
 # create the window and show it without the plot
-window = sg.Window('Kite ROS - Automated Flying',
-                       layout,
-                       no_titlebar=False,
-                       location=(50,1000))
+window = sg.Window('Kite ROS - Automated Flying', layout, no_titlebar=False, location=(50,1000))
 
 writer = None
 cv2.startWindowThread()
@@ -392,7 +391,7 @@ while True:  # Main module loop
     image, cnts, hierarchy = cv2.findContours(diff.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
     base.barangle = get_barangle(kite, base, control)
-    if base.updatemode == 'Manbar': # not getting kiteangle from picture
+    if base.updatemode == 'Manbar':  # not getting kiteangle from picture
         kite.kiteangle = base.barangle * base.kitebarratio
     # lets draw and move cross for manual flying
     if control.config == 'Manfly' or control.config == 'Manbar':
@@ -444,6 +443,7 @@ while True:  # Main module loop
     kite.update_zone(control)
     kite.update_phase()
     base.targetbarangle = calcbarangle(kite, base, control)
+    base.inferbarangle = inferangle(kite, base, control)
 
     if kite.zone == 'Centre' or kite.phase == 'Xwind':
         kite.targetangle = get_heading_points((kite.x, kite.y), (kite.targetx, kite.targety))
@@ -477,11 +477,11 @@ while True:  # Main module loop
     quitkey, resetH = control.joyhandler(joybuttons, joyaxes, kite, base, event)
 
     # print('mode', control.inputmode, base.updatemode)
-    if quitkey or event in ('Quit', None): # quit if controls window closed or home key
+    if quitkey or event in ('Quit', None):  # quit if controls window closed or home key
         break
 
     if resetH and stitcher:
-        stitcher.cachedH=None
+        stitcher.cachedH = None
     time.sleep(control.slow)
 
 print("[INFO] cleaning up...")
