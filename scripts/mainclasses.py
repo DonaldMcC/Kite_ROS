@@ -53,7 +53,7 @@ class Base(object):
 
 class Kite(object):
 
-    def __init__(self, x=0, y=0, mode='Park', phase='Park', targetheading=0, targetangle=0):
+    def __init__(self, x=0, y=0, mode='Park', phase='Park', targetheading=0, targetangle=0, kiteangle=0):
         self.x = x
         self.y = y
         self.mode = mode
@@ -63,7 +63,7 @@ class Kite(object):
         self.timestamps = deque(maxlen=16)
         (self.dX, self.dY) = (0, 0)
         self.direction = ""
-        self.kiteangle = 0
+        self.kiteangle = kiteangle
         self.contourarea = 0
         self.zone = "Centre"
         self.targettype = 'Angle'

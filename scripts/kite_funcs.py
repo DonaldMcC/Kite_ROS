@@ -81,6 +81,7 @@ def calcbarangle(kite, base, controls):
     else:
         return setangle(kite, base, controls)
 
+
 def inferangle(kite, base, controls=None):
     """This will return inferred angle of the control bar based on the  kite angle
        obviously this is a huge approximation of reality but should help with review
@@ -90,12 +91,13 @@ def inferangle(kite, base, controls=None):
         >>> k=Kite(400, kiteangle=10)
         >>> b=Base(barangle=15, kitebarratio=2.0)
         >>> c=Controls(1)
-        >>> inferangle(k,b,c)
+        >>> inferangle(k, b, c)
         5.0
         """
 
     inferangle = kite.kiteangle / base.kitebarratio
     return inferangle
+
 
 def setangle(kite, base, controls):
     """This will return targetbarangle for park mode based largely on kite target angle
