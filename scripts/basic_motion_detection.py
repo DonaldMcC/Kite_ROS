@@ -179,6 +179,11 @@ def display_base(width):
                 cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 255, 255), 2)
     display_line(base.targetbarangle, centx, centy, radius, (0, 255, 255))
     display_line(base.barangle, centx, centy, radius, (0, 255, 0))
+    if config.setup == 'Manfly':
+        display_line(base.inferbarangle, centx, centy, radius, (255, 0, 0))
+        cv2.putText(frame, 'Inf: ' + '{:5.1f}'.format(base.inferbarangle), (outx + 15, centy + 100),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.65, (255, 0, 0), 2)
     return
 
 
@@ -443,7 +448,8 @@ while True:  # Main module loop
     kite.update_zone(control)
     kite.update_phase()
     base.targetbarangle = calcbarangle(kite, base, control)
-    base.inferbarangle = inferangle(kite, base, control)
+    if control.config == 'Manfly':  # only doing this if in manual fly mode
+        base.inferbarangle = inferangle(kite, base, control)
 
     if kite.zone == 'Centre' or kite.phase == 'Xwind':
         kite.targetangle = get_heading_points((kite.x, kite.y), (kite.targetx, kite.targety))
