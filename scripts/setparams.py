@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # these values were derived from testing of the base units three resistors.
 # may move and import from file at some point but for now they are just hard coded here
+# don't think this is being used at all any longer
 
 import rospy
 

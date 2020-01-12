@@ -1,14 +1,50 @@
 #!/usr/bin/env python
-# this should receive motor msg which is currenlty just left or right based on 3 or 4 or stop at 0
-# 1 and 2 are forward and back for initialisation
+# this should generally receive motor msg which is currently just left or right based on 3 or 4 respectively
+# or stop at 0.  1 and 2 are forward and backwards for initialisation - the purpose of this was initially to allow
+# test of the setup without any actual arduino hardware and that should be provided by the kiteangle function
+# testkiteangle is similar and possibly now redundant but both were receiving motormsg published by bascic_motion_det.
+# What we now also want to do is verif that our simulation and actual operation are aligned this seems to need a
+# different approach in two ways
+# 1 We generate the motor_msg more simply - and possibly without the analysis
+# 2 the mock_arduino process returns a different message from the actual one and we can ideally compare them and
+# 3 understand if performance is as expected
+
+"""Our setup is currently 2 actuators that should move in opposite directions and a central guide rail
+for a wooden bar which will hold the kite by means of putting velcro on the handles - so basically just a
+lever with short distance to the actuator - using ones designed for automatic doors and longer distance
+to the kite handle.
+
+Actuator currently in use is https://www.ebay.co.uk/itm/303125148840
+
+dist_act will be from fulcrum to actuator
+dist_handle will be from fulcrum to kite handle
+speed_act is speed of actuator in mm per second 30mm/sec is current setup
+force_act is max force of actuator (without leverage) 200N in my case
+speed_handle is speed of handle in meters per second which I would like to be at least 30cm per sec as and lets
+aim for 35cm of dist_handle and 3.5cm of dist_act as starting point as seems to make the maths easy so got 2 * 200N
+of force which I think is enough as we are only changing the bar angle the main kite pull force should still be on
+the frame
+
+So above is simple arithmetic but bar_angle is slightly more tricky as dist_act will be constrained to an arc and
+also got problem of not breaking lever which makes wider spacing tempting but I think too slow - probably we can
+aim to stop at certain bar angles but this relies on sensor forces presumably change a bit outside centre of arc
+but I think work on centre span needs first
+
+"""
 
 
-import time, math
+import time
+import math
 import rospy
 from std_msgs.msg import String, Int16
 from kite_funcs import getangle, getresist
-
 motorvalue = 0
+
+DIST_ACT = 35.0  # mm
+DIST_HANDLE = 350.0  # mm
+SPEED_ACT = 30.0  # mm/sec
+FORCE_ACT = 200  # N but not sure if will actually use this
+CIRC_ACT = 2 * math.pi * DIST_ACT
 
 
 def listen_motormsg():
@@ -29,20 +65,13 @@ def get_motorv():
 def kiteangle(barangle):
     """This now attempts to simulate how we believe the bar should respond to messages sent to
     the actuator given known distance from 'fulcrum' to mounting points and speed of the actuator.
-    Motorvalue is received for left and right and resistance is sent back as kitenagle message."""
+    Motorvalue is received for left and right and resistance is sent back as kiteangle message."""
 
     resistleft = 340
     resistright = 740
     global motorvalue
     pub = rospy.Publisher('kiteangle', Int16, queue_size=3)
     rospy.init_node('mock_arduino', anonymous=False)
-    bar_speed = 500
-
-    DIST_ACT = 35.0   # mm
-    DIST_HANDLE = 350.0  # mm
-    SPEED_ACT = 30.0  # mm/sec
-    FORCE_ACT = 200 # N but not sure if will actually use this
-    CIRC_ACT = 2 * math.pi * DIST_ACT
 
     loop_time = time.time()
     rate = rospy.Rate(10)  # 10hz
@@ -77,40 +106,48 @@ def kiteangle(barangle):
 
 
 def test_kiteangle(barangle):
-    """So our setup is currently 2 actuators that should move in opposite directions and a central guide rail
-    for a wooden bar which will hold the kite by means of putting velcro on the handles - so basically just a
-    lever with short distance to the actuator - using ones designed for automatic doors and longer distance
-    to the kite handle.
 
-    Actuator currently in use is https://www.ebay.co.uk/itm/303125148840
-
-    dist_act will be from fulcrum to actuator
-    dist_handle will be from fulcrum to kite handle
-    speed_act is speed of actuator in mm per second 30mm/sec is current setup
-    force_act is max force of actuator (without leverage) 200N in my case
-    speed_handle is speed of handle in meters per second which I would like to be at least 30cm per sec as and lets
-    aim for 35cm of dist_handle and 3.5cm of dist_act as starting point as seems to make the maths easy so got 2 * 200N
-    of force which I think is enough as we are only changing the bar angle the main kite pull force should still be on
-    the frame
-
-    So above is simple arithmetic but bar_angle is slightly more tricky as dist_act will be constrained to an arc and
-    also got problem of not breaking lever which makes wider spacing tempting but I think too slow - probably we can
-    aim to stop at certain bar angles but this relies on sensor forces presumably change a bit outside centre of arc
-    but I think work on centre span needs first
-
-    """
     global motorvalue
     pub = rospy.Publisher('kiteangle', Int16, queue_size=3)
     rospy.init_node('mock_arduino', anonymous=False)
     rate = rospy.Rate(5)  # 5hz
-    motorvalue = 100 #   so always go left to start with
+    motorvalue = 100  # so always go left to start with
 
-    DIST_ACT = 35.0   # mm
-    DIST_HANDLE = 350.0  # mm
-    SPEED_ACT = 30.0  # mm/sec
-    FORCE_ACT = 200 # N but not sure if will actually use this
+    # left_act_pos = get_coord(0-DIST_ACT, 0, barangle) not convinced this serves purpose
+    loop_time = time.time()
 
-    CIRC_ACT = 2 * math.pi * DIST_ACT
+    while not rospy.is_shutdown():
+        print('motorv', motorvalue)
+        elapsed_time = time.time() - loop_time
+        loop_time = time.time()
+        if motorvalue:
+            if motorvalue < 200:
+                act_dist = 0 - (SPEED_ACT * elapsed_time)
+            else:
+                act_dist = SPEED_ACT * elapsed_time
+            anglechange = (360 * act_dist) / CIRC_ACT
+            # left_act_pos = get_coord(left_act_pos[0], left_act_pos[1], anglechange)
+            barangle += anglechange
+        # should then oscillate
+        if barangle < -40:
+            motorvalue = 250
+        elif barangle > 40:
+            motorvalue = 100
+        resistance = getresist(barangle)
+        rospy.loginfo(barangle)
+        pub.publish(resistance)
+        print(time.time(), barangle, resistance)
+        rate.sleep()
+
+
+def mock_kiteangle(barangle):
+
+    global motorvalue
+    pub = rospy.Publisher('mockangle', Int16, queue_size=3)
+    rospy.init_node('mock_arduino', anonymous=False)
+    rate = rospy.Rate(5)  # 5hz
+    motorvalue = 2  # so always go back to start with
+
     # left_act_pos = get_coord(0-DIST_ACT, 0, barangle) not convinced this serves purpose
     loop_time = time.time()
 
