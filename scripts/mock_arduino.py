@@ -36,6 +36,7 @@ but I think work on centre span needs first
 import time
 import math
 import rospy
+import argparse
 from std_msgs.msg import String, Int16
 from kite_funcs import getangle, getresist
 motorvalue = 0
@@ -62,7 +63,31 @@ def get_motorv():
     return motorvalue
 
 
-def kiteangle(barangle):
+def mock_kiteangle(barangle, message):
+
+    global motorvalue
+    pub = rospy.Publisher(message, Int16, queue_size=3)
+    rospy.init_node('mock_arduino', anonymous=False)
+    rate = rospy.Rate(10)  # 5hz
+    motorvalue = 2  # so always go back to start with
+
+    # left_act_pos = get_coord(0-DIST_ACT, 0, barangle) not convinced this serves purpose
+    loop_time = time.time()
+    listen_motormsg()
+
+    while not rospy.is_shutdown():
+        get_motorv()
+        print('motorv', motorvalue)
+        elapsed_time = time.time() - loop_time
+        loop_time = time.time()
+        resistance, newbarangle = mockangle(barangle, elapsed_time)
+        rospy.loginfo(newbarangle)
+        pub.publish(resistance)
+        print(time.time(), newbarangle, resistance)
+        rate.sleep()
+
+
+def mockangle(barangle, elapsed_time):
     """This now attempts to simulate how we believe the bar should respond to messages sent to
     the actuator given known distance from 'fulcrum' to mounting points and speed of the actuator.
     Motorvalue is received for left and right and resistance is sent back as kiteangle message."""
@@ -70,114 +95,38 @@ def kiteangle(barangle):
     resistleft = 340
     resistright = 740
     global motorvalue
-    pub = rospy.Publisher('kiteangle', Int16, queue_size=3)
-    rospy.init_node('mock_arduino', anonymous=False)
 
-    loop_time = time.time()
-    rate = rospy.Rate(10)  # 10hz
-    listen_motormsg()
-    while not rospy.is_shutdown():
-        get_motorv()
+    get_motorv()
 
-        elapsed_time = time.time() - loop_time
-        loop_time = time.time()
-        if motorvalue:
-            if motorvalue == 1 or motorvalue == 2:
-                barangle = 0
-            else:
-                if motorvalue == 3:  # Left
-                    act_dist = 0 - (SPEED_ACT * elapsed_time)
-                elif motorvalue == 4:  # Right
-                    act_dist = SPEED_ACT * elapsed_time
-                anglechange = (360 * act_dist) / CIRC_ACT
-                barangle += anglechange
-
-        resistance = getresist(barangle)
-        if resistance < resistleft:
-            resistance = resistleft
-        if resistance > resistright:
-            resistance = resistright
-
-        print('motorv', motorvalue, barangle, resistance)
-        rospy.loginfo(resistance)
-        pub.publish(resistance)
-        rate.sleep()
-    return
-
-
-def test_kiteangle(barangle):
-
-    global motorvalue
-    pub = rospy.Publisher('kiteangle', Int16, queue_size=3)
-    rospy.init_node('mock_arduino', anonymous=False)
-    rate = rospy.Rate(5)  # 5hz
-    motorvalue = 100  # so always go left to start with
-
-    # left_act_pos = get_coord(0-DIST_ACT, 0, barangle) not convinced this serves purpose
-    loop_time = time.time()
-
-    while not rospy.is_shutdown():
-        print('motorv', motorvalue)
-        elapsed_time = time.time() - loop_time
-        loop_time = time.time()
-        if motorvalue:
-            if motorvalue < 200:
+    if motorvalue:
+        if motorvalue == 1 or motorvalue == 2:
+            barangle = 0
+        else:
+            if motorvalue == 3:  # Left
                 act_dist = 0 - (SPEED_ACT * elapsed_time)
-            else:
+            elif motorvalue == 4:  # Right
                 act_dist = SPEED_ACT * elapsed_time
             anglechange = (360 * act_dist) / CIRC_ACT
-            # left_act_pos = get_coord(left_act_pos[0], left_act_pos[1], anglechange)
             barangle += anglechange
-        # should then oscillate
-        if barangle < -40:
-            motorvalue = 250
-        elif barangle > 40:
-            motorvalue = 100
-        resistance = getresist(barangle)
-        rospy.loginfo(barangle)
-        pub.publish(resistance)
-        print(time.time(), barangle, resistance)
-        rate.sleep()
 
+    resistance = getresist(barangle)
+    if resistance < resistleft:
+        resistance = resistleft
+    if resistance > resistright:
+        resistance = resistright
 
-def mock_kiteangle(barangle):
-
-    global motorvalue
-    pub = rospy.Publisher('mockangle', Int16, queue_size=3)
-    rospy.init_node('mock_arduino', anonymous=False)
-    rate = rospy.Rate(5)  # 5hz
-    motorvalue = 2  # so always go back to start with
-
-    # left_act_pos = get_coord(0-DIST_ACT, 0, barangle) not convinced this serves purpose
-    loop_time = time.time()
-
-    while not rospy.is_shutdown():
-        print('motorv', motorvalue)
-        elapsed_time = time.time() - loop_time
-        loop_time = time.time()
-        if motorvalue:
-            if motorvalue < 200:
-                act_dist = 0 - (SPEED_ACT * elapsed_time)
-            else:
-                act_dist = SPEED_ACT * elapsed_time
-            anglechange = (360 * act_dist) / CIRC_ACT
-            # left_act_pos = get_coord(left_act_pos[0], left_act_pos[1], anglechange)
-            barangle += anglechange
-        # should then oscillate
-        if barangle < -40:
-            motorvalue = 250
-        elif barangle > 40:
-            motorvalue = 100
-        resistance = getresist(barangle)
-        rospy.loginfo(barangle)
-        pub.publish(resistance)
-        print(time.time(), barangle, resistance)
-        rate.sleep()
+    return resistance, barangle
 
 
 if __name__ == '__main__':
     try:
-        kiteangle(0)
+        parser = argparse.ArgumentParser()
+        parser.add_argument('-m', '--message', type=str, default='kiteangle',
+                            help='message to generate eitehr kiteangle or mockangle')
+        args = parser.parse_args()
+        mock_kiteangle(0, args.message)
+        #mock_kiteangle(0, 'kiteangle')
+        #kiteangle(0)
         # test_kiteangle(0) this was just for testing new approach
     except rospy.ROSInterruptException:
         pass
