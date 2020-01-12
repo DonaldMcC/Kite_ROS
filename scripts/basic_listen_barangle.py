@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# from ros wiki for initial testing
 # this gets the barangle from the arduino board and now also got an initialisation which
 # should retract the actuators
 
@@ -9,7 +8,7 @@ from std_msgs.msg import Int16
 from kite_funcs import getangle
 from talker import motor_msg
 barangle = 0
-
+mockangle = 0
 
 def callback(data):
     global barangle
@@ -17,24 +16,35 @@ def callback(data):
     barangle = getangle(resistance)
     return
 
+def callmock(data):
+    global mockangle
+    resistance = data.data
+    mockangle = getangle(resistance)
+    return
 
-def listen_kiteangle():
-    print('initing')
-    rospy.Subscriber('kiteangle', Int16, callback)
+
+def listen_kiteangle(message):
+    if message == 'kiteangle':
+        rospy.Subscriber(message, Int16, callback)
+    else:
+        rospy.Subscriber(message, Int16, callmock)
 
 
 def get_actbarangle():
     global barangle
     return barangle
 
+def get_actmockangle():
+    global mockangle
+    return mockangle
+
 
 # this should always return barangle for Manbar or Standard operation Manfly should set
 def get_barangle(kite, base, control):
     global barangle
-    print('barangle', barangle)
+    #  print('barangle', barangle)
     if control.config == 'Manfly' or control.config == 'Manbar':
         if base.updatemode == 'Manbar':
-            print('got here')
             return base.barangle
         else:  # when kiteangle is driving the barangle
             # TO DO add kitebar ratio to this
@@ -60,5 +70,5 @@ def check_kite(kite, base, control):
 
 if __name__ == '__main__':
     rospy.init_node('kite_main', anonymous=False)
-    listen_kiteangle()
+    listen_kiteangle('kiteangle')
     rospy.spin()

@@ -26,13 +26,14 @@ from collections import deque
 
 class Config(object):
     def __init__(self, source=2,  setup='Standard', masklimit=10000,
-                 logging=0, numcams=1, input='keyboard'):
+                 logging=0, numcams=1, input='keyboard', check_motor_sim=False):
         self.source = source
         self.setup = setup
         self.masklimit = masklimit
         self.logging = logging
         self.numcams = numcams
         self.input = input
+        self.check_motor_sim = check_motor_sim
 
 
 class Base(object):
@@ -49,6 +50,7 @@ class Base(object):
         self.inferbarangle = inferbarangle
         self.kitebarratio = kitebarratio  # this will be the rate of change of barangle to kite angle
         self.updatemode = updatemode  # Standard will be unconnected and Manbar will be bar angles kite
+        self.mockangle = 0
 
 
 class Kite(object):

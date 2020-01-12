@@ -49,7 +49,7 @@ from mainclasses import Kite, Controls, Base, Config, calc_route
 from move_func import get_angle
 from talker import kite_pos, KiteImage, motor_msg, init_motor_msg, init_ros
 from cvwriter import initwriter, writeframe
-from basic_listen_barangle import listen_kiteangle, get_barangle, check_kite
+from basic_listen_barangle import listen_kiteangle, get_barangle, check_kite, get_actmockangle
 from listen_joystick import listen_joystick, get_joystick
 from kite_funcs import kitemask, calcbarangle, inferangle
 
@@ -184,6 +184,12 @@ def display_base(width):
         cv2.putText(frame, 'Inf: ' + '{:5.1f}'.format(base.inferbarangle), (outx + 15, centy + 100),
                     cv2.FONT_HERSHEY_SIMPLEX,
                     0.65, (255, 0, 0), 2)
+    if config.check_motor_sim:
+        display_line(base.mockangle, centx, centy, radius, (128, 0, 0))
+        cv2.putText(frame, 'Inf: ' + '{:5.1f}'.format(base.mockangle), (outx + 15, centy + 100),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.65, (128, 0, 0), 2)
+
     return
 
 
@@ -252,7 +258,7 @@ KITETYPE = 'kite1'
 # input options are Keyboard, Joystick or Both
 
 # config = Config(setup='Manfly', source=1, input='Joystick')
-config = Config(setup=args.setup, source=2, numcams=1, input='Joystick')
+config = Config(setup=args.setup, source=2, numcams=1, input='Joystick', check_motor_sim=True)
 
 while config.source not in {1, 2}:
     config.source = input('Key 1 for camera or 2 for source')
@@ -303,7 +309,7 @@ counter = 0
 foundcounter = 0
 
 if config.setup == 'Standard' and config.source == 1:  # otherwise not present
-    listen_kiteangle()  # this then updates base.barangle via the callback function
+    listen_kiteangle('kiteangle')  # this then updates base.barangle via the callback function
     result = ""
     while result != "Ok":
         result = check_kite(actkite, base, control)
@@ -313,8 +319,11 @@ if config.setup == 'Standard' and config.source == 1:  # otherwise not present
             if go_on == "Y":
                 break
 
+if config.check_motor_sim:
+    listen_kiteangle('mockangle')  # this then subscribes to our simulation of expected movement of the bar
+
 if config.input == 'Joystick':
-    listen_joystick()  # subscribe to joystick messages
+    listen_joystick()  # subscribe to joystick messages - now default option
 
 sg.theme('Black')  # Pysimplegui setup
 
@@ -396,6 +405,9 @@ while True:  # Main module loop
     image, cnts, hierarchy = cv2.findContours(diff.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
     base.barangle = get_barangle(kite, base, control)
+    if config.check_motor_sim:
+        base.mockangle = get_actmockangle()
+
     if base.updatemode == 'Manbar':  # not getting kiteangle from picture
         kite.kiteangle = base.barangle * base.kitebarratio
     # lets draw and move cross for manual flying
