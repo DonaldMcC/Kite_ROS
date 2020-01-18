@@ -22,10 +22,11 @@ This file should do the following things
 
 import time
 from collections import deque
+from basic_listen_barangle import reset_bar
 
 
 class Config(object):
-    def __init__(self, source=2,  setup='Standard', masklimit=10000,
+    def __init__(self, source=2, setup='Standard', masklimit=10000,
                  logging=0, numcams=1, input='keyboard', check_motor_sim=False):
         self.source = source
         self.setup = setup
@@ -111,9 +112,9 @@ class Kite(object):
     def get_phase(self):
         if self.mode == 'Park':
             # For park this is now OK we want to get kiteangle to zero
-            phase = 'Hold'
+            self.phase = 'Hold'
         elif self.mode == 'Wiggle':
-            phase = 'Wiggle'
+            self.phase = 'Wiggle'
         else:  # fig8 - assumed
             if self.zone == 'Centre':
                 self.phase = 'Xwind'
@@ -125,7 +126,7 @@ class Kite(object):
                 else:
                     self.phase = 'TurnRight'
             else:  # Right zone
-                if self.turncomplete or self.kiteangle < (0-self.turncomplete_angle):
+                if self.turncomplete or self.kiteangle < (0 - self.turncomplete_angle):
                     self.phase = 'Xwind'
                     self.turncomplete = True
                     self.routechange = True
@@ -178,7 +179,7 @@ class Kite(object):
                 # or we have changed from park or wiggle to xwind which will be presumed to happen
                 # with kite upwards and seems reasonable to just go for the longer xwind distance
                 self.targettype = 'Point'
-                if abs(self.x - leftx) > abs(self.x-rightx):
+                if abs(self.x - leftx) > abs(self.x - rightx):
                     self.targetx = leftx
                     self.targety = lefty
                 else:
@@ -191,7 +192,7 @@ class Kite(object):
                     self.targetangle = 90
                 else:
                     self.targetangle = -90
-                    
+
                 # TODO - may compute the target location
             else:
                 print('End of update_target reached without cover expected cases most likely')
@@ -204,7 +205,7 @@ class Kite(object):
 
 class Controls(object):
 
-    def __init__(self, config ='Standard', step=8):
+    def __init__(self, config='Standard', step=8):
         try:  # this will fail on windows but don't need yet and not convinced I need to set parameters separately
             self.centrex = rospy.get_param('centrex', 400)
             self.centrey = rospy.get_param('centrey', 300)
@@ -230,6 +231,7 @@ class Controls(object):
         self.route = False
         self.maxy = 20  # this should be for top of centre line and sets they y target point for park mode
         self.slow = 0.0
+        self.newbuttons=[]
 
     def getmodestring(self, inputmode):
         # So now always 11 buttons and first 5 and last 2 are std and iteration through should be std
@@ -237,20 +239,20 @@ class Controls(object):
         if inputmode == 0:  # Standard
             return 'STD: Left Right Up Down Pause Wider Narrow Expand Contract Mode Quit'
         elif inputmode == 1:
-            return 'SETFLIGHTMODE: Left Right Up Down Pause Park Wiggle Fig8 Normal Mode Quit'
+            return 'SETFLIGHTMODE: Left Right Up Down Pause Park Wiggle Fig8 Reset Mode Quit'
         elif self.inputmode == 2:
             return 'MANFLIGHT: Left Right Up Down Pause Anti Clock Gauche rigHt Mode Quit'
         else:  # inputmode = 3
             return 'MANBAR: Left Right Up Down Pause Anti Clock Gauche rigHt Mode Quit'
 
-
-    def get_change_mode_buttons(self, inputmode):
+    @staticmethod
+    def get_change_mode_buttons(inputmode):
         if inputmode == 0:
             newbuttons = [('Mode: STD:', 'Mode: STD:'), ('Wider', 'Wider'), ('Narrow', 'Narrow'),
                           ('Expand', 'Expand'), ('Contract', 'Contract')]
         elif inputmode == 1:
             newbuttons = [('Mode: STD:', 'Mode: SETFLIGHTMODE:'), ('Wider', 'Park'), ('Narrow', 'Wiggle'),
-                          ('Expand', 'Fig8'), ('Contract', 'Normal')]
+                          ('Expand', 'Fig8'), ('Contract', 'Reset')]
         elif inputmode == 2:
             newbuttons = [('Mode: STD:', 'Mode: MANFLIGHT'), ('Wider', 'Anti'), ('Narrow', 'Clock'),
                           ('Expand', 'Gauche'), ('Contract', 'rigHt')]
@@ -312,7 +314,7 @@ class Controls(object):
                 time.sleep(10)
 
         if self.inputmode == 1:  # SetFlight
-            if (joybuttons and joybuttons[6] == 1):  # move mode forward
+            if joybuttons and joybuttons[6] == 1:  # move mode forward
                 if kite.mode == 'Park':
                     kite.mode = 'Wiggle'
                 elif kite.mode == 'Wiggle':
@@ -325,12 +327,12 @@ class Controls(object):
                 kite.mode = 'Wiggle'
             elif event == 'Expand' and kite.zone == 'Centre':  # must be in central zone to change mode
                 kite.mode = 'Fig8'
-            elif event == 'Contract':  # simulation
-                self.mode = 1
+            elif event == 'Contract':  # Reset message
+                reset_bar()
 
         elif self.inputmode == 2:  # ManFlight - maybe switch to arrows - let's do this all
             if joybuttons:
-                if joyaxes[0] != 0 :  # -1 = left +1 = right
+                if joyaxes[0] != 0:  # -1 = left +1 = right
                     self.centrex += self.step * int(joyaxes[0])
                     kite.routechange = True
                 elif joyaxes[1] != 0:  # 1 = up -1 = down so needs inverted
@@ -340,9 +342,9 @@ class Controls(object):
                     kite.x += (self.step * joyaxes[2])
                     kite.y -= (self.step * joyaxes[3])
                 elif joybuttons[7] == 1:  # c button pressed - but not working - as calced from kite
-                    base.barangle += (self.step/2 * joyaxes[2])
+                    base.barangle += (self.step / 2 * joyaxes[2])
                 else:  # z button pressed
-                    kite.kiteangle += (self.step/2 * joyaxes[2])
+                    kite.kiteangle += (self.step / 2 * joyaxes[2])
             if event == 'Left':  # left
                 kite.x -= self.step
             elif event == 'Right':  # right
@@ -361,7 +363,7 @@ class Controls(object):
                     kite.routechange = True
 
             if joybuttons and joybuttons[7] == 0 and joybuttons[8] == 0:
-                base.barangle += (self.step/2 * joyaxes[2])
+                base.barangle += (self.step / 2 * joyaxes[2])
             if event == 'Left':  # left
                 base.barangle -= self.step  # this will change
             elif event == 'Right':  # right
@@ -371,7 +373,7 @@ class Controls(object):
             self.inputmode += 1
             if self.inputmode == 4:  # simple toggle around 3 modes
                 self.inputmode = 0
-            self.modestring= self.getmodestring(self.inputmode)
+            self.modestring = self.getmodestring(self.inputmode)
             self.newbuttons = self.get_change_mode_buttons(self.inputmode)
 
         if event == 'Pause':
