@@ -51,7 +51,7 @@ class Base(object):
         self.kitebarratio = kitebarratio  # this will be the rate of change of barangle to kite angle
         self.updatemode = updatemode  # Standard will be unconnected and Manbar will be bar angles kite
         self.mockangle = 0
-
+        self.reset = False
 
 class Kite(object):
 
@@ -231,7 +231,6 @@ class Controls(object):
         self.maxy = 20  # this should be for top of centre line and sets they y target point for park mode
         self.slow = 0.0
         self.newbuttons = []
-        self.reset = False
 
     def getmodestring(self, inputmode):
         # So now always 11 buttons and first 5 and last 2 are std and iteration through should be std
@@ -300,8 +299,8 @@ class Controls(object):
                 kite.routechange = True
             elif event == 'Wider':  # wider
                 self.halfwidth += self.step
-            elif event == 'Narrower':  # narrower
-                self.halfwidth -= 1
+            elif event == 'Narrow':  # narrower
+                self.halfwidth -= self.step
             elif event == 'Expand':  # expand
                 self.radius += self.step
             elif event == 'Contract':  # contract
@@ -314,6 +313,18 @@ class Controls(object):
                 time.sleep(10)
 
         if self.inputmode == 1:  # SetFlight
+            if (joybuttons and joyaxes[0] == -1) or event == 'Left':  # left:  # left
+                self.centrex -= self.step
+                kite.routechange = True
+            elif (joybuttons and joyaxes[0] == 1) or event == 'Right':  # right
+                self.centrex += self.step
+                kite.routechange = True
+            elif (joybuttons and joyaxes[1] == 1) or event == 'Up':  # up
+                self.centrey -= self.step
+                kite.routechange = True
+            elif (joybuttons and joyaxes[1] == -1) or event == 'Down':  # down
+                self.centrey += self.step
+                kite.routechange = True
             if joybuttons and joybuttons[6] == 1:  # move mode forward
                 if kite.mode == 'Park':
                     kite.mode = 'Wiggle'
@@ -328,8 +339,7 @@ class Controls(object):
             elif event == 'Expand' and kite.zone == 'Centre':  # must be in central zone to change mode
                 kite.mode = 'Fig8'
             elif event == 'Contract':  # Reset message
-                self.reset = True
-
+                base.reset = True
         elif self.inputmode == 2:  # ManFlight - maybe switch to arrows - let's do this all
             if joybuttons:
                 if joyaxes[0] != 0:  # -1 = left +1 = right
@@ -345,6 +355,7 @@ class Controls(object):
                     base.barangle += (self.step / 2 * joyaxes[2])
                 else:  # z button pressed
                     kite.kiteangle += (self.step / 2 * joyaxes[2])
+            # move via buttons
             if event == 'Left':  # left
                 kite.x -= self.step
             elif event == 'Right':  # right
@@ -353,6 +364,14 @@ class Controls(object):
                 kite.y -= self.step
             elif event == 'Down':  # down
                 kite.y += self.step
+            elif event == 'Expand':  # bar gauche
+                base.barangle -= self.step
+            elif event == 'Contract':  # bar rigHt
+                base.barangle += self.step
+            elif event == 'Wider':  # anti clockwise
+                kite.kiteangle -= self.step
+            elif event == 'Narrow':  # clockwise
+                kite.kiteangle += self.step
         elif self.inputmode == 3:  # ManBar - maybe switch to arrows - let's do this all
             if joybuttons:
                 if joyaxes[0] != 0:  # -1 = left +1 = right
@@ -361,14 +380,20 @@ class Controls(object):
                 elif joyaxes[1] != 0:  # 1 = up -1 = down so needs inverted
                     self.centrey += self.step * int(joyaxes[1])
                     kite.routechange = True
-
             if joybuttons and joybuttons[7] == 0 and joybuttons[8] == 0:
                 base.barangle += (self.step / 2 * joyaxes[2])
-            if event == 'Left':  # left
+            if event == 'Wider':  # anti-clockwise
                 base.barangle -= self.step  # this will change
-            elif event == 'Right':  # right
+            elif event == 'Narrow':  # clockwise
                 base.barangle += self.step
-
+            elif event == 'Left':  # left
+                kite.x -= self.step
+            elif event == 'Right':  # right
+                kite.x += self.step
+            elif event == 'Up':  # up
+                kite.y -= self.step
+            elif event == 'Down':  # down
+                kite.y += self.step
         if (joybuttons and joybuttons[5] == 1) or event == 'Mode':  # modechange
             self.inputmode += 1
             if self.inputmode == 4:  # simple toggle around 3 modes

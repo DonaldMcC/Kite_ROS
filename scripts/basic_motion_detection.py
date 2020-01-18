@@ -364,7 +364,7 @@ while True:  # Main module loop
     if base.reset:
         reset_bar()
         base.reset=False
-        
+
     if config.numcams == 1:
         if config.source == 1:
             ret, frame = camera.stream.read()
