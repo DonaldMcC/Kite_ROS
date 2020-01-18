@@ -171,7 +171,7 @@ def display_base(width):
     centx = outx + 60
     centy = 300
     radius = 60
-    cv2.putText(frame, 'Base', (outx, centy-70), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
+    cv2.putText(frame, 'Base', (outx + 20, centy-70), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
     cv2.circle(frame, (centx, centy), radius, (0, 255, 255), 2)
     cv2.putText(frame, 'Act: ' + '{:5.1f}'.format(base.barangle), (outx + 15, centy + 100), cv2.FONT_HERSHEY_SIMPLEX,
                 0.65, (0, 255, 0), 2)
@@ -181,12 +181,12 @@ def display_base(width):
     display_line(base.barangle, centx, centy, radius, (0, 255, 0))
     if config.setup == 'Manfly':
         display_line(base.inferbarangle, centx, centy, radius, (255, 0, 0))
-        cv2.putText(frame, 'Inf: ' + '{:5.1f}'.format(base.inferbarangle), (outx + 15, centy + 100),
+        cv2.putText(frame, 'Inf: ' + '{:5.1f}'.format(base.inferbarangle), (outx + 15, centy + 160),
                     cv2.FONT_HERSHEY_SIMPLEX,
                     0.65, (255, 0, 0), 2)
     if config.check_motor_sim:
         display_line(base.mockangle, centx, centy, radius, (128, 0, 0))
-        cv2.putText(frame, 'Inf: ' + '{:5.1f}'.format(base.mockangle), (outx + 15, centy + 100),
+        cv2.putText(frame, 'Mock: ' + '{:5.1f}'.format(base.mockangle), (outx + 15, centy + 70),
                     cv2.FONT_HERSHEY_SIMPLEX,
                     0.65, (128, 0, 0), 2)
 
@@ -195,10 +195,10 @@ def display_base(width):
 
 def display_stats():
     cv2.putText(frame, kite.direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
-    cv2.putText(frame, "dx: {}, dy: {}".format(kite.dX, kite.dY),
+    cv2.putText(frame, "dx: {:.1f}, dy: {:.1f}".format(kite.dX, kite.dY),
                 (10, height - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 1)
-    cv2.putText(frame, "x: {}, y: {}".format(mankite.x, mankite.y),
-                (180, height - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 1)
+    cv2.putText(frame, "Man x: {:.1f}, y: {:.1f}".format(mankite.x, mankite.y),
+                (180, height - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 2)
     cv2.putText(frame, "Act Angle: " + str(int(kite.kiteangle)),
                 (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
     cv2.putText(frame, "Tgt Angle: " + str(int(kite.targetangle)), (10, 70),
@@ -216,10 +216,10 @@ def display_flight(width):
     fontsize = 0.5
     tempstr = "Found: Yes" if kite.found else "Found: No"
 
-    cv2.putText(frame, 'Zone: ' + kite.zone, (outx, 140), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
-    cv2.putText(frame, tempstr, (outx, 160), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
-    cv2.putText(frame, 'Mode: ' + kite.mode, (outx, 180), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
-    cv2.putText(frame, 'Phase: ' + kite.phase, (outx, 200), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
+    cv2.putText(frame, 'Zone: ' + kite.zone, (outx, 40), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
+    cv2.putText(frame, tempstr, (outx, 60), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
+    cv2.putText(frame, 'Mode: ' + kite.mode, (outx, 80), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
+    cv2.putText(frame, 'Phase: ' + kite.phase, (outx, 100), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
     return
 
 
@@ -327,8 +327,12 @@ if config.input == 'Joystick':
 
 sg.theme('Black')  # Pysimplegui setup
 
-button_list = control.modestring.split()[1:]
-sgmodestring = 'Mode: ' + control.modestring.split()[0]
+# below is proving clunky if we may start with any mode as the buttons names get fixed here - so if keeping this logic
+# we must always create buttons with std setup and then cycle to correct mode
+
+initmodestring = control.getmodestring(0) # now always get same initial modestring
+button_list = initmodestring.split()[1:]
+sgmodestring = 'Mode: ' + initmodestring.split()[0]
 buttons =  [sg.Button(x, size=(7, 3), pad=(4,0), font='Helvetica 14')
             for i, x in enumerate(button_list)]
 
@@ -336,6 +340,17 @@ layout = [[sg.Text(sgmodestring, key=sgmodestring, size=(15, 1), font='Helvetica
 
 # create the window and show it without the plot
 window = sg.Window('Kite ROS - Automated Flying', layout, no_titlebar=False, location=(50,1000))
+event, values = window.read(timeout=0)
+
+if control.inputmode != 0:
+    z=0
+    while z < control.inputmode:
+        control.newbuttons = control.get_change_mode_buttons(z+1)
+        for x in control.newbuttons:  # change the button labels if mode has change
+            window[x[0]].Update(x[1])
+        z+=1
+
+
 
 writer = None
 cv2.startWindowThread()

@@ -226,35 +226,37 @@ class Controls(object):
         else:
             self.inputmode = 3  # Manbar
         self.step = step
-        self.modestring, self.newbuttons = self.getmodestring(True)
+        self.modestring = self.getmodestring(True)
         self.route = False
         self.maxy = 20  # this should be for top of centre line and sets they y target point for park mode
         self.slow = 0.0
 
-    def getmodestring(self, initial=False):
+    def getmodestring(self, inputmode):
         # So now always 11 buttons and first 5 and last 2 are std and iteration through should be std
         # so we would have a defined transition of names based on which change took place
-        newbuttons=[]
-        if self.inputmode == 0:  # Standard
-            if not initial:
-                newbuttons = [('Mode: STD:','Mode: STD:'),('Anti','Wider'),('Clock','Narrow'),('Gauche','Expand'),
-                ('rigHt','Contract')]
-            return 'STD: Left Right Up Down Pause Wider Narrow Expand Contract Mode Quit', newbuttons
-        elif self.inputmode == 1:
-            if not initial:
-                newbuttons = [('Mode: STD:','Mode: SETFLIGHTMODE:'), ('Wider','Park'), ('Narrow','Wiggle'), ('Expand','Fig8'),
-                          ('Contract','Normal')]
-            return 'SETFLIGHTMODE: Left Right Up Down Pause Park Wiggle Fig8 Normal Mode Quit', newbuttons
+        if inputmode == 0:  # Standard
+            return 'STD: Left Right Up Down Pause Wider Narrow Expand Contract Mode Quit'
+        elif inputmode == 1:
+            return 'SETFLIGHTMODE: Left Right Up Down Pause Park Wiggle Fig8 Normal Mode Quit'
         elif self.inputmode == 2:
-            if not initial:
-                newbuttons = [('Mode: STD:', 'Mode: MANFLIGHT'), ('Wider', 'Anti'), ('Narrow', 'Clock'), ('Expand', 'Gauche'),
-                          ('Contract', 'rigHt')]
-            return 'MANFLIGHT: Left Right Up Down Pause Anti Clock Gauche rigHt Mode Quit', newbuttons
+            return 'MANFLIGHT: Left Right Up Down Pause Anti Clock Gauche rigHt Mode Quit'
         else:  # inputmode = 3
-            if not initial:
-                newbuttons = [('Mode: STD:', 'Mode: MANBAR:')]
-            return 'MANBAR: Left Right Up Down Pause Anti Clock Gauche rigHt Mode Quit', newbuttons
+            return 'MANBAR: Left Right Up Down Pause Anti Clock Gauche rigHt Mode Quit'
 
+
+    def get_change_mode_buttons(self, inputmode):
+        if inputmode == 0:
+            newbuttons = [('Mode: STD:', 'Mode: STD:'), ('Wider', 'Wider'), ('Narrow', 'Narrow'),
+                          ('Expand', 'Expand'), ('Contract', 'Contract')]
+        elif inputmode == 1:
+            newbuttons = [('Mode: STD:', 'Mode: SETFLIGHTMODE:'), ('Wider', 'Park'), ('Narrow', 'Wiggle'),
+                          ('Expand', 'Fig8'), ('Contract', 'Normal')]
+        elif inputmode == 2:
+            newbuttons = [('Mode: STD:', 'Mode: MANFLIGHT'), ('Wider', 'Anti'), ('Narrow', 'Clock'),
+                          ('Expand', 'Gauche'), ('Contract', 'rigHt')]
+        else:
+            newbuttons = [('Mode: STD:', 'Mode: MANBAR:')]
+        return newbuttons
 
     def joyhandler(self, joybuttons, joyaxes, kite, base, event=None):
         # Using https://github.com/arnaud-ramey/rosxwiimote as a ros package to capture
@@ -328,6 +330,12 @@ class Controls(object):
 
         elif self.inputmode == 2:  # ManFlight - maybe switch to arrows - let's do this all
             if joybuttons:
+                if joyaxes[0] != 0 :  # -1 = left +1 = right
+                    self.centrex += self.step * int(joyaxes[0])
+                    kite.routechange = True
+                elif joyaxes[1] != 0:  # 1 = up -1 = down so needs inverted
+                    self.centrey += self.step * int(joyaxes[1])
+                    kite.routechange = True
                 if joybuttons[7] == 0 and joybuttons[8] == 0:
                     kite.x += (self.step * joyaxes[2])
                     kite.y -= (self.step * joyaxes[3])
@@ -343,8 +351,15 @@ class Controls(object):
                 kite.y -= self.step
             elif event == 'Down':  # down
                 kite.y += self.step
-
         elif self.inputmode == 3:  # ManBar - maybe switch to arrows - let's do this all
+            if joybuttons:
+                if joyaxes[0] != 0:  # -1 = left +1 = right
+                    self.centrex += self.step * int(joyaxes[0])
+                    kite.routechange = True
+                elif joyaxes[1] != 0:  # 1 = up -1 = down so needs inverted
+                    self.centrey += self.step * int(joyaxes[1])
+                    kite.routechange = True
+
             if joybuttons and joybuttons[7] == 0 and joybuttons[8] == 0:
                 base.barangle += (self.step/2 * joyaxes[2])
             if event == 'Left':  # left
@@ -356,7 +371,8 @@ class Controls(object):
             self.inputmode += 1
             if self.inputmode == 4:  # simple toggle around 3 modes
                 self.inputmode = 0
-            self.modestring, self.newbuttons = self.getmodestring()
+            self.modestring= self.getmodestring(self.inputmode)
+            self.newbuttons = self.get_change_mode_buttons(self.inputmode)
 
         if event == 'Pause':
             time.sleep(10)
