@@ -49,7 +49,7 @@ from mainclasses import Kite, Controls, Base, Config, calc_route
 from move_func import get_angle
 from talker import kite_pos, KiteImage, motor_msg, init_motor_msg, init_ros
 from cvwriter import initwriter, writeframe
-from basic_listen_barangle import listen_kiteangle, get_barangle, check_kite, get_actmockangle
+from basic_listen_barangle import listen_kiteangle, get_barangle, check_kite, get_actmockangle, reset_bar
 from listen_joystick import listen_joystick, get_joystick
 from kite_funcs import kitemask, calcbarangle, inferangle
 
@@ -361,6 +361,10 @@ fps = 15
 kite = mankite if control.config == "Manfly" else actkite
 
 while True:  # Main module loop
+    if base.reset:
+        reset_bar()
+        base.reset=False
+        
     if config.numcams == 1:
         if config.source == 1:
             ret, frame = camera.stream.read()

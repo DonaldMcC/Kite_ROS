@@ -22,7 +22,6 @@ This file should do the following things
 
 import time
 from collections import deque
-from basic_listen_barangle import reset_bar
 
 
 class Config(object):
@@ -231,7 +230,8 @@ class Controls(object):
         self.route = False
         self.maxy = 20  # this should be for top of centre line and sets they y target point for park mode
         self.slow = 0.0
-        self.newbuttons=[]
+        self.newbuttons = []
+        self.reset = False
 
     def getmodestring(self, inputmode):
         # So now always 11 buttons and first 5 and last 2 are std and iteration through should be std
@@ -328,7 +328,7 @@ class Controls(object):
             elif event == 'Expand' and kite.zone == 'Centre':  # must be in central zone to change mode
                 kite.mode = 'Fig8'
             elif event == 'Contract':  # Reset message
-                reset_bar()
+                self.reset = True
 
         elif self.inputmode == 2:  # ManFlight - maybe switch to arrows - let's do this all
             if joybuttons:
