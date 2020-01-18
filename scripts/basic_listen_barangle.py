@@ -56,16 +56,20 @@ def get_barangle(kite, base, control):
 def check_kite(kite, base, control):
     # this will now generally be called when motion_detection starts - it will do the following things
     # fully retract both actuators and once done confirm barangle is approximately zero
-    MAX_RETRACT_TIME = 10
     TOLERANCE = 10
-    motor_msg(0, 0, 0, 1)  # send backward signal
-    time.sleep(MAX_RETRACT_TIME)  # assumed to be time for motors to fully retract
-    motor_msg(0, 0, 0, 5)  # stop
+    reset_bar()
     actangle = get_barangle(kite, base, control)
     if abs(actangle) < TOLERANCE:
         return "OK"
     else:
         return "Out of Tolerance "
+
+def reset_bar():
+    MAX_RETRACT_TIME = 10
+    motor_msg(0, 0, 0, 1)  # send backward signal
+    time.sleep(MAX_RETRACT_TIME)  # assumed to be time for motors to fully retract
+    motor_msg(0, 0, 0, 5)  # stop
+    return
 
 
 if __name__ == '__main__':

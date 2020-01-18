@@ -239,7 +239,7 @@ parser.add_argument('-f', '--file', type=str, default='cachedH.npy',
                     help='Filename to load cached matrix')
 parser.add_argument('-l', '--load', type=str, default='yes',
                     help='Do we load cached matrix')
-parser.add_argument('-s', '--setup', type=str, default='Standard',
+parser.add_argument('-s', '--setup', type=str, default='Manfly',
                     help='Setup either Standard or Manfly or Manbar')
 args = parser.parse_args()
 
@@ -258,7 +258,7 @@ KITETYPE = 'kite1'
 # input options are Keyboard, Joystick or Both
 
 # config = Config(setup='Manfly', source=1, input='Joystick')
-config = Config(setup=args.setup, source=2, numcams=1, input='Joystick', check_motor_sim=True)
+config = Config(setup=args.setup, source=1, numcams=1, input='Joystick', check_motor_sim=True)
 
 while config.source not in {1, 2}:
     config.source = input('Key 1 for camera or 2 for source')
@@ -311,10 +311,10 @@ foundcounter = 0
 if config.setup == 'Standard' and config.source == 1:  # otherwise not present
     listen_kiteangle('kiteangle')  # this then updates base.barangle via the callback function
     result = ""
-    while result != "Ok":
+    while result != "OK":
         result = check_kite(actkite, base, control)
         print(result)
-        if result != "Ok":
+        if result != "OK":
             go_on = input("Contine (Y/N)")
             if go_on == "Y":
                 break

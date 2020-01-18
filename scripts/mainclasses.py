@@ -241,15 +241,18 @@ class Controls(object):
                 ('rigHt','Contract')]
             return 'STD: Left Right Up Down Pause Wider Narrow Expand Contract Mode Quit', newbuttons
         elif self.inputmode == 1:
-            newbuttons = [('Mode: STD:','Mode: SETFLIGHTMODE:'), ('Wider','Park'), ('Narrow','Wiggle'), ('Expand','Fig8'),
+            if not initial:
+                newbuttons = [('Mode: STD:','Mode: SETFLIGHTMODE:'), ('Wider','Park'), ('Narrow','Wiggle'), ('Expand','Fig8'),
                           ('Contract','Normal')]
             return 'SETFLIGHTMODE: Left Right Up Down Pause Park Wiggle Fig8 Normal Mode Quit', newbuttons
         elif self.inputmode == 2:
-            newbuttons = [('Mode: STD:', 'Mode: MANFLIGHT'), ('Wider', 'Anti'), ('Narrow', 'Clock'), ('Expand', 'Gauche'),
+            if not initial:
+                newbuttons = [('Mode: STD:', 'Mode: MANFLIGHT'), ('Wider', 'Anti'), ('Narrow', 'Clock'), ('Expand', 'Gauche'),
                           ('Contract', 'rigHt')]
             return 'MANFLIGHT: Left Right Up Down Pause Anti Clock Gauche rigHt Mode Quit', newbuttons
         else:  # inputmode = 3
-            newbuttons = [('Mode: STD:', 'Mode: MANBAR:')]
+            if not initial:
+                newbuttons = [('Mode: STD:', 'Mode: MANBAR:')]
             return 'MANBAR: Left Right Up Down Pause Anti Clock Gauche rigHt Mode Quit', newbuttons
 
 
@@ -333,17 +336,13 @@ class Controls(object):
                 else:  # z button pressed
                     kite.kiteangle += (self.step/2 * joyaxes[2])
             if event == 'Left':  # left
-                kite.centrex -= self.step
-                kite.routechange = True
+                kite.x -= self.step
             elif event == 'Right':  # right
-                kite.centrex += self.step
-                kite.routechange = True
+                kite.x += self.step
             elif event == 'Up':  # up
-                kite.centrey -= self.step
-                kite.routechange = True
+                kite.y -= self.step
             elif event == 'Down':  # down
-                kite.centrey += self.step
-                kite.routechange = True
+                kite.y += self.step
 
         elif self.inputmode == 3:  # ManBar - maybe switch to arrows - let's do this all
             if joybuttons and joybuttons[7] == 0 and joybuttons[8] == 0:
