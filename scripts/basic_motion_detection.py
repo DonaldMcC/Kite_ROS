@@ -179,7 +179,7 @@ def display_base(width):
                 cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 255, 255), 2)
     display_line(base.targetbarangle, centx, centy, radius, (0, 255, 255))
     display_line(base.barangle, centx, centy, radius, (0, 255, 0))
-    if config.setup == 'Manfly':
+    if config.kite == 'Manfly':
         display_line(base.inferbarangle, centx, centy, radius, (255, 0, 0))
         cv2.putText(frame, 'Inf: ' + '{:5.1f}'.format(base.inferbarangle), (outx + 15, centy + 160),
                     cv2.FONT_HERSHEY_SIMPLEX,
@@ -258,7 +258,7 @@ KITETYPE = 'kite1'
 # input options are Keyboard, Joystick or Both
 
 # config = Config(setup='Manfly', source=1, input='Joystick')
-config = Config(setup=args.setup, source=1, numcams=1, input='Joystick', check_motor_sim=False)
+config = Config(kite=args.kite, source=1, numcams=1, input='Joystick', check_motor_sim=False)
 
 while config.source not in {1, 2}:
     config.source = input('Key 1 for camera or 2 for source')
@@ -358,7 +358,7 @@ fps = 15
 
 # below is ok unless we have Manbar when we might want two kites
 # however manbar is also a mode that we can change to
-kite = mankite if control.kite == "Manual" else actkite
+kite = mankite if control.config == "Manual" else actkite
 
 while True:  # Main module loop
     if base.reset:
@@ -427,13 +427,13 @@ while True:  # Main module loop
     if config.check_motor_sim:
         base.mockangle = get_actmockangle()
 
-    if config.kite == 'Manual' and config.inputmode == 3:  # derive kite from bar
+    if config.kite == 'Manual' and control.inputmode == 3:  # derive kite from bar
         kite.kiteangle = base.barangle * base.kitebarratio
     # lets draw and move cross for manual flying
-    if control.config == 'Manfly' or control.config == 'Manbar':
+    if config.kite == 'Manual':
         drawkite(kite)
         kite.found = True
-    elif config.setup == 'Standard':  # not detecting if in manual mode
+    elif config.kite == 'Standard':  # not detecting if in manual mode
         kite.found = False
         maxmask = -1
         index = -1
