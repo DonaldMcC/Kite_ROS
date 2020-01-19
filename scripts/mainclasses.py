@@ -237,9 +237,9 @@ class Controls(object):
         elif inputmode == 1:
             return 'SETFLIGHTMODE: Left Right Up Down Pause Park Wiggle Fig8 Reset Mode Quit'
         elif self.inputmode == 2:
-            return 'MANFLIGHT: Left Right Up Down Pause Anti Clock Gauche rigHt Mode Quit'
+            return 'MANFLIGHT: Left Right Up Down Pause Anti Clock Spare NotUsed Mode Quit'
         else:  # inputmode = 3
-            return 'MANBAR: Left Right Up Down Pause Anti Clock Gauche rigHt Mode Quit'
+            return 'MANBAR: Left Right Up Down Pause Anti Clock Spare NotUsed Mode Quit'
 
     @staticmethod
     def get_change_mode_buttons(inputmode):
@@ -251,7 +251,7 @@ class Controls(object):
                           ('Expand', 'Fig8'), ('Contract', 'Reset')]
         elif inputmode == 2:
             newbuttons = [('Mode: STD:', 'Mode: MANFLIGHT'), ('Wider', 'Anti'), ('Narrow', 'Clock'),
-                          ('Expand', 'Gauche'), ('Contract', 'rigHt')]
+                          ('Expand', 'Spare'), ('Contract', 'NotUsed')]
         else:
             newbuttons = [('Mode: STD:', 'Mode: MANBAR:')]
         return newbuttons
