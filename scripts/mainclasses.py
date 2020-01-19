@@ -317,7 +317,7 @@ class Controls(object):
                     self.centrex += self.step * int(joyaxes[0])
                     kite.routechange = True
                 elif joyaxes[1] != 0:  # 1 = up -1 = down so needs inverted
-                    self.centrey += self.step * int(joyaxes[1])
+                    self.centrey -= self.step * int(joyaxes[1])
                     kite.routechange = True
             if event == 'Left':  # left
                 kite.x -= self.step
