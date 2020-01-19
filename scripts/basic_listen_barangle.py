@@ -10,11 +10,13 @@ from talker import motor_msg
 barangle = 0
 mockangle = 0
 
+
 def callback(data):
     global barangle
     resistance = data.data
     barangle = getangle(resistance)
     return
+
 
 def callmock(data):
     global mockangle
@@ -33,6 +35,7 @@ def listen_kiteangle(message):
 def get_actbarangle():
     global barangle
     return barangle
+
 
 def get_actmockangle():
     global mockangle
@@ -55,18 +58,19 @@ def get_barangle(kite, base, control):
 def check_kite(kite, base, control):
     # this will now generally be called when motion_detection starts - it will do the following things
     # fully retract both actuators and once done confirm barangle is approximately zero
-    TOLERANCE = 10
+    tolerance = 10
     reset_bar()
     actangle = get_barangle(kite, base, control)
-    if abs(actangle) < TOLERANCE:
+    if abs(actangle) < tolerance:
         return "OK"
     else:
         return "Out of Tolerance "
 
+
 def reset_bar():
-    MAX_RETRACT_TIME = 10
+    max_retract_time = 10
     motor_msg(0, 0, 0, 1)  # send backward signal
-    time.sleep(MAX_RETRACT_TIME)  # assumed to be time for motors to fully retract
+    time.sleep(max_retract_time)  # assumed to be time for motors to fully retract
     motor_msg(0, 0, 0, 5)  # stop
     return
 

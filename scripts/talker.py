@@ -44,12 +44,12 @@ def init_motor_msg():
 
 
 def motor_msg(barangle, targetbarangle, tolerance=10, action=None):
-    MAXLEFT = -20 # These are to try and avoid breaking the bar
-    MAXRIGHT= 20  # similarly to protect bar as attached close to pivot
+    MAXLEFT = -20  # These are to try and avoid breaking the bar
+    MAXRIGHT = 20  # similarly to protect bar as attached close to pivot
 
     global pub
     if action:
-        pub.publish(action) # 1 for forward and 2 for backward
+        pub.publish(action)  # 1 for forward and 2 for backward
         return
     diff = barangle - targetbarangle
     if abs(diff) < tolerance:

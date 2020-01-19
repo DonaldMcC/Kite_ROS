@@ -1,3 +1,4 @@
+PySimpleGUI
 cv2
 imutils
 cv-bridge==1.13.0

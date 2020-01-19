@@ -171,7 +171,7 @@ def display_base(width):
     centx = outx + 60
     centy = 300
     radius = 60
-    cv2.putText(frame, 'Base', (outx + 20, centy-70), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
+    cv2.putText(frame, 'Base', (outx + 20, centy - 70), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
     cv2.circle(frame, (centx, centy), radius, (0, 255, 255), 2)
     cv2.putText(frame, 'Act: ' + '{:5.1f}'.format(base.barangle), (outx + 15, centy + 100), cv2.FONT_HERSHEY_SIMPLEX,
                 0.65, (0, 255, 0), 2)
@@ -293,7 +293,7 @@ else:
 control = Controls(config.kite, step=16)
 actkite = Kite(control.centrex, control.centrey)
 mankite = Kite(300, 400)
-base = Base(kitebarratio=3)  #TODO look at where 3 has come from - just testing I think
+base = Base(kitebarratio=3)  # TODO look at where 3 has come from - just testing I think
 
 # Initialisation steps
 es = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
@@ -330,25 +330,25 @@ sg.theme('Black')  # Pysimplegui setup
 # below is proving clunky if we may start with any mode as the buttons names get fixed here - so if keeping this logic
 # we must always create buttons with std setup and then cycle to correct mode
 
-initmodestring = control.getmodestring(0) # now always get same initial modestring
+initmodestring = control.getmodestring(0)  # now always get same initial modestring
 button_list = initmodestring.split()[1:]
 sgmodestring = 'Mode: ' + initmodestring.split()[0]
-buttons =  [sg.Button(x, size=(7, 3), pad=(4,0), font='Helvetica 14')
-            for i, x in enumerate(button_list)]
+buttons = [sg.Button(x, size=(7, 3), pad=(4, 0), font='Helvetica 14')
+           for i, x in enumerate(button_list)]
 
 layout = [[sg.Text(sgmodestring, key=sgmodestring, size=(15, 1), font='Helvetica 20')], buttons]
 
 # create the window and show it without the plot
-window = sg.Window('Kite ROS - Automated Flying', layout, no_titlebar=False, location=(50,1000))
+window = sg.Window('Kite ROS - Automated Flying', layout, no_titlebar=False, location=(50, 1000))
 event, values = window.read(timeout=0)
 
 if control.inputmode != 0:
-    z=0
+    z = 0
     while z < control.inputmode:
-        control.newbuttons = control.get_change_mode_buttons(z+1)
+        control.newbuttons = control.get_change_mode_buttons(z + 1)
         for x in control.newbuttons:  # change the button labels if mode has change
             window[x[0]].Update(x[1])
-        z+=1
+        z += 1
 
 writer = None
 cv2.startWindowThread()
@@ -363,7 +363,7 @@ kite = mankite if control.config == "Manual" else actkite
 while True:  # Main module loop
     if base.reset:
         reset_bar()
-        base.reset=False
+        base.reset = False
 
     if config.numcams == 1:
         if config.source == 1:

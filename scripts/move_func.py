@@ -389,8 +389,7 @@ def get_long_lat(x, y, z):
     return long, lat, r
 
 
-
-def conv_lin(a,b=1.0,c=0.0,inverse=False):
+def conv_lin(a, b=1.0, c=0.0, inverse=False):
     """Simple linear transform
         will I think store parameters against each sensor then they are handy
         >>> conv_lin(4,2,3)
