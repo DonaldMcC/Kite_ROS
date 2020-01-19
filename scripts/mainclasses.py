@@ -319,19 +319,18 @@ class Controls(object):
                 elif joyaxes[1] != 0:  # 1 = up -1 = down so needs inverted
                     self.centrey += self.step * int(joyaxes[1])
                     kite.routechange = True
-                elif event == 'Left':  # left
-                    kite.x -= self.step
-                elif event == 'Right':  # right
-                    kite.x += self.step
-                elif event == 'Up':  # up
-                    kite.y -= self.step
-                elif event == 'Down':  # down
-                    kite.y += self.step
-                    # move via buttons
-                elif event == 'Expand':  # slow
-                    self.slow += 0.1
-                elif event == 'Contract':  # fast
-                    self.slow = 0.0
+            if event == 'Left':  # left
+                kite.x -= self.step
+            elif event == 'Right':  # right
+                kite.x += self.step
+            elif event == 'Up':  # up
+                kite.y -= self.step
+            elif event == 'Down':  # down
+                kite.y += self.step
+            elif event == 'Expand':  # slow
+                self.slow += 0.1
+            elif event == 'Contract':  # fast
+                self.slow = 0.0
 
         if self.inputmode == 0:  # Standard
             if event == 'Wider':  # wider
@@ -370,11 +369,12 @@ class Controls(object):
             elif event == 'Narrow':  # clockwise
                 kite.kiteangle += self.step
         elif self.inputmode == 3:  # ManBar - maybe switch to arrows - let's do this all
-            if joybuttons and joybuttons[7] == 0 and joybuttons[8] == 0:
-                base.barangle += (self.step / 2 * joyaxes[2])
-            else: # c or z button pressed
-                kite.x += (self.step * joyaxes[2])
-                kite.y -= (self.step * joyaxes[3])
+            if joybuttons:
+                if joybuttons[7] == 0 and joybuttons[8] == 0:
+                    base.barangle += (self.step / 2 * joyaxes[2])
+                else: # c or z button pressed
+                    kite.x += (self.step * joyaxes[2])
+                    kite.y -= (self.step * joyaxes[3])
             if event == 'Wider':  # anti-clockwise
                 base.barangle -= self.step  # this will change
             elif event == 'Narrow':  # clockwise
