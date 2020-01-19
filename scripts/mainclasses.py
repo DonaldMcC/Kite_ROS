@@ -237,9 +237,9 @@ class Controls(object):
         elif inputmode == 1:
             return 'SETFLIGHTMODE: Left Right Up Down Pause Park Wiggle Fig8 Reset Mode Quit'
         elif self.inputmode == 2:
-            return 'MANFLIGHT: Left Right Up Down Pause Anti Clock Spare NotUsed Mode Quit'
+            return 'MANFLIGHT: Left Right Up Down Pause Anti Clock Slow Fast Mode Quit'
         else:  # inputmode = 3
-            return 'MANBAR: Left Right Up Down Pause Anti Clock Spare NotUsed Mode Quit'
+            return 'MANBAR: Left Right Up Down Pause Anti Clock Slow Fast Mode Quit'
 
     @staticmethod
     def get_change_mode_buttons(inputmode):
@@ -251,7 +251,7 @@ class Controls(object):
                           ('Expand', 'Fig8'), ('Contract', 'Reset')]
         elif inputmode == 2:
             newbuttons = [('Mode: STD:', 'Mode: MANFLIGHT'), ('Wider', 'Anti'), ('Narrow', 'Clock'),
-                          ('Expand', 'Spare'), ('Contract', 'NotUsed')]
+                          ('Expand', 'Slow'), ('Contract', 'Fast')]
         else:
             newbuttons = [('Mode: STD:', 'Mode: MANBAR:')]
         return newbuttons
@@ -268,20 +268,37 @@ class Controls(object):
         # 2. nunchuk left - right joystick(floating value in the range - 1 = left..1 = right)
         # 3. nunchuk down - up joystick(floating value in the range - 1 = down.. 1 = up)
 
-        # 0. XWII_KEY_A - maybe the pause button
+        # 0. XWII_KEY_A - this should change the mode
         # 1. XWII_KEY_B - this should toggle the rockers between move and stretch squashc
-        # 2. XWII_KEY_PLUS - probably the faster button and poss some other things
-        # 3. XWII_KEY_MINUS - probably the slower button and poss some other things
+        # 2. XWII_KEY_PLUS - probably the faster button and poss some other things for playback
+        # 3. XWII_KEY_MINUS - probably the slower button and poss some other things for playback in slow motion
         # 4. XWII_KEY_HOME this should be the quit key
-        # 5. XWII_KEY_ONE  this will do an input mode change
+        # 5. XWII_KEY_ONE  this will do a pause
         # 6. XWII_KEY_TWO  and this will do a flight mode change
-        # 7. XWII_KEY_C - so this will be left or anticlockwise flight depending on key b
-        # 8. XWII_KEY_Z   and this will be right or clockwise kite depending on key b
+        # 7. XWII_KEY_C - so
+        # 8. XWII_KEY_Z   so bigger numchuck key should change manflight to angle kite
 
         # in terms of what we do with this the basic idea is that the nunchuk flies the kite
         # and the rockers support the route moving about
         reset_stitcher = False
-        if self.inputmode == 0:  # Standard
+
+        # events for all input modes
+        if (joybuttons and joybuttons[0] == 1) or event == 'Mode':  # modechange on A key
+            self.inputmode += 1
+            kite.barbasedangle = True if self.inputmode == 3 else False
+            if self.inputmode == 4:  # simple toggle around 3 modes
+                self.inputmode = 0
+            self.modestring = self.getmodestring(self.inputmode)
+            self.newbuttons = self.get_change_mode_buttons(self.inputmode)
+        elif (joybuttons and joybuttons[5] == 1) or event == 'Pause':  # pause on 1 key
+                time.sleep(10)
+        elif (joybuttons and joybuttons[3] == 1):  # slow
+            self.slow += 0.1
+        elif (joybuttons and joybuttons[2] == 1):  # fast
+            self.slow = 0.0
+
+        # common handling when not in one of the man modes
+        if self.inputmode == 0 or self.inputmode == 1:
             if (joybuttons and joyaxes[0] == -1) or event == 'Left':  # left:  # left
                 self.centrex -= self.step
                 kite.routechange = True
@@ -294,7 +311,30 @@ class Controls(object):
             elif (joybuttons and joyaxes[1] == -1) or event == 'Down':  # down
                 self.centrey += self.step
                 kite.routechange = True
-            elif event == 'Wider':  # wider
+        elif self.inputmode == 2 or self.inputmode == 3: # common events for Man modes
+            if joybuttons:
+                if joyaxes[0] != 0:  # -1 = left +1 = right
+                    self.centrex += self.step * int(joyaxes[0])
+                    kite.routechange = True
+                elif joyaxes[1] != 0:  # 1 = up -1 = down so needs inverted
+                    self.centrey += self.step * int(joyaxes[1])
+                    kite.routechange = True
+                elif event == 'Left':  # left
+                    kite.x -= self.step
+                elif event == 'Right':  # right
+                    kite.x += self.step
+                elif event == 'Up':  # up
+                    kite.y -= self.step
+                elif event == 'Down':  # down
+                    kite.y += self.step
+                    # move via buttons
+                elif event == 'Expand':  # slow
+                    self.slow += 0.1
+                elif event == 'Contract':  # fast
+                    self.slow = 0.0
+
+        if self.inputmode == 0:  # Standard
+            if event == 'Wider':  # wider
                 self.halfwidth += self.step
             elif event == 'Narrow':  # narrower
                 self.halfwidth -= self.step
@@ -302,26 +342,7 @@ class Controls(object):
                 self.radius += self.step
             elif event == 'Contract':  # contract
                 self.radius -= self.step
-            elif (joybuttons and joybuttons[3] == 1) or event == 'Slow':  # slow
-                self.slow += 0.1
-            elif (joybuttons and joybuttons[2] == 1) or event == 'Fast':  # fast
-                self.slow = 0.0
-            elif (joybuttons and joybuttons[0] == 1) or event == 'Pause':  # pause - this may apply in all modes
-                time.sleep(10)
-
-        if self.inputmode == 1:  # SetFlight
-            if (joybuttons and joyaxes[0] == -1) or event == 'Left':  # left:  # left
-                self.centrex -= self.step
-                kite.routechange = True
-            elif (joybuttons and joyaxes[0] == 1) or event == 'Right':  # right
-                self.centrex += self.step
-                kite.routechange = True
-            elif (joybuttons and joyaxes[1] == 1) or event == 'Up':  # up
-                self.centrey -= self.step
-                kite.routechange = True
-            elif (joybuttons and joyaxes[1] == -1) or event == 'Down':  # down
-                self.centrey += self.step
-                kite.routechange = True
+        elif self.inputmode == 1:  # SetFlight
             if joybuttons and joybuttons[6] == 1:  # move mode forward
                 if kite.mode == 'Park':
                     kite.mode = 'Wiggle'
@@ -339,68 +360,25 @@ class Controls(object):
                 base.reset = True
         elif self.inputmode == 2:  # ManFlight - maybe switch to arrows - let's do this all
             if joybuttons:
-                if joyaxes[0] != 0:  # -1 = left +1 = right
-                    self.centrex += self.step * int(joyaxes[0])
-                    kite.routechange = True
-                elif joyaxes[1] != 0:  # 1 = up -1 = down so needs inverted
-                    self.centrey += self.step * int(joyaxes[1])
-                    kite.routechange = True
                 if joybuttons[7] == 0 and joybuttons[8] == 0:
                     kite.x += (self.step * joyaxes[2])
                     kite.y -= (self.step * joyaxes[3])
-                elif joybuttons[7] == 1:  # c button pressed - but not working - as calced from kite
-                    base.barangle += (self.step / 2 * joyaxes[2])
-                else:  # z button pressed
+                else: #  c or z button pressed angle the kite and automatically the bar
                     kite.kiteangle += (self.step / 2 * joyaxes[2])
-            # move via buttons
-            if event == 'Left':  # left
-                kite.x -= self.step
-            elif event == 'Right':  # right
-                kite.x += self.step
-            elif event == 'Up':  # up
-                kite.y -= self.step
-            elif event == 'Down':  # down
-                kite.y += self.step
-            elif event == 'Expand':  # bar gauche
-                base.barangle -= self.step
-            elif event == 'Contract':  # bar rigHt
-                base.barangle += self.step
-            elif event == 'Wider':  # anti clockwise
+            if event == 'Wider':  # anti clockwise
                 kite.kiteangle -= self.step
             elif event == 'Narrow':  # clockwise
                 kite.kiteangle += self.step
         elif self.inputmode == 3:  # ManBar - maybe switch to arrows - let's do this all
-            if joybuttons:
-                if joyaxes[0] != 0:  # -1 = left +1 = right
-                    self.centrex += self.step * int(joyaxes[0])
-                    kite.routechange = True
-                elif joyaxes[1] != 0:  # 1 = up -1 = down so needs inverted
-                    self.centrey += self.step * int(joyaxes[1])
-                    kite.routechange = True
             if joybuttons and joybuttons[7] == 0 and joybuttons[8] == 0:
                 base.barangle += (self.step / 2 * joyaxes[2])
+            else: # c or z button pressed
+                kite.x += (self.step * joyaxes[2])
+                kite.y -= (self.step * joyaxes[3])
             if event == 'Wider':  # anti-clockwise
                 base.barangle -= self.step  # this will change
             elif event == 'Narrow':  # clockwise
                 base.barangle += self.step
-            elif event == 'Left':  # left
-                kite.x -= self.step
-            elif event == 'Right':  # right
-                kite.x += self.step
-            elif event == 'Up':  # up
-                kite.y -= self.step
-            elif event == 'Down':  # down
-                kite.y += self.step
-        if (joybuttons and joybuttons[5] == 1) or event == 'Mode':  # modechange
-            self.inputmode += 1
-            kite.barbasedangle = True if self.inputmode == 3 else False
-            if self.inputmode == 4:  # simple toggle around 3 modes
-                self.inputmode = 0
-            self.modestring = self.getmodestring(self.inputmode)
-            self.newbuttons = self.get_change_mode_buttons(self.inputmode)
-
-        if event == 'Pause':
-            time.sleep(10)
 
         return joybuttons and joybuttons[4] == 1, reset_stitcher  # quit
 
