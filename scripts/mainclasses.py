@@ -25,10 +25,10 @@ from collections import deque
 
 
 class Config(object):
-    def __init__(self, source=2, setup='Standard', masklimit=10000,
+    def __init__(self, source=2, kite='Standard', masklimit=10000,
                  logging=0, numcams=1, input='keyboard', check_motor_sim=False):
         self.source = source
-        self.setup = setup
+        self.kite = kite
         self.masklimit = masklimit
         self.logging = logging
         self.numcams = numcams
@@ -39,7 +39,7 @@ class Config(object):
 class Base(object):
 
     def __init__(self, barangle=0, parkangle=0, maxright=40, maxleft=-40, lag=1,
-                 targetbarangle=0, kitebarratio=1, updatemode='Standard', inferbarangle=0):
+                 targetbarangle=0, kitebarratio=1, inferbarangle=0):
         self.barangle = barangle
         self.parkangle = parkangle
         self.maxright = maxright
@@ -49,7 +49,6 @@ class Base(object):
         self.targetbarangle = targetbarangle
         self.inferbarangle = inferbarangle
         self.kitebarratio = kitebarratio  # this will be the rate of change of barangle to kite angle
-        self.updatemode = updatemode  # Standard will be unconnected and Manbar will be bar angles kite
         self.mockangle = 0
         self.reset = False
 
@@ -198,7 +197,6 @@ class Kite(object):
                 # TODO ensure change of flight mode is barred unless in the centre zone -
                 # seems sensible and should
                 # mena changemode and changephase generally only triggered in centre zone
-
         return
 
 
@@ -217,11 +215,10 @@ class Controls(object):
             self.halfwidth = 200
             self.radius = 100
         self.routepoints = calc_route(self.centrex, self.centrey, self.halfwidth, self.radius)
-        # possible config ('Standard', 'SetFlight', 'ManFly')
-        self.config = config
+        self.config = config   #  possible config ('Standard', 'Manual')
         if self.config == 'Standard':
             self.inputmode = 0
-        elif self.config == 'Manfly':  # Manfly
+        elif self.config == 'Manual':  # Manual kite start with kite fling
             self.inputmode = 2
         else:
             self.inputmode = 3  # Manbar
@@ -396,6 +393,7 @@ class Controls(object):
                 kite.y += self.step
         if (joybuttons and joybuttons[5] == 1) or event == 'Mode':  # modechange
             self.inputmode += 1
+            kite.barbasedangle = True if self.inputmode == 3 else False
             if self.inputmode == 4:  # simple toggle around 3 modes
                 self.inputmode = 0
             self.modestring = self.getmodestring(self.inputmode)

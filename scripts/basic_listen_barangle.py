@@ -43,12 +43,11 @@ def get_actmockangle():
 def get_barangle(kite, base, control):
     global barangle
     #  print('barangle', barangle)
-    if control.config == 'Manfly' or control.config == 'Manbar':
-        if base.updatemode == 'Manbar':
-            return base.barangle
-        else:  # when kiteangle is driving the barangle
-            # TO DO add kitebar ratio to this
+    if control.kite == 'Manual':
+        if control.inputmode == 2:  # so when inputmode manual flight you see actual barangle follow from kite
             return kite.kiteangle / base.kitebarratio
+        else:  # when kiteangle is driving the barangle
+            return base.barangle
     else:  # automated flight reading from some sort of sensor via ROS
         return get_actbarangle()
 

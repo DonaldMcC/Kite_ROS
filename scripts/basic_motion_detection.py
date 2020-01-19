@@ -239,8 +239,8 @@ parser.add_argument('-f', '--file', type=str, default='cachedH.npy',
                     help='Filename to load cached matrix')
 parser.add_argument('-l', '--load', type=str, default='yes',
                     help='Do we load cached matrix')
-parser.add_argument('-s', '--setup', type=str, default='Manfly',
-                    help='Setup either Standard or Manfly or Manbar')
+parser.add_argument('-k', '--kite', type=str, default='Manual',
+                    help='Kite either Standard or Manual')
 args = parser.parse_args()
 
 # iphone
@@ -258,7 +258,7 @@ KITETYPE = 'kite1'
 # input options are Keyboard, Joystick or Both
 
 # config = Config(setup='Manfly', source=1, input='Joystick')
-config = Config(setup=args.setup, source=1, numcams=1, input='Joystick', check_motor_sim=True)
+config = Config(setup=args.setup, source=1, numcams=1, input='Joystick', check_motor_sim=False)
 
 while config.source not in {1, 2}:
     config.source = input('Key 1 for camera or 2 for source')
@@ -290,10 +290,10 @@ else:
     # print('video:', camera.grab())
 
 # initiate class instances
-control = Controls(config.setup, step=16)
+control = Controls(config.kite, step=16)
 actkite = Kite(control.centrex, control.centrey)
 mankite = Kite(300, 400)
-base = Base(updatemode=config.setup, kitebarratio=3)
+base = Base(kitebarratio=3)  #TODO look at where 3 has come from - just testing I think
 
 # Initialisation steps
 es = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
@@ -308,7 +308,7 @@ init_motor_msg()
 counter = 0
 foundcounter = 0
 
-if config.setup == 'Standard' and config.source == 1:  # otherwise not present
+if config.kite == 'Standard' and config.source == 1:  # otherwise not present
     listen_kiteangle('kiteangle')  # this then updates base.barangle via the callback function
     result = ""
     while result != "OK":
@@ -350,15 +350,15 @@ if control.inputmode != 0:
             window[x[0]].Update(x[1])
         z+=1
 
-
-
 writer = None
 cv2.startWindowThread()
 cv2.namedWindow('contours')
 fps = 15
 # fps = camera.get(cv2.CV_CAP_PROP_FPS)
 
-kite = mankite if control.config == "Manfly" else actkite
+# below is ok unless we have Manbar when we might want two kites
+# however manbar is also a mode that we can change to
+kite = mankite if control.kite == "Manual" else actkite
 
 while True:  # Main module loop
     if base.reset:
@@ -427,7 +427,7 @@ while True:  # Main module loop
     if config.check_motor_sim:
         base.mockangle = get_actmockangle()
 
-    if base.updatemode == 'Manbar':  # not getting kiteangle from picture
+    if config.kite == 'Manual' and config.inputmode == 3:  # derive kite from bar
         kite.kiteangle = base.barangle * base.kitebarratio
     # lets draw and move cross for manual flying
     if control.config == 'Manfly' or control.config == 'Manbar':
