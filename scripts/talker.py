@@ -43,13 +43,13 @@ def init_motor_msg():
     pub = rospy.Publisher('motormsg', Int16, queue_size=10)
 
 
-def motor_msg(barangle, targetbarangle, tolerance=10, action=None):
+def motor_msg(barangle, targetbarangle, tolerance=10, action=None, doaction=False):
     MAXLEFT = -20  # These are to try and avoid breaking the bar
     MAXRIGHT = 20  # similarly to protect bar as attached close to pivot
 
     global pub
-    if action:
-        pub.publish(action)  # 1 for forward and 2 for backward
+    if doaction:
+        pub.publish(action)  # 1 for forward and 2 for backward - will now execute 0 as doaction drives
         return
     diff = barangle - targetbarangle
     if abs(diff) < tolerance:

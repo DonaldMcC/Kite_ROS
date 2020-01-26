@@ -241,6 +241,8 @@ parser.add_argument('-l', '--load', type=str, default='yes',
                     help='Do we load cached matrix')
 parser.add_argument('-k', '--kite', type=str, default='Manual',
                     help='Kite either Standard or Manual')
+parser.add_argument('-m', '--motortest', type=int, default=0,
+                    help='motortest either 0 or 1')
 args = parser.parse_args()
 
 # iphone
@@ -255,7 +257,7 @@ KITETYPE = 'kite1'
 # and perhaps a configuration class
 # controls setup self.inputmodes = ('Standard', 'SetFlight', 'ManFly')
 # setup options are Manfly, Standard
-# input options are Keyboard, Joystick or Both
+# input now always joystick - but pysimplegui buttons also work
 
 # config = Config(setup='Manfly', source=1, input='Joystick')
 config = Config(kite=args.kite, source=1, numcams=1, input='Joystick', check_motor_sim=False)
@@ -284,13 +286,13 @@ if config.source == 1:
 else:
     # TODO at some point will change this to current directory and append file - not urgent
     camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
-    # Videostream seems to create errors with playbakc
+    # Videostream seems to create errors with playback
     # camera = VideoStream(src=r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4').start()
     # camera = VideoStream(src=r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4').start()
     # print('video:', camera.grab())
 
 # initiate class instances
-control = Controls(config.kite, step=16)
+control = Controls(config.kite, step=16, motortest=args.motortest)
 actkite = Kite(control.centrex, control.centrey)
 mankite = Kite(300, 400)
 base = Base(kitebarratio=3)  # TODO look at where 3 has come from - just testing I think
@@ -323,7 +325,7 @@ if config.check_motor_sim:
     listen_kiteangle('mockangle')  # this then subscribes to our simulation of expected movement of the bar
 
 if config.input == 'Joystick':
-    listen_joystick()  # subscribe to joystick messages - now default option
+    listen_joystick()  # subscribe to joystick messages - now only option
 
 sg.theme('Black')  # Pysimplegui setup
 
@@ -417,7 +419,6 @@ while True:  # Main module loop
     gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     gray_frame = cv2.GaussianBlur(gray_frame, (21, 21), 0)
     diff = cv2.absdiff(background, gray_frame)
-    # diff = cv2.threshold(diff, 25, 255, cv2.THRESH_BINARY)[1]
     diff = cv2.threshold(diff, 25, 255, cv2.THRESH_BINARY)[1]
 
     diff = cv2.dilate(diff, es, iterations=2)
@@ -429,7 +430,8 @@ while True:  # Main module loop
 
     if config.kite == 'Manual' and control.inputmode == 3:  # derive kite from bar
         kite.kiteangle = base.barangle * base.kitebarratio
-    # lets draw and move cross for manual flying
+
+    # draw and move cross for manual flying
     if config.kite == 'Manual':
         drawkite(kite)
         kite.found = True
@@ -493,7 +495,7 @@ while True:  # Main module loop
     display_base(width)
 
     kite_pos(kite.x, kite.y, kite.kiteangle, kite.dX, kite.dY, 0, 0)
-    motor_msg(base.barangle, base.targetbarangle, 5)
+    motor_msg(base.barangle, base.targetbarangle, 5, base.action, control.motortest)
     cv2.imshow("contours", frame)
     # below commented due to failing on 18.04
     # kiteimage.pubimage(imagemessage, frame)
@@ -511,7 +513,7 @@ while True:  # Main module loop
         window[x[0]].Update(x[1])
 
     joybuttons, joyaxes = get_joystick()
-    quitkey, resetH = control.joyhandler(joybuttons, joyaxes, kite, base, event)
+    quitkey, resetH = control.joyhandler(joybuttons, joyaxes, kite, base, control, event)
 
     # print('mode', control.inputmode, base.updatemode)
     if quitkey or event in ('Quit', None):  # quit if controls window closed or home key
@@ -521,6 +523,7 @@ while True:  # Main module loop
         stitcher.cachedH = None
     time.sleep(control.slow)
 
+# Exit and clean up
 print("[INFO] cleaning up...")
 cv2.destroyAllWindows()
 if config.numcams == 1:

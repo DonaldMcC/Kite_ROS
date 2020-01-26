@@ -51,6 +51,8 @@ class Base(object):
         self.kitebarratio = kitebarratio  # this will be the rate of change of barangle to kite angle
         self.mockangle = 0
         self.reset = False
+        self.action = None
+
 
 class Kite(object):
 
@@ -202,7 +204,7 @@ class Kite(object):
 
 class Controls(object):
 
-    def __init__(self, config='Standard', step=8):
+    def __init__(self, config='Standard', step=8, motortest=False):
         try:  # this will fail on windows but don't need yet and not convinced I need to set parameters separately
             self.centrex = rospy.get_param('centrex', 400)
             self.centrey = rospy.get_param('centrey', 300)
@@ -228,6 +230,7 @@ class Controls(object):
         self.maxy = 20  # this should be for top of centre line and sets they y target point for park mode
         self.slow = 0.0
         self.newbuttons = []
+        self.motortest=motortest
 
     def getmodestring(self, inputmode):
         # So now always 11 buttons and first 5 and last 2 are std and iteration through should be std
@@ -256,7 +259,7 @@ class Controls(object):
             newbuttons = [('Mode: STD:', 'Mode: MANBAR:')]
         return newbuttons
 
-    def joyhandler(self, joybuttons, joyaxes, kite, base, event=None):
+    def joyhandler(self, joybuttons, joyaxes, kite, base, control, event=None):
         # Using https://github.com/arnaud-ramey/rosxwiimote as a ros package to capture
         # the joystick message this was because std one tried to do bluetooth
         # connection to wiimote via python and it didn't work perhaps as only
@@ -291,7 +294,10 @@ class Controls(object):
             self.modestring = self.getmodestring(self.inputmode)
             self.newbuttons = self.get_change_mode_buttons(self.inputmode)
         elif (joybuttons and joybuttons[5] == 1) or event == 'Pause':  # pause on 1 key
-                time.sleep(10)
+                if not control.motortest:
+                    time.sleep(10)
+                else:
+                    base.action = 5  # Stop
         elif (joybuttons and joybuttons[3] == 1):  # slow
             self.slow += 0.1
         elif (joybuttons and joybuttons[2] == 1):  # fast
@@ -302,15 +308,19 @@ class Controls(object):
             if (joybuttons and joyaxes[0] == -1) or event == 'Left':  # left:  # left
                 self.centrex -= self.step
                 kite.routechange = True
+                base.action = 3
             elif (joybuttons and joyaxes[0] == 1) or event == 'Right':  # right
                 self.centrex += self.step
                 kite.routechange = True
+                base.action = 4
             elif (joybuttons and joyaxes[1] == 1) or event == 'Up':  # up
                 self.centrey -= self.step
                 kite.routechange = True
+                base.action = 1
             elif (joybuttons and joyaxes[1] == -1) or event == 'Down':  # down
                 self.centrey += self.step
                 kite.routechange = True
+                base.action = 2
         elif self.inputmode == 2 or self.inputmode == 3: # common events for Man modes
             if joybuttons:
                 if joyaxes[0] != 0:  # -1 = left +1 = right
