@@ -39,7 +39,10 @@ import rospy
 import argparse
 from std_msgs.msg import String, Int16
 from kite_funcs import getangle, getresist
-motorvalue = 0
+motorvalue = 3
+barangle = 0
+MAXLEFT = -20  # These are to simulate limits of angles
+MAXRIGHT = 20  # similarly to protect bar as attached close to pivot
 
 DIST_ACT = 35.0  # mm
 DIST_HANDLE = 350.0  # mm
@@ -63,13 +66,12 @@ def get_motorv():
     return motorvalue
 
 
-def mock_kiteangle(barangle, message):
-
+def mock_kiteangle(message):
     global motorvalue
+    global barangle
     pub = rospy.Publisher(message, Int16, queue_size=3)
     rospy.init_node('mock_arduino', anonymous=False)
     rate = rospy.Rate(10)  # 5hz
-    motorvalue = 2  # so always go back to start with
 
     # left_act_pos = get_coord(0-DIST_ACT, 0, barangle) not convinced this serves purpose
     loop_time = time.time()
@@ -80,51 +82,58 @@ def mock_kiteangle(barangle, message):
         print('motorv', motorvalue)
         elapsed_time = time.time() - loop_time
         loop_time = time.time()
-        resistance, newbarangle = mockangle(barangle, elapsed_time)
-        rospy.loginfo(newbarangle)
+        barangle = mockangle(barangle, elapsed_time)#
+        resistance = get_resistance(barangle)
+        rospy.loginfo(barangle)
         pub.publish(resistance)
-        print(time.time(), newbarangle, resistance)
+        print(elapsed_time, barangle, resistance)
         rate.sleep()
 
 
-def mockangle(barangle, elapsed_time):
+def mockangle(angle, elapsed_time):
     """This now attempts to simulate how we believe the bar should respond to messages sent to
     the actuator given known distance from 'fulcrum' to mounting points and speed of the actuator.
     Motorvalue is received for left and right and resistance is sent back as kiteangle message."""
-
-    resistleft = 340
-    resistright = 740
     global motorvalue
 
     get_motorv()
-
+    print(angle)
     if motorvalue:
         if motorvalue == 1 or motorvalue == 2:
-            barangle = 0
+            angle = 0
         else:
             if motorvalue == 3:  # Left
                 act_dist = 0 - (SPEED_ACT * elapsed_time)
+                print(act_dist)
             elif motorvalue == 4:  # Right
                 act_dist = SPEED_ACT * elapsed_time
             anglechange = (360 * act_dist) / CIRC_ACT
-            barangle += anglechange
+            print(anglechange)
+            angle += anglechange
+    if angle <= MAXLEFT:
+        angle = MAXLEFT
+    elif angle >= MAXRIGHT:
+        angle = MAXRIGHT
 
+    return angle
+
+def get_resistance(barangle):
+    resistleft = 340
+    resistright = 740
     resistance = getresist(barangle)
     if resistance < resistleft:
         resistance = resistleft
-    if resistance > resistright:
+    elif resistance > resistright:
         resistance = resistright
-
-    return resistance, barangle
-
+    return resistance
 
 if __name__ == '__main__':
     try:
         parser = argparse.ArgumentParser()
         parser.add_argument('-m', '--message', type=str, default='kiteangle',
-                            help='message to generate eitehr kiteangle or mockangle')
+                            help='message to generate either kiteangle or mockangle')
         args = parser.parse_args()
-        mock_kiteangle(0, args.message)
+        new_angle = mock_kiteangle(args.message)
         #mock_kiteangle(0, 'kiteangle')
         #kiteangle(0)
         # test_kiteangle(0) this was just for testing new approach
