@@ -72,7 +72,6 @@ def mock_kiteangle(message):
     pub = rospy.Publisher(message, Int16, queue_size=3)
     rospy.init_node('mock_arduino', anonymous=False)
     rate = rospy.Rate(10)  # 5hz
-
     # left_act_pos = get_coord(0-DIST_ACT, 0, barangle) not convinced this serves purpose
     loop_time = time.time()
     listen_motormsg()
@@ -82,13 +81,13 @@ def mock_kiteangle(message):
         print('motorv', motorvalue)
         elapsed_time = time.time() - loop_time
         loop_time = time.time()
-        barangle = mockangle(barangle, elapsed_time)#
+        barangle = mockangle(barangle, elapsed_time)
         resistance = get_resistance(barangle)
         rospy.loginfo(barangle)
         pub.publish(resistance)
         print(elapsed_time, barangle, resistance)
         rate.sleep()
-
+    return True
 
 def mockangle(angle, elapsed_time):
     """This now attempts to simulate how we believe the bar should respond to messages sent to
@@ -114,18 +113,19 @@ def mockangle(angle, elapsed_time):
         angle = MAXLEFT
     elif angle >= MAXRIGHT:
         angle = MAXRIGHT
-
     return angle
 
-def get_resistance(barangle):
+
+def get_resistance(angle):
     resistleft = 340
     resistright = 740
-    resistance = getresist(barangle)
+    resistance = getresist(angle)
     if resistance < resistleft:
         resistance = resistleft
     elif resistance > resistright:
         resistance = resistright
     return resistance
+
 
 if __name__ == '__main__':
     try:
@@ -134,8 +134,5 @@ if __name__ == '__main__':
                             help='message to generate either kiteangle or mockangle')
         args = parser.parse_args()
         new_angle = mock_kiteangle(args.message)
-        #mock_kiteangle(0, 'kiteangle')
-        #kiteangle(0)
-        # test_kiteangle(0) this was just for testing new approach
     except rospy.ROSInterruptException:
         pass
