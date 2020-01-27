@@ -306,21 +306,29 @@ class Controls(object):
         # common handling when not in one of the man modes
         if self.inputmode == 0 or self.inputmode == 1:
             if (joybuttons and joyaxes[0] == -1) or event == 'Left':  # left:  # left
-                self.centrex -= self.step
-                kite.routechange = True
-                base.action = 3
+                if not control.motortest:
+                    self.centrex -= self.step
+                    kite.routechange = True
+                else:
+                    base.action = 3
             elif (joybuttons and joyaxes[0] == 1) or event == 'Right':  # right
-                self.centrex += self.step
-                kite.routechange = True
-                base.action = 4
+                if not control.motortest:
+                    self.centrex += self.step
+                    kite.routechange = True
+                else:
+                    base.action = 4
             elif (joybuttons and joyaxes[1] == 1) or event == 'Up':  # up
-                self.centrey -= self.step
-                kite.routechange = True
-                base.action = 1
+                if not control.motortest:
+                    self.centrey -= self.step
+                    kite.routechange = True
+                else:
+                    base.action = 1
             elif (joybuttons and joyaxes[1] == -1) or event == 'Down':  # down
-                self.centrey += self.step
-                kite.routechange = True
-                base.action = 2
+                if not control.motortest:
+                    self.centrey += self.step
+                    kite.routechange = True
+                else:
+                    base.action = 2
         elif self.inputmode == 2 or self.inputmode == 3: # common events for Man modes
             if joybuttons:
                 if joyaxes[0] != 0:  # -1 = left +1 = right

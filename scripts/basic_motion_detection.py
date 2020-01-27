@@ -241,7 +241,7 @@ parser.add_argument('-l', '--load', type=str, default='yes',
                     help='Do we load cached matrix')
 parser.add_argument('-k', '--kite', type=str, default='Manual',
                     help='Kite either Standard or Manual')
-parser.add_argument('-m', '--motortest', type=int, default=0,
+parser.add_argument('-m', '--motortest', type=int, default=1,
                     help='motortest either 0 or 1')
 args = parser.parse_args()
 
