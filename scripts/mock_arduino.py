@@ -89,6 +89,7 @@ def mock_kiteangle(message):
         rate.sleep()
     return True
 
+
 def mockangle(angle, elapsed_time):
     """This now attempts to simulate how we believe the bar should respond to messages sent to
     the actuator given known distance from 'fulcrum' to mounting points and speed of the actuator.
@@ -103,12 +104,11 @@ def mockangle(angle, elapsed_time):
         else:
             if motorvalue == 3:  # Left
                 act_dist = 0 - (SPEED_ACT * elapsed_time)
-                print(act_dist)
             elif motorvalue == 4:  # Right
                 act_dist = SPEED_ACT * elapsed_time
-            anglechange = (360 * act_dist) / CIRC_ACT
-            print(anglechange)
-            angle += anglechange
+            else:
+                act_dist = 0
+            angle += (360 * act_dist) / CIRC_ACT
     if angle <= MAXLEFT:
         angle = MAXLEFT
     elif angle >= MAXRIGHT:
