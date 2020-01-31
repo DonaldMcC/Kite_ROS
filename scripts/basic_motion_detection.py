@@ -232,6 +232,7 @@ def display_line(angle, cx, cy, radius, colour):
     cv2.line(frame, (offx, offy), (pointx, pointy), colour, 2)
     return
 
+
 def display_motor_msg(action):
     fontsize = 0.5
     cv2.putText(frame, 'Motor Msg: ' + str(action), (20, 20), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 255, 255), 2)
@@ -243,9 +244,9 @@ parser.add_argument('-f', '--file', type=str, default='cachedH.npy',
                     help='Filename to load cached matrix')
 parser.add_argument('-l', '--load', type=str, default='yes',
                     help='Do we load cached matrix')
-parser.add_argument('-k', '--kite', type=str, default='Standard',
+parser.add_argument('-k', '--kite', type=str, default='Manual',
                     help='Kite either Standard or Manual')
-parser.add_argument('-m', '--motortest', type=int, default=1,
+parser.add_argument('-m', '--motortest', type=int, default=0,
                     help='motortest either 0 or 1')
 args = parser.parse_args()
 
@@ -500,8 +501,8 @@ while True:  # Main module loop
 
     kite_pos(kite.x, kite.y, kite.kiteangle, kite.dX, kite.dY, 0, 0)
     motor_msg(base.barangle, base.targetbarangle, 5, base.action, control.motortest)
-    if control.motortest:
-        display_motor_msg(base.action)
+    # if control.motortest:
+    display_motor_msg(base.action)
     cv2.imshow("contours", frame)
     # below commented due to failing on 18.04
     # kiteimage.pubimage(imagemessage, frame)
