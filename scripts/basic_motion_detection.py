@@ -197,7 +197,7 @@ def display_stats():
     cv2.putText(frame, kite.direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
     cv2.putText(frame, "dx: {:.1f}, dy: {:.1f}".format(kite.dX, kite.dY),
                 (10, height - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 1)
-    cv2.putText(frame, "Man x: {:.1f}, y: {:.1f}".format(mankite.x, mankite.y),
+    cv2.putText(frame, "Man x: {:.1f}, y: {:.1f}".format(kite.x, kite.y),
                 (180, height - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 2)
     cv2.putText(frame, "Act Angle: " + str(int(kite.kiteangle)),
                 (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
@@ -321,7 +321,7 @@ foundcounter = 0
 listen_kiteangle('kiteangle')  # this then updates base.barangle via the callback function
 result = ""
 while result != "OK":
-    result = check_kite(kite, base, control)
+    result = check_kite(kite, base, control, config)
     print(result)
     if result != "OK":
         go_on = input("Contine (Y/N)")

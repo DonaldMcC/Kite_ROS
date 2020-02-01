@@ -61,12 +61,12 @@ def get_angles(kite, base, control, config):
     return
 
 
-def check_kite(kite, base, control):
+def check_kite(kite, base, control, config):
     # this will now generally be called when motion_detection starts - it will do the following things
     # fully retract both actuators and once done confirm barangle is approximately zero
     tolerance = 10
-    reset_bar()
-    actangle = get_barangle(kite, base, control)
+    reset_bar(base)
+    actangle = get_barangle(kite, base, control, config)
     if abs(actangle) < tolerance:
         return "OK"
     else:
