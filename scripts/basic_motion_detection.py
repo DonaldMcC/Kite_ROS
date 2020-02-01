@@ -246,8 +246,10 @@ parser.add_argument('-l', '--load', type=str, default='yes',
                     help='Do we load cached matrix')
 parser.add_argument('-k', '--kite', type=str, default='Manual',
                     help='Kite either Standard or Manual')
+parser.add_argument('-s', '--setup', type=str, default='Standard',
+                    help='KiteActual, KiteTarget, BarActual, BarTarget')
 parser.add_argument('-m', '--motortest', type=int, default=0,
-                    help='motortest either 0 or 1')
+                    help='motortest either 0 or 1')  #  This allows direct motor commands to be sent
 args = parser.parse_args()
 
 # iphone
@@ -265,7 +267,7 @@ KITETYPE = 'kite1'
 # input now always joystick - but pysimplegui buttons also work
 
 # config = Config(setup='Manfly', source=1, input='Joystick')
-config = Config(kite=args.kite, source=1, numcams=1, input='Joystick', check_motor_sim=False)
+config = Config(kite=args.kite, source=1, numcams=1, input='Joystick', check_motor_sim=False, setup=args.setup)
 
 while config.source not in {1, 2}:
     config.source = input('Key 1 for camera or 2 for source')
