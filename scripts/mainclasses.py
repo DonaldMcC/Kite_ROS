@@ -26,13 +26,12 @@ from collections import deque
 
 class Config(object):
     def __init__(self, source=2, kite='Standard', masklimit=10000,
-                 logging=0, numcams=1, input='keyboard', check_motor_sim=False, setup='Standard'):
+                 logging=0, numcams=1, check_motor_sim=False, setup='Standard'):
         self.source = source
         self.kite = kite
         self.masklimit = masklimit
         self.logging = logging
         self.numcams = numcams
-        self.input = input
         self.check_motor_sim = check_motor_sim
         self.setup = setup
 

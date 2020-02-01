@@ -49,7 +49,7 @@ from mainclasses import Kite, Controls, Base, Config, calc_route
 from move_func import get_angle
 from talker import kite_pos, KiteImage, motor_msg, init_motor_msg, init_ros
 from cvwriter import initwriter, writeframe
-from basic_listen_barangle import listen_kiteangle, get_barangle, check_kite, get_actmockangle, reset_bar
+from basic_listen_barangle import listen_kiteangle, get_barangle, check_kite, get_actmockangle, reset_bar, get_angles
 from listen_joystick import listen_joystick, get_joystick
 from kite_funcs import kitemask, calcbarangle, inferangle
 
@@ -247,7 +247,9 @@ parser.add_argument('-l', '--load', type=str, default='yes',
 parser.add_argument('-k', '--kite', type=str, default='Manual',
                     help='Kite either Standard or Manual')
 parser.add_argument('-s', '--setup', type=str, default='Standard',
-                    help='KiteActual, KiteTarget, BarActual, BarTarget')
+                    help='Standard, BarKiteActual, KiteBarActual, KiteBarTarget')
+# Standard means no connections between KiteAngle, KiteTargetAngle and Bar Angles others
+# show connections from and to
 parser.add_argument('-m', '--motortest', type=int, default=0,
                     help='motortest either 0 or 1')  #  This allows direct motor commands to be sent
 args = parser.parse_args()
@@ -266,8 +268,12 @@ KITETYPE = 'kite1'
 # setup options are Manfly, Standard
 # input now always joystick - but pysimplegui buttons also work
 
+# initiate class instances
 # config = Config(setup='Manfly', source=1, input='Joystick')
-config = Config(kite=args.kite, source=1, numcams=1, input='Joystick', check_motor_sim=False, setup=args.setup)
+config = Config(kite=args.kite, source=1, numcams=1, check_motor_sim=False, setup=args.setup)
+control = Controls(config.kite, step=16, motortest=args.motortest)
+kite = Kite(300, 400) if control.config == "Manual" else Kite(control.centrex, control.centrey)
+base = Base(kitebarratio=1)
 
 while config.source not in {1, 2}:
     config.source = input('Key 1 for camera or 2 for source')
@@ -298,12 +304,6 @@ else:
     # camera = VideoStream(src=r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4').start()
     # print('video:', camera.grab())
 
-# initiate class instances
-control = Controls(config.kite, step=16, motortest=args.motortest)
-actkite = Kite(control.centrex, control.centrey)
-mankite = Kite(300, 400)
-base = Base(kitebarratio=3)  # TODO look at where 3 has come from - just testing I think
-
 # Initialisation steps
 es = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
 kernel = np.ones((5, 5), np.uint8)
@@ -317,22 +317,21 @@ init_motor_msg()
 counter = 0
 foundcounter = 0
 
-if config.kite == 'Standard' and config.source == 1:  # otherwise not present
-    listen_kiteangle('kiteangle')  # this then updates base.barangle via the callback function
-    result = ""
-    while result != "OK":
-        result = check_kite(actkite, base, control)
-        print(result)
-        if result != "OK":
-            go_on = input("Contine (Y/N)")
-            if go_on == "Y":
-                break
+
+listen_kiteangle('kiteangle')  # this then updates base.barangle via the callback function
+result = ""
+while result != "OK":
+    result = check_kite(kite, base, control)
+    print(result)
+    if result != "OK":
+        go_on = input("Contine (Y/N)")
+        if go_on == "Y":
+            break
 
 if config.check_motor_sim:
     listen_kiteangle('mockangle')  # this then subscribes to our simulation of expected movement of the bar
 
-if config.input == 'Joystick':
-    listen_joystick()  # subscribe to joystick messages - now only option
+listen_joystick()  # subscribe to joystick messages - now only option
 
 sg.theme('Black')  # Pysimplegui setup
 
@@ -365,14 +364,10 @@ cv2.namedWindow('contours')
 fps = 15
 # fps = camera.get(cv2.CV_CAP_PROP_FPS)
 
-# below is ok unless we have Manbar when we might want two kites
-# however manbar is also a mode that we can change to
-kite = mankite if control.config == "Manual" else actkite
 
 while True:  # Main module loop
     if base.reset:
-        reset_bar()
-        base.reset = False
+        reset_bar(base)
 
     if config.numcams == 1:
         if config.source == 1:
@@ -431,13 +426,6 @@ while True:  # Main module loop
     diff = cv2.dilate(diff, es, iterations=2)
     image, cnts, hierarchy = cv2.findContours(diff.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
-    base.barangle = get_barangle(kite, base, control)
-    if config.check_motor_sim:
-        base.mockangle = get_actmockangle()
-
-    if config.kite == 'Manual' and control.inputmode == 3:  # derive kite from bar
-        kite.kiteangle = base.barangle * base.kitebarratio
-
     # draw and move cross for manual flying
     if config.kite == 'Manual':
         drawkite(kite)
@@ -484,10 +472,16 @@ while True:  # Main module loop
     # start direction and analysis - this will be a routine based on class
     getdirection(kite)
     kite.targetheading = get_heading_points((kite.x, kite.y), (kite.targetx, kite.targety))
-    kite.targetangle = kite.targetheading
     kite.update_zone(control)
     kite.update_phase()
-    base.targetbarangle = calcbarangle(kite, base, control)
+
+    if config.check_motor_sim:
+        base.mockangle = get_actmockangle()
+
+    # Update actual angles based on full setup
+    get_angles(kite, base, control, config)
+
+    kite.targetangle = kite.targetheading
     if control.config == 'Manfly':  # only doing this if in manual fly mode
         base.inferbarangle = inferangle(kite, base, control)
 
