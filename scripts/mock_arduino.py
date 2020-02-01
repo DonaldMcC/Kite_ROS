@@ -71,7 +71,7 @@ def mock_kiteangle(message):
     global barangle
     pub = rospy.Publisher(message, Int16, queue_size=3)
     rospy.init_node('mock_arduino', anonymous=False)
-    rate = rospy.Rate(10)  # 5hz
+    rate = rospy.Rate(20)  # Cycles per Second
     # left_act_pos = get_coord(0-DIST_ACT, 0, barangle) not convinced this serves purpose
     loop_time = time.time()
     listen_motormsg()
@@ -97,7 +97,6 @@ def mockangle(angle, elapsed_time):
     global motorvalue
 
     get_motorv()
-    print(angle)
     if motorvalue:
         if motorvalue == 1 or motorvalue == 2:
             angle = 0

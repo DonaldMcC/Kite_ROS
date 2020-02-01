@@ -5,7 +5,7 @@
 import time
 import rospy
 from std_msgs.msg import Int16
-from kite_funcs import getangle, calcbarangle
+from kite_funcs import getangle, calcbarangle, inferangle
 from talker import motor_msg
 barangle = 0
 mockangle = 0
@@ -44,7 +44,7 @@ def get_actmockangle():
 
 # this should always return barangle for Manbar or Standard operation Manfly should set
 def get_barangle(kite, base, control, config):
-    if config.setup == 'BarKiteActual':
+    if config.setup == 'KiteBarActual':
         return kite.kiteangle / base.kitebarratio
     else:  # automated flight reading from some sort of sensor via ROS
         return get_actbarangle()
@@ -58,6 +58,8 @@ def get_angles(kite, base, control, config):
         base.targetbarangle = calcbarangle(kite, base, control)
     if config.setup == 'BarKiteActual':  # derive kite from bar
         kite.kiteangle = base.barangle * base.kitebarratio
+    elif config.setup == 'KiteBarInfer':
+        base.inferbarangle = inferangle(kite, base, control)
     return
 
 
@@ -74,7 +76,7 @@ def check_kite(kite, base, control, config):
 
 
 def reset_bar(base):
-    max_retract_time = 10
+    max_retract_time = 5
     motor_msg(0, 0, 0, 1, 1)  # send backward signal
     time.sleep(max_retract_time)  # assumed to be time for motors to fully retract
     motor_msg(0, 0, 0, 5, 1)  # stop

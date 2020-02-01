@@ -49,9 +49,9 @@ from mainclasses import Kite, Controls, Base, Config, calc_route
 from move_func import get_angle
 from talker import kite_pos, KiteImage, motor_msg, init_motor_msg, init_ros
 from cvwriter import initwriter, writeframe
-from basic_listen_barangle import listen_kiteangle, get_barangle, check_kite, get_actmockangle, reset_bar, get_angles
+from basic_listen_barangle import listen_kiteangle, check_kite, get_actmockangle, reset_bar, get_angles
 from listen_joystick import listen_joystick, get_joystick
-from kite_funcs import kitemask, calcbarangle, inferangle
+from kite_funcs import kitemask
 
 
 # this is just for display flight decisions will be elsewhere
@@ -179,7 +179,7 @@ def display_base(width):
                 cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 255, 255), 2)
     display_line(base.targetbarangle, centx, centy, radius, (0, 255, 255))
     display_line(base.barangle, centx, centy, radius, (0, 255, 0))
-    if config.kite == 'Manfly':
+    if config.setup == 'KiteBarInfer':
         display_line(base.inferbarangle, centx, centy, radius, (255, 0, 0))
         cv2.putText(frame, 'Inf: ' + '{:5.1f}'.format(base.inferbarangle), (outx + 15, centy + 160),
                     cv2.FONT_HERSHEY_SIMPLEX,
@@ -210,9 +210,9 @@ def display_stats():
     return
 
 
-def display_flight(width):
+def display_flight(screenwidth):
     # output flight values
-    outx = width - 180
+    outx = screenwidth - 180
     fontsize = 0.5
     tempstr = "Found: Yes" if kite.found else "Found: No"
 
@@ -233,9 +233,9 @@ def display_line(angle, cx, cy, radius, colour):
     return
 
 
-def display_motor_msg(action):
+def display_motor_msg(action, setup):
     fontsize = 0.5
-    cv2.putText(frame, 'Motor Msg: ' + str(action), (20, 20), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 255, 255), 2)
+    cv2.putText(frame, 'Motor Msg: ' + str(action) + ' ' + setup, (20, 20), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 255, 255), 2)
 
 
 # MAIN ROUTINE START
@@ -246,12 +246,12 @@ parser.add_argument('-l', '--load', type=str, default='yes',
                     help='Do we load cached matrix')
 parser.add_argument('-k', '--kite', type=str, default='Manual',
                     help='Kite either Standard or Manual')
-parser.add_argument('-s', '--setup', type=str, default='Standard',
-                    help='Standard, BarKiteActual, KiteBarActual, KiteBarTarget')
+parser.add_argument('-s', '--setup', type=str, default='KiteBarInfer',
+                    help='Standard, BarKiteActual, KiteBarInfer, KiteBarTarget')
 # Standard means no connections between KiteAngle, KiteTargetAngle and Bar Angles others
 # show connections from and to
 parser.add_argument('-m', '--motortest', type=int, default=0,
-                    help='motortest either 0 or 1')  #  This allows direct motor commands to be sent
+                    help='motortest either 0 or 1')   # This allows direct motor commands to be sent
 args = parser.parse_args()
 
 # iphone
@@ -316,7 +316,6 @@ init_motor_msg()
 # and the coordinate deltas
 counter = 0
 foundcounter = 0
-
 
 listen_kiteangle('kiteangle')  # this then updates base.barangle via the callback function
 result = ""
@@ -480,10 +479,7 @@ while True:  # Main module loop
 
     # Update actual angles based on full setup
     get_angles(kite, base, control, config)
-
     kite.targetangle = kite.targetheading
-    if control.config == 'Manfly':  # only doing this if in manual fly mode
-        base.inferbarangle = inferangle(kite, base, control)
 
     if kite.zone == 'Centre' or kite.phase == 'Xwind':
         kite.targetangle = get_heading_points((kite.x, kite.y), (kite.targetx, kite.targety))
@@ -496,9 +492,12 @@ while True:  # Main module loop
     display_base(width)
 
     kite_pos(kite.x, kite.y, kite.kiteangle, kite.dX, kite.dY, 0, 0)
-    motor_msg(base.barangle, base.targetbarangle, 5, base.action, control.motortest)
-    # if control.motortest:
-    display_motor_msg(base.action)
+    msg = motor_msg(base.barangle, base.targetbarangle, 2, base.action, control.motortest)
+    if control.motortest:
+        display_motor_msg(base.action, config.setup)
+    else:
+        display_motor_msg(msg, config.setup)
+
     cv2.imshow("contours", frame)
     # below commented due to failing on 18.04
     # kiteimage.pubimage(imagemessage, frame)

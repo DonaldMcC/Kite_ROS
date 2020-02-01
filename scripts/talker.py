@@ -46,21 +46,19 @@ def init_motor_msg():
 def motor_msg(barangle, targetbarangle, tolerance=10, action=None, doaction=False):
     MAXLEFT = -20  # These are to try and avoid breaking the bar
     MAXRIGHT = 20  # similarly to protect bar as attached close to pivot
-
-    global pub
+    msg = 0
     if doaction:
-        pub.publish(action)  # 1 for forward and 2 for backward - will now execute 0 as doaction drives
-        return
-    diff = barangle - targetbarangle
-    if abs(diff) < tolerance:
-        pub.publish(0)  # stop
-    elif diff > 0 and barangle > MAXLEFT:
-        pub.publish(3)   # Left
-    elif diff < 0 and barangle < MAXRIGHT:
-        pub.publish(4)   # Right
+        msg = action  # 1 for forward and 2 for backward - will now execute 0 as doaction drives
     else:
-        pub.publish(0)
-    return
+        diff = barangle - targetbarangle
+        if abs(diff) < tolerance:
+            msg = 0 # stop
+        elif diff > 0 and barangle > MAXLEFT:
+            msg = 3   # Left
+        elif diff < 0 and barangle < MAXRIGHT:
+            msg = 4  # Right
+    pub.publish(msg)
+    return msg
 
 
 class KiteImage:
