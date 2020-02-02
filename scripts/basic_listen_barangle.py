@@ -44,7 +44,7 @@ def get_barangle(kite, base, control, config):
     if config.setup == 'KiteBarActual':
         return kite.kiteangle / base.kitebarratio
     else:  # automated flight reading from some sort of sensor via ROS
-        return barangle()
+        return barangle
 
 
 def get_angles(kite, base, control, config):
