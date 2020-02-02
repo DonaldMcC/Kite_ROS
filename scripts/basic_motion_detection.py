@@ -171,7 +171,7 @@ def display_base(width):
     centx = outx + 60
     centy = 300
     radius = 60
-    cv2.putText(frame, 'Base', (outx + 20, centy - 70), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
+    cv2.putText(frame, 'Base R:'+str(base.resistance), (outx + 20, centy - 70), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
     cv2.circle(frame, (centx, centy), radius, (0, 255, 255), 2)
     cv2.putText(frame, 'Act: ' + '{:5.1f}'.format(base.barangle), (outx + 15, centy + 100), cv2.FONT_HERSHEY_SIMPLEX,
                 0.65, (0, 255, 0), 2)
