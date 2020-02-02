@@ -80,7 +80,7 @@ if args.load == 'yes':
         print("File not found continuing:", args.file)
 
 
-motion = BasicMotionDetector(minArea=500)
+#motion = BasicMotionDetector(minArea=500)
 total = 0
 
 # loop over frames from the video streams

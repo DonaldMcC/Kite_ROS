@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# from ros wiki for initial testing
+# this runs as separate ROS node and publishes messages from joystick - generally working fin
 
 import rospy
 from sensor_msgs.msg import Joy

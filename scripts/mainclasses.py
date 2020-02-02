@@ -52,6 +52,7 @@ class Base(object):
         self.mockangle = 0
         self.reset = False
         self.action = None
+        self.resistance = 0
 
 
 class Kite(object):
@@ -217,7 +218,7 @@ class Controls(object):
             self.halfwidth = 200
             self.radius = 100
         self.routepoints = calc_route(self.centrex, self.centrey, self.halfwidth, self.radius)
-        self.config = config   #  possible config ('Standard', 'Manual')
+        self.config = config  # possible config ('Standard', 'Manual')
         if self.config == 'Standard':
             self.inputmode = 0
         elif self.config == 'Manual':  # Manual kite start with kite fling
@@ -230,7 +231,7 @@ class Controls(object):
         self.maxy = 20  # this should be for top of centre line and sets they y target point for park mode
         self.slow = 0.0
         self.newbuttons = []
-        self.motortest=motortest
+        self.motortest = motortest
 
     def getmodestring(self, inputmode):
         # So now always 11 buttons and first 5 and last 2 are std and iteration through should be std
@@ -294,13 +295,13 @@ class Controls(object):
             self.modestring = self.getmodestring(self.inputmode)
             self.newbuttons = self.get_change_mode_buttons(self.inputmode)
         elif (joybuttons and joybuttons[5] == 1) or event == 'Pause':  # pause on 1 key
-                if not control.motortest:
-                    time.sleep(10)
-                else:
-                    base.action = 5  # Stop
-        elif (joybuttons and joybuttons[3] == 1):  # slow
+            if not control.motortest:
+                time.sleep(10)
+            else:
+                base.action = 5  # Stop
+        elif joybuttons and joybuttons[3] == 1:  # slow
             self.slow += 0.1
-        elif (joybuttons and joybuttons[2] == 1):  # fast
+        elif joybuttons and joybuttons[2] == 1:  # fast
             self.slow = 0.0
 
         # common handling when not in one of the man modes
@@ -329,7 +330,7 @@ class Controls(object):
                     kite.routechange = True
                 else:
                     base.action = 2
-        elif self.inputmode == 2 or self.inputmode == 3: # common events for Man modes
+        elif self.inputmode == 2 or self.inputmode == 3:  # common events for Man modes
             if joybuttons:
                 if joyaxes[0] != 0:  # -1 = left +1 = right
                     self.centrex += self.step * int(joyaxes[0])
@@ -380,7 +381,7 @@ class Controls(object):
                 if joybuttons[7] == 0 and joybuttons[8] == 0:
                     kite.x += (self.step * joyaxes[2])
                     kite.y -= (self.step * joyaxes[3])
-                else: #  c or z button pressed angle the kite and automatically the bar
+                else:  # c or z button pressed angle the kite and automatically the bar
                     kite.kiteangle += (self.step / 2 * joyaxes[2])
             if event == 'Wider':  # anti clockwise
                 kite.kiteangle -= self.step
@@ -390,7 +391,7 @@ class Controls(object):
             if joybuttons:
                 if joybuttons[7] == 0 and joybuttons[8] == 0:
                     base.barangle += (self.step / 2 * joyaxes[2])
-                else: # c or z button pressed
+                else:  # c or z button pressed
                     kite.x += (self.step * joyaxes[2])
                     kite.y -= (self.step * joyaxes[3])
             if event == 'Wider':  # anti-clockwise

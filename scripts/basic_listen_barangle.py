@@ -8,18 +8,19 @@ from std_msgs.msg import Int16
 from kite_funcs import getangle, calcbarangle, inferangle
 from talker import motor_msg
 barangle = 0
+resistance = 0
 mockangle = 0
 
 
 def callback(data):
-    global barangle
+    global barangle, resistance
     resistance = data.data
     barangle = getangle(resistance)
     return
 
 
 def callmock(data):
-    global mockangle
+    global mockangle, resistance
     resistance = data.data
     mockangle = getangle(resistance)
     return
@@ -32,26 +33,23 @@ def listen_kiteangle(message):
         rospy.Subscriber(message, Int16, callmock)
 
 
-def get_actbarangle():
-    global barangle
-    return barangle
-
-
 def get_actmockangle():
     global mockangle
     return mockangle
 
 
-# this should always return barangle for Manbar or Standard operation Manfly should set
+# this should always return barangle except when barangle being set from the kite for simulation
 def get_barangle(kite, base, control, config):
+    global barangle
     if config.setup == 'KiteBarActual':
         return kite.kiteangle / base.kitebarratio
     else:  # automated flight reading from some sort of sensor via ROS
-        return get_actbarangle()
+        return barangle()
 
 
 def get_angles(kite, base, control, config):
     base.barangle = get_barangle(kite, base, control, config)
+    base.resistance = resistance
     if config.setup == 'KiteBarTarget':
         base.targetbarangle = kite.kiteangle / base.kitebarratio
     else:
