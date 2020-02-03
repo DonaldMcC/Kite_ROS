@@ -44,6 +44,7 @@ def init_motor_msg():
 
 
 def motor_msg(barangle, targetbarangle, tolerance=10, action=None, doaction=False):
+    # TODO we are now adding ability to send motor message 6 for leftonly and 7 for rightonly
     MAXLEFT = -20  # These are to try and avoid breaking the bar
     MAXRIGHT = 20  # similarly to protect bar as attached close to pivot
     msg = 0

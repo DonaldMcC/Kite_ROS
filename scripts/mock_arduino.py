@@ -44,7 +44,7 @@ barangle = 0
 MAXLEFT = -20  # These are to simulate limits of angles
 MAXRIGHT = 20  # similarly to protect bar as attached close to pivot
 
-DIST_ACT = 35.0  # mm
+DIST_ACT = 35.0  # mm # this is horizontal distance between centre and bar
 DIST_HANDLE = 350.0  # mm
 SPEED_ACT = 30.0  # mm/sec
 FORCE_ACT = 200  # N but not sure if will actually use this
