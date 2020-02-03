@@ -49,6 +49,12 @@ switch (int_msg.data) {
     case 4:
       right();
       break;
+    case 6:
+      leftonly();
+      break;
+    case 7:
+      rightonly();
+      break;
     default:
         stop();
     break;
@@ -58,7 +64,6 @@ switch (int_msg.data) {
 // Defining Subscriber 
 ros::Subscriber<std_msgs::Int16> 
 sub("motormsg", callback); 
-
 
 int pinI1=8;//define I1 interface
 int pinI2=11;//define I2 interface 
@@ -70,6 +75,9 @@ int spead=255;//define the spead of motor as fast as poss
 
 int sensorPin = A0;    // select the input pin for the potentiometer
 int sensorValue = 0;  // variable to store the value coming from the sensor
+
+unsigned long previousMillis = 0;
+unsigned long intervalMills = 10;
 
 void setup()
 {
@@ -111,8 +119,16 @@ void left()//
      analogWrite(speedpinB,spead);
      digitalWrite(pinI4,HIGH);//turn DC Motor B move clockwise
      digitalWrite(pinI3,LOW);
-     digitalWrite(pinI2,HIGH);//turn DC Motor A move clockwise
+     digitalWrite(pinI2,HIGH);//turn DC Motor A move anticlockwise
      digitalWrite(pinI1,LOW);
+}
+
+void leftonly()//
+{
+     analogWrite(speedpinA,spead);//input a simulation value to set the speed
+     analogWrite(speedpinB,spead);
+     digitalWrite(pinI4,HIGH);//turn DC Motor B move clockwise
+     digitalWrite(pinI3,LOW);
 }
 
 void right()//
@@ -125,32 +141,26 @@ void right()//
      digitalWrite(pinI1,HIGH);
 }
 
+void rightonly()//
+{
+     analogWrite(speedpinA,spead);//input a simulation value to set the speed
+     analogWrite(speedpinB,spead);
+     digitalWrite(pinI2,LOW);//turn DC Motor A move clockwise
+     digitalWrite(pinI1,HIGH);
+}
+
 void stop()//
 {
      digitalWrite(speedpinA,LOW);// Unenable the pin, to stop the motor. this should be done to avid damaging the motor. 
      digitalWrite(speedpinB,LOW);
-     //delay(1000);  remove not clear why this was here
- 
+
 }
 
 void loop()
 {
-  //left();
-  //delay(100);
-  //stop();
-  //right();
-  //delay(100);
-  //stop();
- // delay(2000);
-  //forward();
-  //delay(100);
-  //stop();
-  //backward();
-  //delay(100); 
-  //stop(); 
   sensorValue = analogRead(sensorPin);
   msg.data = sensorValue;
   kiteangle.publish(&msg);
   nh.spinOnce();
-  delay(10);
+  delay(5);
 }
