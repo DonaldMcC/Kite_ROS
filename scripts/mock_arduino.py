@@ -105,6 +105,10 @@ def mockangle(angle, elapsed_time):
                 act_dist = 0 - (SPEED_ACT * elapsed_time)
             elif motorvalue == 4:  # Right
                 act_dist = SPEED_ACT * elapsed_time
+            elif motorvalue == 6:  # Left Only
+                act_dist = SPEED_ACT * elapsed_time / 2.0
+            elif motorvalue == 7:  # Right
+                act_dist = SPEED_ACT * elapsed_time / 2.0
             else:
                 act_dist = 0
             angle += (360 * act_dist) / CIRC_ACT

@@ -368,6 +368,12 @@ while True:  # Main module loop
     if base.reset:
         reset_bar(base)
 
+    if base.calibrate:
+        # this would be a base method and should store the start
+        # time when set and the cycle state and then every time we change state we
+        # store the values - when finished we would display results somewhere - perhaps another window
+        pass
+
     if config.numcams == 1:
         if config.source == 1:
             ret, frame = camera.stream.read()

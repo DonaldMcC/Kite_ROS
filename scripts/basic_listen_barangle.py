@@ -72,36 +72,6 @@ def check_kite(kite, base, control, config):
     else:
         return "Out of Tolerance "
 
-def calibrate(back_resist):
-    global resistance
-    #Setup the constants
-    maxleft = -20  # These are to simulate limits of angles
-    maxright = 20  # similarly to protect bar as attached close to pivot
-    dist_act = 35.0  # Radius from fulcrum to attachment point of actuator - but we actually have two actuators
-    # floating centre
-    speed_act = 30.0  # mm/sec
-    circ_act = 2 * math.pi * dist_act * 2  # because going to move each army separately
-    actuator_length = 60
-    rev_time = circ_act / speed_act  # time for one revolution
-    half_max_left_time  = (rev_time * maxleft / 360.0) / 2.0  # expected time in secs to get to the maxleft angle but will do in
-    resistlist=[]
-    for x in range(2):
-        innerlist=[]
-        for y in range(6, 8):
-            motor_msg(0, 0, 0, y, 1)  # send rightonly motor signal
-            time.sleep(half_max_left_time)  # assumed to be time for motors to fully retract
-            motor_msg(0, 0, 0, y, 1)  # stop
-            time.sleep(0.5)
-            innerlist.append(resistance)
-        resistlist.append(innerlist)
-    # we would now want to print the calibration
-    print(resistlist)
-    # ideally these should be roughly the same
-    print('start:' + str(back_resist) + ' after:' + str(resistance))
-    return
-
-
-
 
 def reset_bar(base):
     global resistance
@@ -109,10 +79,8 @@ def reset_bar(base):
     motor_msg(0, 0, 0, 1, 1)  # send backward signal
     time.sleep(max_retract_time)  # assumed to be time for motors to fully retract
     motor_msg(0, 0, 0, 5, 1)  # stop
-    back_resist = resistance  # so this should be value at full back base
-    calibrate(back_resist)
     base.reset=False
-    return
+    return resistance
 
 
 if __name__ == '__main__':

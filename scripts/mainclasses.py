@@ -20,7 +20,7 @@ This file should do the following things
     10  Upturns only for now
 """
 
-import time
+import time, math
 from collections import deque
 
 
@@ -38,7 +38,7 @@ class Config(object):
 
 class Base(object):
 
-    def __init__(self, barangle=0, parkangle=0, maxright=40, maxleft=-40, lag=1,
+    def __init__(self, barangle=0, parkangle=0, maxright=20, maxleft=-20, lag=1,
                  targetbarangle=0, kitebarratio=1, inferbarangle=0):
         self.barangle = barangle
         self.parkangle = parkangle
@@ -53,6 +53,18 @@ class Base(object):
         self.reset = False
         self.action = None
         self.resistance = 0
+        self.dist_act = 35.0  # Radius from fulcrum to attachment point of actuator - we will have two actuators
+        self.speed_act = 30.0
+        self.actuator_length = 60
+        self.calibrate = False
+
+    def get_calibrate_time(self):
+        # idea here is to have an expectation of how the setup should work based on components
+        # believed to be there - and also identify if resistor is working as expected
+        circ_act = 2 * math.pi * self.dist_act * 2  # because going to move each army separately
+        rev_time = circ_act / self.speed_act  # time for one revolution
+        return (rev_time * self.maxright / 360.0) / 2.0  # expected time to get half way
+
 
 
 class Kite(object):
