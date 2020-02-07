@@ -367,8 +367,25 @@ fps = 15
 while True:  # Main module loop
     if base.reset:
         reset_bar(base)
+        base.calibrate = 'start'
 
     if base.calibrate:
+        if base.calibrate == 'start':
+            starttime = bla
+            msg = 'leftonly'
+            base.calibrate = 'leftonly'
+            tartget_runtime = getbasebla
+        elif base.calibrate == 'leftonly'
+            are we over tartget_runtime
+            if yes
+                get barangle vs expected barangle
+                store result somewhere
+                movetonext phase
+                reset starttime
+        if last phase
+            display_results and %age accuracy
+
+
         # this would be a base method and should store the start
         # time when set and the cycle state and then every time we change state we
         # store the values - when finished we would display results somewhere - perhaps another window
