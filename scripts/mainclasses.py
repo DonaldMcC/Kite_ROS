@@ -22,6 +22,7 @@ This file should do the following things
 
 import time, math
 from collections import deque
+from kite_funcs import checklimits, getresist
 
 
 def calcbarangle(kite, base, controls):
@@ -95,7 +96,6 @@ def setangleturn(kite, base):
     return targetbarangle
 
 
-
 class Config(object):
     def __init__(self, source=2, kite='Standard', masklimit=10000,
                  logging=0, numcams=1, check_motor_sim=False, setup='Standard'):
@@ -132,6 +132,8 @@ class Base(object):
         self.calibrate_phase = 0
         self.start_time = 0
         self.calibrate_list = []
+        self.plan_calibration()
+
 
     def get_calibrate_time(self):
         # idea here is to have an expectation of how the setup should work based on components
@@ -139,16 +141,17 @@ class Base(object):
         circ_act = 2 * math.pi * self.dist_act * 2  # because going to move each army separately
         rev_time = circ_act / self.speed_act  # time for one revolution
         return 1000 * (rev_time * self.maxright / 360.0) / 2.0  # expected time to get half way in millisecs
-        
-    def check_calibration(self):
+
+
+    def calibration_check(self):
         curr_millis = round(time.monotonic() * 1000)
         elapsed_millis = curr_millis - self.start_time
         if elapsed_millis > self.calibrate_list[self.calibrate_phase][1]:
             self.calibrate_list[self.calibrate_phase][2] = elapsed_millis
             self.calibrate_list[self.calibrate_phase][4] = self.resistance
-            self.calibrate_phase += 1
             self.start_time = curr_millis
             self.action = self.calibrate_list[self.calibrate_phase][5]
+            self.calibrate_phase += 1
             if self.calibrate_phase == 4: # valid values are 0 to 3 this is end of loop
                 self.calibrate = False
                 self.calibrate_phase = 0
@@ -161,12 +164,12 @@ class Base(object):
         #  this should initalise a list of phases that the calibration will
         #  take I think name, motormsg, target time, should  work
         target_time = self.get_calibrate_time() #  this is assumed to be constant for all phases
-        #target_resist = getresist(self.maxright/2, self.maxleft, self.maxright, self.resistleft, self.resistright)
+        target_resist = getresist(self.maxright/2, self.maxleft, self.maxright)
 
         for x, y in enumerate(range(4)):
             action = 'halfleft' if (x % 2) == 0 else 'halfright'
             motor_action = 6 if (x % 2) == 0 else 7  # send motor left or right
-            self.calibrate_list.append([action,target_time, 0, target_resist, 0, motor_action])
+            self.calibrate_list.append([action, target_time, 0, target_resist, 0, motor_action])
         return
 
 

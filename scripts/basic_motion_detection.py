@@ -237,7 +237,11 @@ def display_motor_msg(action, setup):
     fontsize = 0.5
     cv2.putText(frame, 'Motor Msg: ' + str(action) + ' ' + setup, (20, 20), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 255, 255), 2)
     return
-    
+
+    # self.calibrate_list.append([action, target_time, 0, target_resist, 0, motor_action])
+def present_calibrate_row(row):
+    pass
+
 def display_calibration_results():
     win2_active = False
     while True:
@@ -248,8 +252,11 @@ def display_calibration_results():
 
         if not win2_active:
             win2_active = True
-            layout2 = [[sg.Text('Window 2')],
-                       [sg.Button('Exit')]]
+
+            layout2 = []
+            for y in range(4):
+                layout2 += [sg.Text(base.calibrate_list[y])],
+            layout2 += [[sg.Button('Exit')]]
 
             win2 = sg.Window('Window 2', layout2)
 
@@ -388,6 +395,7 @@ fps = 15
 # fps = camera.get(cv2.CV_CAP_PROP_FPS)
 
 
+base.calibrate = True
 while True:  # Main module loop
     if base.reset:
         reset_bar(base)
