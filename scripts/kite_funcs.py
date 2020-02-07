@@ -1,8 +1,6 @@
 import numpy as np
 import cv2
 
-from mainclasses import Kite, Controls, Base
-
 # http://www.pyimagesearch.com/2014/08/04/opencv-python-color-detection/
 # define the list of boundaries
 # boundaries = [([0, 0, 0], [40, 40, 40])]
@@ -58,77 +56,6 @@ def kitemask(c, frame, kitecolours='kite1'):
         print(x, y, w, h, "cont", cv2.contourArea(c))
         print("mask: ", np.sum(mask), totmask)
     return totmask
-
-
-def calcbarangle(kite, base, controls):
-    """This should just basically set the target bar angle based on the mode phase
-    and zone we are in when in park or wiggle mode
-    >>> k=Kite(400, targetangle=10)
-    >>> b=Base(barangle=15, kitebarratio=2)
-    >>> c=Controls(1)
-    >>> calcbarangle(k,b,c)
-    10
-
-    >>> k=Kite(400, phase='TurnR', targetangle=10)
-    >>> b=Base(barangle=15, kitebarratio=2)
-    >>> c=Controls(1)
-    >>> calcbarangle(k,b,c)
-    40
-
-    """
-    if kite.phase == "TurnR" or kite.phase == "TurnL":
-        return setangleturn(kite, base)
-    else:
-        return setangle(kite, base, controls)
-
-
-def inferangle(kite, base, controls=None):
-    """This will return inferred angle of the control bar based on the  kite angle
-       obviously this is a huge approximation of reality but should help with review
-       of actual changes of the bar versus what we would like to happen ie no lag when
-       testing
-
-        >>> k=Kite(400, kiteangle=10)
-        >>> b=Base(barangle=15, kitebarratio=2.0)
-        >>> c=Controls(1)
-        >>> inferangle(k, b, c)
-        5.0
-        """
-
-    inferangle = kite.kiteangle / base.kitebarratio
-    return inferangle
-
-
-def setangle(kite, base, controls):
-    """This will return targetbarangle for park mode based largely on kite target angle
-    We will start simple but may move to a pid mode if required
-
-    >>> k=Kite(400, targetangle=10)
-    >>> b=Base(barangle=15, kitebarratio=2)
-    >>> c=Controls(1)
-    >>> setangle(k,b,c)
-    10
-    """
-
-    # targetbarangle = checklimits((kite.targetangle * base.kitebarratio), base.maxleft, base.maxright)
-    targetbarangle = checklimits(kite.targetangle, base.maxleft, base.maxright)
-    return targetbarangle
-
-
-def setangleturn(kite, base):
-    """This should be a simple function as we will always aim to turn as fast as poss
-    identifying the point to ease off from max turn should be done as part of phase setting and not here
-
-    >>> k=Kite(400)
-    >>> b=Base(400)
-    >>> setangleturn(k,b)
-    -40
-    """
-    if kite.phase == "TurnR":
-        targetbarangle = base.maxright
-    else:
-        targetbarangle = base.maxleft
-    return targetbarangle
 
 
 def checklimits(angle, maxleft, maxright):
