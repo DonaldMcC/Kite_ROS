@@ -236,6 +236,12 @@ def display_line(angle, cx, cy, radius, colour):
 def display_motor_msg(action, setup):
     fontsize = 0.5
     cv2.putText(frame, 'Motor Msg: ' + str(action) + ' ' + setup, (20, 20), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 255, 255), 2)
+    return
+    
+def display_calibration_results():
+    #values  will  all  come frm base
+    pass
+    return
 
 
 # MAIN ROUTINE START
@@ -367,23 +373,13 @@ fps = 15
 while True:  # Main module loop
     if base.reset:
         reset_bar(base)
-        base.calibrate = 'start'
+        base.calibrate = True
+        base.start_time = now()
 
     if base.calibrate:
-        if base.calibrate == 'start':
-            starttime = bla
-            msg = 'leftonly'
-            base.calibrate = 'leftonly'
-            tartget_runtime = getbasebla
-        elif base.calibrate == 'leftonly'
-            are we over tartget_runtime
-            if yes
-                get barangle vs expected barangle
-                store result somewhere
-                movetonext phase
-                reset starttime
-        if last phase
-            display_results and %age accuracy
+        base.calibration_check()
+        if not base.calibrate
+            display_calibration_results()
 
 
         # this would be a base method and should store the start

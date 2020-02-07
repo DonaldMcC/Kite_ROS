@@ -57,6 +57,7 @@ class Base(object):
         self.speed_act = 30.0
         self.actuator_length = 60
         self.calibrate = False
+        self.calibrate_phase = 0
 
     def get_calibrate_time(self):
         # idea here is to have an expectation of how the setup should work based on components
@@ -64,7 +65,29 @@ class Base(object):
         circ_act = 2 * math.pi * self.dist_act * 2  # because going to move each army separately
         rev_time = circ_act / self.speed_act  # time for one revolution
         return (rev_time * self.maxright / 360.0) / 2.0  # expected time to get half way
+        
+    def check_calibration(self, start_time):
+        if base.
+            msg = 'leftonly'
+            base.calibrate = 'leftonly'
+            tartget_runtime = getbasebla
+        elif base.calibrate == 'leftonly'
+            are we over tartget_runtime
+            if yes
+                get barangle vs expected barangle
+                store result somewhere
+                movetonext phase
+                reset starttime
+        if last phase
+            display_results and %age accuracy
 
+    def plan_calibration(self):
+        #  this should initalise a list of
+        #  phases that the calibration will
+        #  take I think name  motormsg target time 
+        # should  work
+        target_time =  1
+        target_resistchange  
 
 
 class Kite(object):
