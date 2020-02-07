@@ -374,18 +374,14 @@ while True:  # Main module loop
     if base.reset:
         reset_bar(base)
         base.calibrate = True
-        base.start_time = now()
+        base.start_time = round(time.monotonic() * 1000)
 
     if base.calibrate:
         base.calibration_check()
-        if not base.calibrate
+        if not base.calibrate:
             display_calibration_results()
+            break
 
-
-        # this would be a base method and should store the start
-        # time when set and the cycle state and then every time we change state we
-        # store the values - when finished we would display results somewhere - perhaps another window
-        pass
 
     if config.numcams == 1:
         if config.source == 1:

@@ -66,20 +66,15 @@ class Base(object):
         rev_time = circ_act / self.speed_act  # time for one revolution
         return (rev_time * self.maxright / 360.0) / 2.0  # expected time to get half way
         
-    def check_calibration(self, start_time):
-        if base.
-            msg = 'leftonly'
-            base.calibrate = 'leftonly'
-            tartget_runtime = getbasebla
-        elif base.calibrate == 'leftonly'
-            are we over tartget_runtime
-            if yes
-                get barangle vs expected barangle
-                store result somewhere
-                movetonext phase
-                reset starttime
-        if last phase
-            display_results and %age accuracy
+    def check_calibration(self):
+        curr_millis = round(time.monotonic() * 1000)
+        elapsed_millis = curr_millis - self.start_time
+        if elapsed_millis > 300:
+            # storestuff
+            # nextphase
+            # set start time
+            pass
+
 
     def plan_calibration(self):
         #  this should initalise a list of
@@ -87,7 +82,8 @@ class Base(object):
         #  take I think name  motormsg target time 
         # should  work
         target_time =  1
-        target_resistchange  
+        #target_resistchange
+        pass
 
 
 class Kite(object):
