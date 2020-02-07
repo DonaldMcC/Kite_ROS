@@ -171,7 +171,8 @@ def display_base(width):
     centx = outx + 60
     centy = 300
     radius = 60
-    cv2.putText(frame, 'Base R:'+str(base.resistance), (outx + 20, centy - 70), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
+    cv2.putText(frame, 'Base R:'+str(base.resistance), (outx + 20, centy - 70),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
     cv2.circle(frame, (centx, centy), radius, (0, 255, 255), 2)
     cv2.putText(frame, 'Act: ' + '{:5.1f}'.format(base.barangle), (outx + 15, centy + 100), cv2.FONT_HERSHEY_SIMPLEX,
                 0.65, (0, 255, 0), 2)
@@ -238,24 +239,24 @@ def display_motor_msg(action, setup):
     cv2.putText(frame, 'Motor Msg: ' + str(action) + ' ' + setup, (20, 20), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 255, 255), 2)
     return
 
+
     # self.calibrate_list.append([action, target_time, 0, target_resist, 0, motor_action])
 def present_calibrate_row(row):
-    pass
+    # some sort of accuracy formulas here
+    return f'Action: {row[0]} T_Time: {row[1]} A_Time: {row[2]} T_Resist: {row[3]} A_Resist: {row[4]} '
+
 
 def display_calibration_results():
     win2_active = False
     while True:
-        #ev1, vals1 = win1.Read(timeout=100)
-        #win1.FindElement('_OUTPUT_').Update(vals1[0])
-        #if ev1 is None or ev1 == 'Exit':
-        #    break
 
         if not win2_active:
             win2_active = True
 
             layout2 = []
             for y in range(4):
-                layout2 += [sg.Text(base.calibrate_list[y])],
+                formatted = present_calibrate_row(base.calibrate_list[y])
+                layout2 += [sg.Text(formatted)],
             layout2 += [[sg.Button('Exit')]]
 
             win2 = sg.Window('Window 2', layout2)
@@ -277,7 +278,7 @@ parser.add_argument('-l', '--load', type=str, default='yes',
                     help='Do we load cached matrix')
 parser.add_argument('-k', '--kite', type=str, default='Manual',
                     help='Kite either Standard or Manual')
-parser.add_argument('-s', '--setup', type=str, default='KiteBarInfer',
+parser.add_argument('-s', '--setup', type=str, default='Standard',
                     help='Standard, BarKiteActual, KiteBarInfer, KiteBarTarget')
 # Standard means no connections between KiteAngle, KiteTargetAngle and Bar Angles others
 # show connections from and to
@@ -396,11 +397,12 @@ fps = 15
 
 
 base.calibrate = True
+base.start_time = round(time.monotonic() * 1000)
 while True:  # Main module loop
     if base.reset:
         reset_bar(base)
         base.calibrate = True
-        base.start_time = round(time.monotonic() * 1000)
+
 
     if base.calibrate:
         base.calibration_check()

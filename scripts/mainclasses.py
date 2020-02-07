@@ -163,7 +163,7 @@ class Base(object):
     def plan_calibration(self):
         #  this should initalise a list of phases that the calibration will
         #  take I think name, motormsg, target time, should  work
-        target_time = self.get_calibrate_time() #  this is assumed to be constant for all phases
+        target_time = int(self.get_calibrate_time()) #  this is assumed to be constant for all phases
         target_resist = getresist(self.maxright/2, self.maxleft, self.maxright)
 
         for x, y in enumerate(range(4)):
