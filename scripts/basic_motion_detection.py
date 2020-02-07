@@ -239,8 +239,26 @@ def display_motor_msg(action, setup):
     return
     
 def display_calibration_results():
-    #values  will  all  come frm base
-    pass
+    win2_active = False
+    while True:
+        #ev1, vals1 = win1.Read(timeout=100)
+        #win1.FindElement('_OUTPUT_').Update(vals1[0])
+        #if ev1 is None or ev1 == 'Exit':
+        #    break
+
+        if not win2_active:
+            win2_active = True
+            layout2 = [[sg.Text('Window 2')],
+                       [sg.Button('Exit')]]
+
+            win2 = sg.Window('Window 2', layout2)
+
+        if win2_active:
+            ev2, vals2 = win2.Read(timeout=100)
+            if ev2 is None or ev2 == 'Exit':
+                #win2_active = False
+                win2.Close()
+                break
     return
 
 
