@@ -507,7 +507,8 @@ while True:  # Main module loop
     display_base(width)
 
     kite_pos(kite.x, kite.y, kite.kiteangle, kite.dX, kite.dY, 0, 0)
-    msg = motor_msg(base.barangle, base.targetbarangle, 2, base.action, control.motortest)
+    doaction = True if control.motortest or base.calibrate else False
+    msg = motor_msg(base.barangle, base.targetbarangle, 2, base.action, doaction)
     if control.motortest:
         display_motor_msg(base.action, config.setup)
     else:
