@@ -243,7 +243,8 @@ def display_motor_msg(action, setup):
     # self.calibrate_list.append([action, target_time, 0, target_resist, 0, motor_action])
 def present_calibrate_row(row):
     # some sort of accuracy formulas here
-    return f'Action: {row[0]} T_Time: {row[1]} A_Time: {row[2]} T_Resist: {row[3]} A_Resist: {row[4]} '
+    return f'Action: {row[0]} T_Time: {row[1]} A_Time: {row[2]} ' \
+           f'T_Resist: {row[3]} A_Resist: {row[4]} Cycles: {row[6]} {row[7]} '
 
 
 def display_calibration_results():
@@ -353,7 +354,7 @@ listen_kiteangle('kiteangle')  # this then updates base.barangle via the callbac
 result = ""
 while result != "OK":
     result = check_kite(kite, base, control, config)
-    print(result)
+    print(base.resistance, result)
     if result != "OK":
         go_on = input("Contine (Y/N)")
         if go_on == "Y":
@@ -403,13 +404,12 @@ while True:  # Main module loop
         reset_bar(base)
         base.calibrate = True
 
-
     if base.calibrate:
         base.calibration_check()
         if not base.calibrate:
+            motor_msg(0, 0, 0, 5, 1)  # stop
             display_calibration_results()
             break
-
 
     if config.numcams == 1:
         if config.source == 1:
@@ -442,7 +442,7 @@ while True:  # Main module loop
             break
         else:
             frame = camera
-    print('frame', frame.shape[1])
+    # print('frame', frame.shape[1])
     height, width, channels = frame.shape
 
     if background is None:
@@ -450,75 +450,62 @@ while True:  # Main module loop
         background = cv2.GaussianBlur(background, (21, 21), 0)
         continue
 
-    if config.logging and writer is None:
-        # h, w = frame.shape[:2]
-        # height, width = 480, 640 - removed should now be set above
-        # height, width, channels = frame.shape
-        writer = initwriter("record.avi", height, width, fps)
-        origwriter = initwriter("origrecord.avi", height, width, fps)
+    if not base.calibrate:
+        gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        gray_frame = cv2.GaussianBlur(gray_frame, (21, 21), 0)
+        diff = cv2.absdiff(background, gray_frame)
+        diff = cv2.threshold(diff, 25, 255, cv2.THRESH_BINARY)[1]
+        diff = cv2.dilate(diff, es, iterations=2)
+        image, cnts, hierarchy = cv2.findContours(diff.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
-    if config.logging:
-        writeframe(origwriter, frame, height, width)
-
-    gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    gray_frame = cv2.GaussianBlur(gray_frame, (21, 21), 0)
-    diff = cv2.absdiff(background, gray_frame)
-    diff = cv2.threshold(diff, 25, 255, cv2.THRESH_BINARY)[1]
-
-    diff = cv2.dilate(diff, es, iterations=2)
-    image, cnts, hierarchy = cv2.findContours(diff.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-
-    # draw and move cross for manual flying
-    if config.kite == 'Manual':
-        drawkite(kite)
-        kite.found = True
-    elif config.kite == 'Standard':  # not detecting if in manual mode
-        kite.found = False
-        maxmask = -1
-        index = -1
-        for i, c in enumerate(cnts):
-            mask = kitemask(c, frame, KITETYPE)
-            if mask > maxmask:
-                index = i
-                maxmask = mask
-            # (x, y, w, h) = cv2.boundingRect(c)
-            # cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 125, 0), 2)
-
-        if maxmask > masklimit:
+        # draw and move cross for manual flying
+        if config.kite == 'Manual':
+            drawkite(kite)
             kite.found = True
-            c = cnts[index]
-            kite.contourarea = cv2.contourArea(cnts[index])
-            (x, y, w, h) = cv2.boundingRect(c)
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 255, 0), 2)
-            finalframe = frame[y:y + h, x:x + w]
-            center = (x + (w // 2), y + (h // 2))
-            kite.pts.appendleft(center)
-            kite.x = center[0]
-            kite.y = center[1]
+        elif config.kite == 'Standard':  # not detecting if in manual mode
+            kite.found = False
+            maxmask = -1
+            index = -1
+            for i, c in enumerate(cnts):
+                mask = kitemask(c, frame, KITETYPE)
+                if mask > maxmask:
+                    index = i
+                    maxmask = mask
+                # (x, y, w, h) = cv2.boundingRect(c)
+                # cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 125, 0), 2)
 
-            # Min Area seems reasonable to get angle of kite
-            rect = cv2.minAreaRect(c)
-            box = cv2.boxPoints(rect)  # cv2.boxPoints(rect) for OpenCV 3.x
-            box = np.int0(box)
+            if maxmask > masklimit:
+                kite.found = True
+                c = cnts[index]
+                kite.contourarea = cv2.contourArea(cnts[index])
+                (x, y, w, h) = cv2.boundingRect(c)
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 255, 0), 2)
+                finalframe = frame[y:y + h, x:x + w]
+                center = (x + (w // 2), y + (h // 2))
+                kite.pts.appendleft(center)
+                kite.x = center[0]
+                kite.y = center[1]
 
-            cv2.drawContours(frame, [box], 0, (0, 0, 255), 2)
-            kite.kiteangle = get_angle(box, kite.dX, kite.dY)
-        # print index, maxmask
+                # Min Area seems reasonable to get angle of kite
+                rect = cv2.minAreaRect(c)
+                box = cv2.boxPoints(rect)  # cv2.boxPoints(rect) for OpenCV 3.x
+                box = np.int0(box)
 
-    # Establish route
-    if kite.changezone or kite.changephase or kite.routechange:
-        control.routepoints = calc_route(control.centrex, control.centrey, control.halfwidth, control.radius)
-        kite.update_target(control.routepoints[0][0], control.routepoints[0][1],
+                cv2.drawContours(frame, [box], 0, (0, 0, 255), 2)
+                kite.kiteangle = get_angle(box, kite.dX, kite.dY)
+            # print index, maxmask
+
+        # Establish route
+        if kite.changezone or kite.changephase or kite.routechange:
+            control.routepoints = calc_route(control.centrex, control.centrey, control.halfwidth, control.radius)
+            kite.update_target(control.routepoints[0][0], control.routepoints[0][1],
                            control.centrex, control.maxy, control.routepoints[3][0], control.routepoints[3][1])
 
-    # start direction and analysis - this will be a routine based on class
-    getdirection(kite)
-    kite.targetheading = get_heading_points((kite.x, kite.y), (kite.targetx, kite.targety))
-    kite.update_zone(control)
-    kite.update_phase()
-
-    if config.check_motor_sim:
-        base.mockangle = get_actmockangle()
+        # start direction and analysis - this will be a routine based on class
+        getdirection(kite)
+        kite.targetheading = get_heading_points((kite.x, kite.y), (kite.targetx, kite.targety))
+        kite.update_zone(control)
+        kite.update_phase()
 
     # Update actual angles based on full setup
     get_angles(kite, base, control, config)
@@ -530,12 +517,16 @@ while True:  # Main module loop
     drawroute(control.routepoints, control.centrex, control.centrey)
     drawcross(kite.targetx, kite.targety, 'Target', (0, 150, 250))
 
+    if config.check_motor_sim:
+        base.mockangle = get_actmockangle()
+
     display_stats()
     display_flight(width)
     display_base(width)
 
     kite_pos(kite.x, kite.y, kite.kiteangle, kite.dX, kite.dY, 0, 0)
     doaction = True if control.motortest or base.calibrate else False
+    print(base.action, doaction)
     msg = motor_msg(base.barangle, base.targetbarangle, 2, base.action, doaction)
     if control.motortest:
         display_motor_msg(base.action, config.setup)
@@ -549,6 +540,13 @@ while True:  # Main module loop
     counter += 1
     if kite.found:
         foundcounter += 1
+
+    if config.logging and writer is None:
+        # h, w = frame.shape[:2]
+        # height, width = 480, 640 - removed should now be set above
+        # height, width, channels = frame.shape
+        writer = initwriter("record.avi", height, width, fps)
+        origwriter = initwriter("origrecord.avi", height, width, fps)
 
     if config.logging:  # not saving this either as it errors on other screen
         writeframe(writer, frame, height, width)

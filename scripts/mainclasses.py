@@ -139,7 +139,7 @@ class Base(object):
         # believed to be there - and also identify if resistor is working as expected
         circ_act = 2 * math.pi * self.dist_act * 2  # because going to move each army separately
         rev_time = circ_act / self.speed_act  # time for one revolution
-        return 1000 * (rev_time * self.maxright / 360.0) / 2.0  # expected time to get half way in millisecs
+        return 1000 * (rev_time * self.maxright / 360.0)  # expected time to get to max angle in millisecs
 
     def calibration_check(self):
         curr_millis = round(time.monotonic() * 1000)
@@ -154,6 +154,9 @@ class Base(object):
                 self.calibrate = False
                 self.calibrate_phase = 0
                 self.action = 0
+        else:  # increase cycle counter
+            self.calibrate_list[self.calibrate_phase][6] += 1
+            self.calibrate_list[self.calibrate_phase][7].append(self.resistance)
         return
 
     def plan_calibration(self):
@@ -163,14 +166,14 @@ class Base(object):
 
         for x, y in enumerate(range(4)):
             if (x % 2) == 0:
-                action = 'halfleft'
-                motor_action = 6
-                target_resist = getresist(self.maxleft / 2, self.maxleft, self.maxright)
+                action = 'fullright'
+                motor_action = 6  # Left motor activated
+                target_resist = getresist(self.maxright)
             else:
-                action = 'halfright'
+                action = 'centre'  # so right motor will drive
                 motor_action = 7
-                target_resist = getresist(0, self.maxleft, self.maxright)  # should return to square
-            self.calibrate_list.append([action, target_time, 0, target_resist, 0, motor_action])
+                target_resist = getresist(0)  # should return to square
+            self.calibrate_list.append([action, target_time, 0, target_resist, 0, motor_action, 0, []])
         return
 
 

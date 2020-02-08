@@ -39,7 +39,7 @@ import rospy
 import argparse
 from std_msgs.msg import String, Int16
 from kite_funcs import getangle, getresist
-motorvalue = 3
+motorvalue = 5 # stop
 barangle = 0
 MAXLEFT = -20  # These are to simulate limits of angles
 MAXRIGHT = 20  # similarly to protect bar as attached close to pivot
@@ -73,19 +73,19 @@ def mock_kiteangle(message):
     rospy.init_node('mock_arduino', anonymous=False)
     rate = rospy.Rate(20)  # Cycles per Second
     # left_act_pos = get_coord(0-DIST_ACT, 0, barangle) not convinced this serves purpose
-    loop_time = time.time()
+    loop_time = round(time.monotonic() * 1000)
     listen_motormsg()
 
     while not rospy.is_shutdown():
         get_motorv()
         print('motorv', motorvalue)
-        elapsed_time = time.time() - loop_time
-        loop_time = time.time()
-        barangle = mockangle(barangle, elapsed_time)
+        cycle_time = round(time.monotonic() * 1000) - loop_time
+        loop_time = round(time.monotonic() * 1000)
+        barangle = mockangle(barangle, cycle_time)
         resistance = get_resistance(barangle)
-        rospy.loginfo(barangle)
+        #rospy.loginfo(barangle)
         pub.publish(resistance)
-        print(elapsed_time, barangle, resistance)
+        print(cycle_time, barangle, resistance)
         rate.sleep()
     return True
 
@@ -102,13 +102,13 @@ def mockangle(angle, elapsed_time):
             angle = 0
         else:
             if motorvalue == 3:  # Left
-                act_dist = 0 - (SPEED_ACT * elapsed_time)
+                act_dist = 0 - (SPEED_ACT * elapsed_time / 1000.0)
             elif motorvalue == 4:  # Right
-                act_dist = SPEED_ACT * elapsed_time
+                act_dist = SPEED_ACT * elapsed_time / 1000.0
             elif motorvalue == 6:  # Left Only
-                act_dist = SPEED_ACT * elapsed_time / 2.0
+                act_dist = 0 - (SPEED_ACT * elapsed_time / 2000.0)
             elif motorvalue == 7:  # Right
-                act_dist = SPEED_ACT * elapsed_time / 2.0
+                act_dist = SPEED_ACT * elapsed_time / 2000.0
             else:
                 act_dist = 0
             angle += (360 * act_dist) / CIRC_ACT

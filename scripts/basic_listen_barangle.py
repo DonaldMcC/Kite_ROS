@@ -9,7 +9,7 @@ from kite_funcs import getangle
 from mainclasses import calcbarangle, inferangle
 from talker import motor_msg
 barangle = 0
-resistance = 0
+resistance = 541 # prefer to start with reasonable value
 mockangle = 0
 
 
@@ -29,9 +29,9 @@ def callmock(data):
 
 def listen_kiteangle(message):
     if message == 'kiteangle':
-        rospy.Subscriber(message, Int16, callback)
+        rospy.Subscriber(message, Int16, callback, queue_size=1)
     else:
-        rospy.Subscriber(message, Int16, callmock)
+        rospy.Subscriber(message, Int16, callmock, queue_size=1)
 
 
 def get_actmockangle():
