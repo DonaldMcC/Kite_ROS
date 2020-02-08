@@ -244,7 +244,7 @@ def display_motor_msg(action, setup):
 def present_calibrate_row(row):
     # some sort of accuracy formulas here
     return f'Action: {row[0]} T_Time: {row[1]} A_Time: {row[2]} ' \
-           f'T_Resist: {row[3]} A_Resist: {row[4]} Cycles: {row[6]} {row[7]} '
+           f'T_Resist: {row[3]} A_Resist: {row[4]} {row[5]} Cycles: {row[6]} {row[7]} '
 
 
 def display_calibration_results():
@@ -397,6 +397,8 @@ fps = 15
 # fps = camera.get(cv2.CV_CAP_PROP_FPS)
 
 
+get_angles(kite, base, control, config)
+time.sleep(2)
 base.calibrate = True
 base.start_time = round(time.monotonic() * 1000)
 while True:  # Main module loop
@@ -526,7 +528,6 @@ while True:  # Main module loop
 
     kite_pos(kite.x, kite.y, kite.kiteangle, kite.dX, kite.dY, 0, 0)
     doaction = True if control.motortest or base.calibrate else False
-    print(base.action, doaction)
     msg = motor_msg(base.barangle, base.targetbarangle, 2, base.action, doaction)
     if control.motortest:
         display_motor_msg(base.action, config.setup)

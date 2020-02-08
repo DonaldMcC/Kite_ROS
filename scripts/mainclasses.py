@@ -148,12 +148,12 @@ class Base(object):
             self.calibrate_list[self.calibrate_phase][2] = elapsed_millis
             self.calibrate_list[self.calibrate_phase][4] = self.resistance
             self.start_time = curr_millis
-            self.action = self.calibrate_list[self.calibrate_phase][5]
             self.calibrate_phase += 1
             if self.calibrate_phase == 4:  # valid values are 0 to 3 this is end of loop
                 self.calibrate = False
                 self.calibrate_phase = 0
                 self.action = 0
+            self.action = self.calibrate_list[self.calibrate_phase][5]
         else:  # increase cycle counter
             self.calibrate_list[self.calibrate_phase][6] += 1
             self.calibrate_list[self.calibrate_phase][7].append(self.resistance)
@@ -163,6 +163,7 @@ class Base(object):
         #  this should initalise a list of phases that the calibration will
         #  take I think name, motormsg, target time, should  work
         target_time = int(self.get_calibrate_time())  # this is assumed to be constant for all phases
+        self.action = 6
 
         for x, y in enumerate(range(4)):
             if (x % 2) == 0:

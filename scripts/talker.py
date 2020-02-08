@@ -29,7 +29,7 @@ def kite_pos(posx, posy, kiteangle, dirx, diry, routepoints, priorpos):
     msg.kiteangle = kiteangle
     msg.dirx = dirx
     msg.diry = diry
-    rospy.loginfo(msg)
+    # rospy.loginfo(msg)
     pub.publish(msg)
     return
 

@@ -9,7 +9,7 @@ from kite_funcs import getangle
 from mainclasses import calcbarangle, inferangle
 from talker import motor_msg
 barangle = 0
-resistance = 541 # prefer to start with reasonable value
+resistance = 543 # prefer to start with reasonable value
 mockangle = 0
 
 
