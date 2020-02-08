@@ -134,14 +134,12 @@ class Base(object):
         self.calibrate_list = []
         self.plan_calibration()
 
-
     def get_calibrate_time(self):
         # idea here is to have an expectation of how the setup should work based on components
         # believed to be there - and also identify if resistor is working as expected
         circ_act = 2 * math.pi * self.dist_act * 2  # because going to move each army separately
         rev_time = circ_act / self.speed_act  # time for one revolution
         return 1000 * (rev_time * self.maxright / 360.0) / 2.0  # expected time to get half way in millisecs
-
 
     def calibration_check(self):
         curr_millis = round(time.monotonic() * 1000)
@@ -152,26 +150,28 @@ class Base(object):
             self.start_time = curr_millis
             self.action = self.calibrate_list[self.calibrate_phase][5]
             self.calibrate_phase += 1
-            if self.calibrate_phase == 4: # valid values are 0 to 3 this is end of loop
+            if self.calibrate_phase == 4:  # valid values are 0 to 3 this is end of loop
                 self.calibrate = False
                 self.calibrate_phase = 0
                 self.action = 0
         return
 
-
-
     def plan_calibration(self):
         #  this should initalise a list of phases that the calibration will
         #  take I think name, motormsg, target time, should  work
-        target_time = int(self.get_calibrate_time()) #  this is assumed to be constant for all phases
-        target_resist = getresist(self.maxright/2, self.maxleft, self.maxright)
+        target_time = int(self.get_calibrate_time())  # this is assumed to be constant for all phases
 
         for x, y in enumerate(range(4)):
-            action = 'halfleft' if (x % 2) == 0 else 'halfright'
-            motor_action = 6 if (x % 2) == 0 else 7  # send motor left or right
+            if (x % 2) == 0:
+                action = 'halfleft'
+                motor_action = 6
+                target_resist = getresist(self.maxleft / 2, self.maxleft, self.maxright)
+            else:
+                action = 'halfright'
+                motor_action = 7
+                target_resist = getresist(0, self.maxleft, self.maxright)  # should return to square
             self.calibrate_list.append([action, target_time, 0, target_resist, 0, motor_action])
         return
-
 
 
 class Kite(object):

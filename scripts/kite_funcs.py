@@ -135,6 +135,7 @@ def getresist(angle, maxleft=-45, maxright=45, resistleft=740, resistright=340):
     if maxleft <= angle <= maxright:
         resistance = resistleft + ((angle - maxleft) * (resistright - resistleft) / (maxright - maxleft))
     else:
+        # expected value at centrepoint
         resistance = (resistleft + resistright) / 2
 
     return int(resistance)
