@@ -258,15 +258,13 @@ def display_calibration_results():
             for y in range(4):
                 formatted = present_calibrate_row(base.calibrate_list[y])
                 layout2 += [sg.Text(formatted)],
-            layout2 += [[sg.Button('Exit')]]
-
+            layout2 += [[sg.Button('Continue')]]
             win2 = sg.Window('Window 2', layout2)
 
         if win2_active:
             ev2, vals2 = win2.Read(timeout=100)
-            if ev2 is None or ev2 == 'Exit':
-                #win2_active = False
-                win2.Close()
+            if ev2 is None or ev2 == 'Continue':
+                win2.hide()
                 break
     return
 
@@ -411,7 +409,7 @@ while True:  # Main module loop
         if not base.calibrate:
             motor_msg(0, 0, 0, 5, 1)  # stop
             display_calibration_results()
-            break
+
 
     if config.numcams == 1:
         if config.source == 1:
