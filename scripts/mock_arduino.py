@@ -52,7 +52,7 @@ CIRC_ACT = 2 * math.pi * DIST_ACT
 
 
 def listen_motormsg():
-    rospy.Subscriber('motormsg', Int16, callback)
+    rospy.Subscriber('motormsg', Int16, callback, queue_size=1)
 
 
 def callback(data):
@@ -105,10 +105,10 @@ def mockangle(angle, elapsed_time):
                 act_dist = 0 - (SPEED_ACT * elapsed_time / 1000.0)
             elif motorvalue == 4:  # Right
                 act_dist = SPEED_ACT * elapsed_time / 1000.0
-            elif motorvalue == 6:  # Left Only
-                act_dist = 0 - (SPEED_ACT * elapsed_time / 2000.0)
-            elif motorvalue == 7:  # Right
-                act_dist = SPEED_ACT * elapsed_time / 2000.0
+            elif motorvalue == 6:  # Left Motor Only ie going right
+                act_dist =  (SPEED_ACT * elapsed_time / 2000.0)
+            elif motorvalue == 7:  # Right Motor only ie going left
+                act_dist = 0 - SPEED_ACT * elapsed_time / 2000.0
             else:
                 act_dist = 0
             angle += (360 * act_dist) / CIRC_ACT
@@ -120,8 +120,8 @@ def mockangle(angle, elapsed_time):
 
 
 def get_resistance(angle):
-    resistleft = 340
-    resistright = 740
+    resistleft = 740
+    resistright = 340
     resistance = getresist(angle)
     if resistance < resistleft:
         resistance = resistleft
