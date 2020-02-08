@@ -32,14 +32,13 @@ but I think work on centre span needs first
 
 """
 
-
 import time
 import math
 import rospy
 import argparse
 from std_msgs.msg import String, Int16
-from kite_funcs import getangle, getresist
-motorvalue = 5 # stop
+from kite_funcs import getresist
+motorvalue = 5  # stop
 barangle = 0
 MAXLEFT = -20  # These are to simulate limits of angles
 MAXRIGHT = 20  # similarly to protect bar as attached close to pivot

@@ -171,7 +171,7 @@ def display_base(width):
     centx = outx + 60
     centy = 300
     radius = 60
-    cv2.putText(frame, 'Base R:'+str(base.resistance), (outx + 20, centy - 70),
+    cv2.putText(frame, 'Base R:' + str(base.resistance), (outx + 20, centy - 70),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
     cv2.circle(frame, (centx, centy), radius, (0, 255, 255), 2)
     cv2.putText(frame, 'Act: ' + '{:5.1f}'.format(base.barangle), (outx + 15, centy + 100), cv2.FONT_HERSHEY_SIMPLEX,
@@ -236,11 +236,11 @@ def display_line(angle, cx, cy, radius, colour):
 
 def display_motor_msg(action, setup):
     fontsize = 0.5
-    cv2.putText(frame, 'Motor Msg: ' + str(action) + ' ' + setup, (20, 20), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 255, 255), 2)
+    cv2.putText(frame, 'Motor Msg: ' + str(action) + ' ' + setup, (20, 20), cv2.FONT_HERSHEY_SIMPLEX, fontsize,
+                (0, 255, 255), 2)
     return
 
 
-    # self.calibrate_list.append([action, target_time, 0, target_resist, 0, motor_action])
 def present_calibrate_row(row):
     # some sort of accuracy formulas here
     return f'Action: {row[0]} T_Time: {row[1]} A_Time: {row[2]} ' \
@@ -282,7 +282,7 @@ parser.add_argument('-s', '--setup', type=str, default='Standard',
 # Standard means no connections between KiteAngle, KiteTargetAngle and Bar Angles others
 # show connections from and to
 parser.add_argument('-m', '--motortest', type=int, default=0,
-                    help='motortest either 0 or 1')   # This allows direct motor commands to be sent
+                    help='motortest either 0 or 1')  # This allows direct motor commands to be sent
 args = parser.parse_args()
 
 # iphone
@@ -410,7 +410,6 @@ while True:  # Main module loop
             motor_msg(0, 0, 0, 5, 1)  # stop
             display_calibration_results()
 
-
     if config.numcams == 1:
         if config.source == 1:
             ret, frame = camera.stream.read()
@@ -499,7 +498,7 @@ while True:  # Main module loop
         if kite.changezone or kite.changephase or kite.routechange:
             control.routepoints = calc_route(control.centrex, control.centrey, control.halfwidth, control.radius)
             kite.update_target(control.routepoints[0][0], control.routepoints[0][1],
-                           control.centrex, control.maxy, control.routepoints[3][0], control.routepoints[3][1])
+                               control.centrex, control.maxy, control.routepoints[3][0], control.routepoints[3][1])
 
         # start direction and analysis - this will be a routine based on class
         getdirection(kite)
