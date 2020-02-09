@@ -513,14 +513,22 @@ class Controls(object):
         elif self.inputmode == 3:  # ManBar - maybe switch to arrows - let's do this all
             if joybuttons:
                 if joybuttons[7] == 0 and joybuttons[8] == 0:
-                    base.barangle += (self.step / 2 * joyaxes[2])
+                    if joyaxes[2] < -0.2:
+                        base.action = 3
+                    elif joyaxes[2] >  0.2:
+                        base.action = 4
+                    else:
+                        base.action = 0
                 else:  # c or z button pressed
                     kite.x += (self.step * joyaxes[2])
                     kite.y -= (self.step * joyaxes[3])
-            if event == 'Wider':  # anti-clockwise
-                base.barangle -= self.step  # this will change
-            elif event == 'Narrow':  # clockwise
-                base.barangle += self.step
+            else:
+                if event == 'Wider':  # anti-clockwise
+                    base.action = 3
+                elif event == 'Narrow':  # clockwise
+                    base.action = 4
+                else:
+                    base.action = 0
 
         return joybuttons and joybuttons[4] == 1, reset_stitcher  # quit
 

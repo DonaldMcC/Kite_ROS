@@ -277,7 +277,7 @@ parser.add_argument('-l', '--load', type=str, default='yes',
                     help='Do we load cached matrix')
 parser.add_argument('-k', '--kite', type=str, default='Manual',
                     help='Kite either Standard or Manual')
-parser.add_argument('-s', '--setup', type=str, default='Standard',
+parser.add_argument('-s', '--setup', type=str, default='BarKiteActual',
                     help='Standard, BarKiteActual, KiteBarInfer, KiteBarTarget')
 # Standard means no connections between KiteAngle, KiteTargetAngle and Bar Angles others
 # show connections from and to
@@ -332,7 +332,7 @@ else:
     camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
     # Videostream seems to create errors with playback
     # camera = VideoStream(src=r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4').start()
-    # camera = VideoStream(src=r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4').start()
+    # camera =a VideoStream(src=r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4').start()
     # print('video:', camera.grab())
 
 # Initialisation steps
@@ -524,7 +524,9 @@ while True:  # Main module loop
     display_base(width)
 
     kite_pos(kite.x, kite.y, kite.kiteangle, kite.dX, kite.dY, 0, 0)
-    doaction = True if control.motortest or base.calibrate else False
+
+    doaction = True if control.motortest or base.calibrate or (
+        config.setup == 'BarKiteActual' and control.inputmode == 3) else False
     msg = motor_msg(base.barangle, base.targetbarangle, 2, base.action, doaction)
     if control.motortest:
         display_motor_msg(base.action, config.setup)

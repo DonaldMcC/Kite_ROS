@@ -40,6 +40,7 @@ def get_actmockangle():
 
 
 # this should always return barangle except when barangle being set from the kite for simulation
+# or on manbar when bar should be freely controlled
 def get_barangle(kite, base, control, config):
     global barangle
     if config.setup == 'KiteBarActual':
