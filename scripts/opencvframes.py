@@ -16,15 +16,15 @@ if __name__ == '__main__' :
 
     if int(major_ver) < 3:
         fps = video.get(cv2.cv.CV_CAP_PROP_FPS)
-        print("Frames per second using video.get(cv2.cv.CV_CAP_PROP_FPS): {0}".format(fps))
+        print(f"Frames per second using video.get(cv2.cv.CV_CAP_PROP_FPS): {fps}")
     else:
         fps = video.get(cv2.CAP_PROP_FPS)
-        print("Frames per second using video.get(cv2.CAP_PROP_FPS) : {0}".format(fps))
+        print(f"Frames per second using video.get(cv2.CAP_PROP_FPS) : {fps}")
 
     # Number of frames to capture
     num_frames = 180
 
-    print("Capturing {0} frames".format(num_frames))
+    print(f"Capturing {num_frames} frames")
 
     # Start time
     start = time.time()
@@ -39,11 +39,11 @@ if __name__ == '__main__' :
 
     # Time elapsed
     seconds = end - start
-    print("Time taken : {0} seconds".format(seconds))
+    print(f"Time taken : {seconds} seconds")
 
     # Calculate frames per second
     fps  = num_frames / seconds
-    print("Estimated frames per second : {0}".format(fps))
+    print(f"Estimated frames per second : {fps}")
 
     # Release video
     video.release()

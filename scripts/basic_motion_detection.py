@@ -154,7 +154,7 @@ def getdirection(kte):
 
                 # handle when both directions are non-empty
             if dirX != "" and dirY != "":
-                kte.direction = "{}-{}".format(dirY, dirX)
+                kte.direction = f"{dirY}-{dirX}"
                 # otherwise, only one direction is non-empty
             else:
                 kte.direction = dirX if dirX != "" else dirY
@@ -174,20 +174,20 @@ def display_base(width):
     cv2.putText(frame, 'Base R:' + str(base.resistance), (outx + 20, centy - 70),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
     cv2.circle(frame, (centx, centy), radius, (0, 255, 255), 2)
-    cv2.putText(frame, 'Act: ' + '{:5.1f}'.format(base.barangle), (outx + 15, centy + 100), cv2.FONT_HERSHEY_SIMPLEX,
+    cv2.putText(frame, 'Act: ' + f'{base.barangle:5.1f}', (outx + 15, centy + 100), cv2.FONT_HERSHEY_SIMPLEX,
                 0.65, (0, 255, 0), 2)
-    cv2.putText(frame, 'Tgt: ' + '{:5.1f}'.format(base.targetbarangle), (outx + 15, centy + 130),
+    cv2.putText(frame, 'Tgt: ' + f'{base.targetbarangle:5.1f}', (outx + 15, centy + 130),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 255, 255), 2)
     display_line(base.targetbarangle, centx, centy, radius, (0, 255, 255))
     display_line(base.barangle, centx, centy, radius, (0, 255, 0))
     if config.setup == 'KiteBarInfer':
         display_line(base.inferbarangle, centx, centy, radius, (255, 0, 0))
-        cv2.putText(frame, 'Inf: ' + '{:5.1f}'.format(base.inferbarangle), (outx + 15, centy + 160),
+        cv2.putText(frame, 'Inf: ' + f'{base.inferbarangle:5.1f}', (outx + 15, centy + 160),
                     cv2.FONT_HERSHEY_SIMPLEX,
                     0.65, (255, 0, 0), 2)
     if config.check_motor_sim:
         display_line(base.mockangle, centx, centy, radius, (128, 0, 0))
-        cv2.putText(frame, 'Mock: ' + '{:5.1f}'.format(base.mockangle), (outx + 15, centy + 70),
+        cv2.putText(frame, 'Mock: ' + f'{base.mockangle:5.1f}', (outx + 15, centy + 70),
                     cv2.FONT_HERSHEY_SIMPLEX,
                     0.65, (128, 0, 0), 2)
 
@@ -196,9 +196,9 @@ def display_base(width):
 
 def display_stats():
     cv2.putText(frame, kite.direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
-    cv2.putText(frame, "dx: {:.1f}, dy: {:.1f}".format(kite.dX, kite.dY),
+    cv2.putText(frame, f"dx: {kite.dX:.1f}, dy: {kite.dY:.1f}",
                 (10, height - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 1)
-    cv2.putText(frame, "Man x: {:.1f}, y: {:.1f}".format(kite.x, kite.y),
+    cv2.putText(frame, f"Man x: {kite.x:.1f}, y: {kite.y:.1f}",
                 (180, height - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 2)
     cv2.putText(frame, "Act Angle: " + str(int(kite.kiteangle)),
                 (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
