@@ -374,7 +374,7 @@ sgmodestring = 'Mode: ' + initmodestring.split()[0]
 buttons = [sg.Button(x, size=(7, 3), pad=(4, 0), font='Helvetica 14')
            for i, x in enumerate(button_list)]
 
-layout = [[sg.Text(sgmodestring, key=sgmodestring, size=(15, 1), font='Helvetica 20')], buttons]
+layout = [[sg.Text(sgmodestring, key=sgmodestring, size=(70, 1), font='Helvetica 20')], buttons]
 
 # create the window and show it without the plot
 window = sg.Window('Kite ROS - Automated Flying', layout, no_titlebar=False, location=(50, 1000))
@@ -402,9 +402,9 @@ base.start_time = round(time.monotonic() * 1000)
 while True:  # Main module loop
     if base.reset:
         reset_bar(base)
-        base.calibrate = True
+        # base.calibrate = 'Auto' will redo this to show resutl
 
-    if base.calibrate:
+    if base.calibrate == 'Auto':
         base.calibration_check()
         if not base.calibrate:
             motor_msg(0, 0, 0, 5, 1)  # stop

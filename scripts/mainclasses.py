@@ -111,7 +111,8 @@ class Config(object):
 class Base(object):
 
     def __init__(self, barangle=0, parkangle=0, maxright=20, maxleft=-20, lag=1,
-                 targetbarangle=0, kitebarratio=1, inferbarangle=0):
+                 targetbarangle=0, kitebarratio=1, inferbarangle=0, resistleft=740,
+                 resistright=340, resistcentre=543):
         self.barangle = barangle
         self.parkangle = parkangle
         self.maxright = maxright
@@ -132,6 +133,13 @@ class Base(object):
         self.calibrate_phase = 0
         self.start_time = 0
         self.calibrate_list = []
+        self.resistright = resistright
+        self.resistleft = resistleft
+        self.resistcentre = resistcentre
+        self.manual_calib_phases=['Bar to straight (0 degrees) and press set or key 2 on wii',
+                                  'Bar to 20 degrees left and press set or key 2 on wii',
+                                  'Bar to 20 degrees right and press set or key 2 on wii']
+        self.manual_calib_phase=0
         self.plan_calibration()
 
     def get_calibrate_time(self):
@@ -142,6 +150,8 @@ class Base(object):
         return 1000 * (rev_time * self.maxright / 360.0)  # expected time to get to max angle in millisecs
 
     def calibration_check(self):
+        #This should basically wiggle the bar and put it into position to start if results
+        #not good process would be to start manual calibration from the ManBar mode
         curr_millis = round(time.monotonic() * 1000)
         elapsed_millis = curr_millis - self.start_time
         if elapsed_millis > self.calibrate_list[self.calibrate_phase][1]:
@@ -175,6 +185,20 @@ class Base(object):
                 motor_action = 7
                 target_resist = getresist(0)  # should return to square
             self.calibrate_list.append([action, target_time, 0, target_resist, 0, motor_action, 0, []])
+        return
+
+    def set_resistance(self, control):
+        # this should set the resistance for particular angle on the base unit and
+        # is triggered when the set button is pressed
+        if self.manual_calib_phase == 0:
+            self.resistcentre = self.resistance
+        elif self.manual_calib_phase == 1:
+            self.resistleft = self.resistance
+        else:
+            self.resistright = self.resistance
+        self.manual_calib_phase += 1
+        #if self.manual_calib_phase < 2 else 0
+        control.newbuttons = control.get_change_phase_buttons(self)
         return
 
 
@@ -371,7 +395,7 @@ class Controls(object):
     @staticmethod
     def get_change_mode_buttons(inputmode):
         if inputmode == 0:
-            newbuttons = [('Mode: STD:', 'Mode: STD:'), ('Wider', 'Wider'), ('Narrow', 'Narrow'),
+            newbuttons = [('Mode: STD:', 'Mode: STD:'), ('Pause','Pause'), ('Wider', 'Wider'), ('Narrow', 'Narrow'),
                           ('Expand', 'Expand'), ('Contract', 'Contract')]
         elif inputmode == 1:
             newbuttons = [('Mode: STD:', 'Mode: SETFLIGHTMODE:'), ('Wider', 'Park'), ('Narrow', 'Wiggle'),
@@ -380,8 +404,13 @@ class Controls(object):
             newbuttons = [('Mode: STD:', 'Mode: MANFLIGHT'), ('Wider', 'Anti'), ('Narrow', 'Clock'),
                           ('Expand', 'Slow'), ('Contract', 'Fast')]
         else:
-            newbuttons = [('Mode: STD:', 'Mode: MANBAR:')]
+            newbuttons = [('Mode: STD:', 'Mode: MANBAR:'), ('Pause','Calib'), ('Expand', 'Set')]
         return newbuttons
+
+    def get_change_phase_buttons(self, base):
+        newbuttons = [('Mode: STD:', 'Mode:' + base.manual_calib_phases[base.manual_calib_phase])]
+        return newbuttons
+
 
     def joyhandler(self, joybuttons, joyaxes, kite, base, control, event=None):
         # Using https://github.com/arnaud-ramey/rosxwiimote as a ros package to capture
@@ -400,7 +429,7 @@ class Controls(object):
         # 2. XWII_KEY_PLUS - probably the faster button and poss some other things for playback
         # 3. XWII_KEY_MINUS - probably the slower button and poss some other things for playback in slow motion
         # 4. XWII_KEY_HOME this should be the quit key
-        # 5. XWII_KEY_ONE  this will do a pause
+        # 5. XWII_KEY_ONE  this will do a pause or calibrate in manbar mode
         # 6. XWII_KEY_TWO  and this will do a flight mode change
         # 7. XWII_KEY_C - so
         # 8. XWII_KEY_Z   so bigger numchuck key should change manflight to angle kite
@@ -417,8 +446,12 @@ class Controls(object):
                 self.inputmode = 0
             self.modestring = self.getmodestring(self.inputmode)
             self.newbuttons = self.get_change_mode_buttons(self.inputmode)
+            base.calibrate = False # calibration always ends on Mode Change
         elif (joybuttons and joybuttons[5] == 1) or event == 'Pause':  # pause on 1 key
-            if not control.motortest:
+            if control.inputmode == 3:  # Manbar Calibrate
+                base.calibrate = 'Manual' # then slow button becomes set to set and that actions and cycles
+                self.newbuttons = self.get_change_phase_buttons(base)
+            elif not control.motortest:
                 time.sleep(10)
             else:
                 base.action = 5  # Stop
@@ -470,7 +503,10 @@ class Controls(object):
             elif event == 'Down':  # down
                 kite.y += self.step
             elif event == 'Expand':  # slow
-                self.slow += 0.1
+                if base.calibrate != 'Manual':
+                    self.slow += 0.1
+                else:
+                    base.set_resistance(control)
             elif event == 'Contract':  # fast
                 self.slow = 0.0
 
