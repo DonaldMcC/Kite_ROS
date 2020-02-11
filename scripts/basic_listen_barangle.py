@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # this gets the barangle from the arduino board and now also got an initialisation which
 # should retract the actuators
+# TODO - this needs reworked idea is to be able to support two resistors which will need two
+# global variables but both use the setup of the base so need its max and min settings etc
 
 import time, math
 import rospy
@@ -16,7 +18,6 @@ mockangle = 0
 def callback(data):
     global barangle, resistance
     resistance = data.data
-    barangle = getangle(resistance)
     return
 
 
@@ -42,10 +43,11 @@ def get_actmockangle():
 # this should always return barangle except when barangle being set from the kite for simulation
 # or on manbar when bar should be freely controlled
 def get_barangle(kite, base, control, config):
-    global barangle
+    global barangle, resistance
     if config.setup == 'KiteBarActual':
         return kite.kiteangle / base.kitebarratio
     else:  # automated flight reading from some sort of sensor via ROS
+        barangle = getangle(resistance, base.maxleft, base.maxright, base.resistleft, base.resistright)
         return barangle
 
 
