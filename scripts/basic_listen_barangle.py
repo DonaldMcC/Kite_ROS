@@ -12,19 +12,18 @@ from mainclasses import calcbarangle, inferangle
 from talker import motor_msg
 barangle = 0
 resistance = 543 # prefer to start with reasonable value
-mockangle = 0
+mockresistance = 538
 
 
 def callback(data):
-    global barangle, resistance
+    global resistance
     resistance = data.data
     return
 
 
 def callmock(data):
-    global mockangle, resistance
-    resistance = data.data
-    mockangle = getangle(resistance)
+    global mockresistance
+    mockresistance = data.data
     return
 
 
@@ -35,8 +34,9 @@ def listen_kiteangle(message):
         rospy.Subscriber(message, Int16, callmock, queue_size=1)
 
 
-def get_actmockangle():
-    global mockangle
+def get_actmockangle(kite, base, control, config):
+    global mockangle, mockresistance
+    mockangle = getangle(resistance, base.maxleft, base.maxright, base.resistleft, base.resistright)
     return mockangle
 
 
