@@ -162,5 +162,5 @@ void loop()
   msg.data = sensorValue;
   kiteangle.publish(&msg);
   nh.spinOnce();
-  delay(5);
+  delay(20);
 }

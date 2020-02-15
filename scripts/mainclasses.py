@@ -136,9 +136,9 @@ class Base(object):
         self.resistright = resistright
         self.resistleft = resistleft
         self.resistcentre = resistcentre
-        self.manual_calib_phases=['Bar to straight (0 degrees) and press set or key 2 on wii',
-                                  'Bar to 20 degrees left and press set or key 2 on wii',
-                                  'Bar to 20 degrees right and press set or key 2 on wii']
+        self.manual_calib_phases=['Bar to straight (0 degrees) and press set or - key on wii',
+                                  'Bar to 20 degrees left and press set or - key on wii',
+                                  'Bar to 20 degrees right and press set or - key on wii']
         self.manual_calib_phase=0
         self.plan_calibration()
 
@@ -196,7 +196,10 @@ class Base(object):
             self.resistleft = self.resistance
         else:
             self.resistright = self.resistance
-        self.manual_calib_phase += 1
+        if self.manual_calib_phase < 2:
+            self.manual_calib_phase += 1
+        else:
+            self.manual_calib_phase = 0
         #if self.manual_calib_phase < 2 else 0
         control.newbuttons = control.get_change_phase_buttons(self)
         return
@@ -502,7 +505,7 @@ class Controls(object):
                 kite.y -= self.step
             elif event == 'Down':  # down
                 kite.y += self.step
-            elif event == 'Expand':  # slow
+            elif event == 'Expand' or joybuttons[3] == 1:  # slow
                 if base.calibrate != 'Manual':
                     self.slow += 0.1
                 else:
@@ -553,6 +556,10 @@ class Controls(object):
                         base.action = 3
                     elif joyaxes[2] >  0.2:
                         base.action = 4
+                    elif joyaxes[3] >  0.2:
+                        base.action = 1
+                    elif joyaxes[3] <  -0.2:
+                        base.action = 2
                     else:
                         base.action = 0
                 else:  # c or z button pressed

@@ -36,7 +36,8 @@ def listen_kiteangle(message):
 
 def get_actmockangle(kite, base, control, config):
     global mockangle, mockresistance
-    mockangle = getangle(resistance, base.maxleft, base.maxright, base.resistleft, base.resistright)
+    mockangle = getangle(resistance, base.maxleft, base.maxright,
+                         base.resistleft, base.resistright, base.resistcentre)
     return mockangle
 
 
@@ -47,7 +48,8 @@ def get_barangle(kite, base, control, config):
     if config.setup == 'KiteBarActual':
         return kite.kiteangle / base.kitebarratio
     else:  # automated flight reading from some sort of sensor via ROS
-        barangle = getangle(resistance, base.maxleft, base.maxright, base.resistleft, base.resistright)
+        barangle = getangle(resistance, base.maxleft, base.maxright,
+                            base.resistleft, base.resistright, base.resistcentre)
         return barangle
 
 

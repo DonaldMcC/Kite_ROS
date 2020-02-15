@@ -80,7 +80,7 @@ def checklimits(angle, maxleft, maxright):
     return angle
 
 
-def getangle(resistance, maxleft=-45, maxright=45, resistleft=740, resistright=340):
+def getangle(resistance, maxleft=-45, maxright=45, resistleft=740, resistright=340, resistcentre=540):
     """
     :param resistright:
     :param resistleft:
@@ -96,16 +96,19 @@ def getangle(resistance, maxleft=-45, maxright=45, resistleft=740, resistright=3
     >>> getangle(340)
     45
     >>> getangle(350)
-    43
+    42
     """
 
     # calibration is based on 0 being the centre and maxleft and maxright being
     # defined in degrees - the corrsesponding values of the resistor should be taken
-    # for all of these and we will for now assume resistor is linear
+    # for all of these and we will for now assume resistor is linear - have now changed
+    # so that values beyond maxleft and maxright should be supported
 
-    if resistleft >= resistance >= resistright:
-        angle = maxright - ((resistance - resistright) * (maxright - maxleft) / (resistleft - resistright))
+    if resistance > resistcentre:
+        angle = ((resistance - resistcentre) * maxleft) / (resistleft - resistcentre)
         # angle = -45 + ((resistance - resistleft)/ 400.0)
+    elif resistance < resistcentre:
+        angle = ((resistance - resistcentre) * maxright) / (resistright - resistcentre)
     else:
         angle = 0
     return int(angle)
