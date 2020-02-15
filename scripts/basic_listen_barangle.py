@@ -82,9 +82,9 @@ def check_kite(kite, base, control, config):
 def reset_bar(base):
     global resistance
     max_retract_time = 5
-    motor_msg(0, 0, 0, 1, 1)  # send backward signal
+    motor_msg(0, 0, 0, 100, 1)  # send backward signal
     time.sleep(max_retract_time)  # assumed to be time for motors to fully retract
-    motor_msg(0, 0, 0, 5, 1)  # stop
+    motor_msg(0, 0, 0, 500, 1)  # stop
     base.reset=False
     return resistance
 

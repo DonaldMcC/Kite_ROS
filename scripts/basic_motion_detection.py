@@ -407,7 +407,7 @@ while True:  # Main module loop
     if base.calibrate == 'Auto':
         base.calibration_check()
         if not base.calibrate:
-            motor_msg(0, 0, 0, 5, 1)  # stop
+            motor_msg(0, 0, 0, 500, 1)  # stop
             display_calibration_results()
 
     if config.numcams == 1:

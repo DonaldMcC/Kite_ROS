@@ -457,7 +457,7 @@ class Controls(object):
             elif not control.motortest:
                 time.sleep(10)
             else:
-                base.action = 5  # Stop
+                base.action = 500  # Stop
         elif joybuttons and joybuttons[3] == 1:  # slow
             self.slow += 0.1
         elif joybuttons and joybuttons[2] == 1:  # fast
@@ -470,25 +470,25 @@ class Controls(object):
                     self.centrex -= self.step
                     kite.routechange = True
                 else:
-                    base.action = 3
+                    base.action = 300
             elif (joybuttons and joyaxes[0] == 1) or event == 'Right':  # right
                 if not control.motortest:
                     self.centrex += self.step
                     kite.routechange = True
                 else:
-                    base.action = 4
+                    base.action = 400
             elif (joybuttons and joyaxes[1] == 1) or event == 'Up':  # up
                 if not control.motortest:
                     self.centrey -= self.step
                     kite.routechange = True
                 else:
-                    base.action = 1
+                    base.action = 100
             elif (joybuttons and joyaxes[1] == -1) or event == 'Down':  # down
                 if not control.motortest:
                     self.centrey += self.step
                     kite.routechange = True
                 else:
-                    base.action = 2
+                    base.action = 200
         elif self.inputmode == 2 or self.inputmode == 3:  # common events for Man modes
             if joybuttons:
                 if joyaxes[0] != 0:  # -1 = left +1 = right
@@ -553,13 +553,13 @@ class Controls(object):
             if joybuttons:
                 if joybuttons[7] == 0 and joybuttons[8] == 0:
                     if joyaxes[2] < -0.2:
-                        base.action = 3
+                        base.action = 300 - (joyaxes[2] * 99)
                     elif joyaxes[2] >  0.2:
-                        base.action = 4
+                        base.action = 400 + (joyaxes[2] * 99)
                     elif joyaxes[3] >  0.2:
-                        base.action = 1
+                        base.action = 100 + (joyaxes[2] * 99)
                     elif joyaxes[3] <  -0.2:
-                        base.action = 2
+                        base.action = 200 - (joyaxes[2] * 99)
                     else:
                         base.action = 0
                 else:  # c or z button pressed
@@ -567,9 +567,9 @@ class Controls(object):
                     kite.y -= (self.step * joyaxes[3])
             else:
                 if event == 'Wider':  # anti-clockwise
-                    base.action = 3
+                    base.action = 300
                 elif event == 'Narrow':  # clockwise
-                    base.action = 4
+                    base.action = 400
                 else:
                     base.action = 0
 
