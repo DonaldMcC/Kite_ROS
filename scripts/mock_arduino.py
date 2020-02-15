@@ -106,16 +106,16 @@ def mockangle(angle, elapsed_time):
         angle = 0
     else:
         if direction == 3:  # Left
-                act_dist = 0 - (SPEED_ACT * elapsed_time / 1000.0)
-            elif direction == 4:  # Right
-                act_dist = SPEED_ACT * elapsed_time / 1000.0
-            elif direction == 6:  # Left Motor Only ie going right
-                act_dist = (SPEED_ACT * elapsed_time / 2000.0)
-            elif direction == 7:  # Right Motor only ie going left
-                act_dist = 0 - SPEED_ACT * elapsed_time / 2000.0
-            else:
-                act_dist = 0
-            angle += (360 * act_dist) / CIRC_ACT
+            act_dist = 0 - (speed * SPEED_ACT * elapsed_time / 1000.0 * 255)
+        elif direction == 4:  # Right
+            act_dist = speed * SPEED_ACT * elapsed_time / (1000.0 * 255)
+        elif direction == 6:  # Left Motor Only ie going right
+            act_dist = speed * SPEED_ACT * elapsed_time / (2000.0 * 255)
+        elif direction == 7:  # Right Motor only ie going left
+            act_dist = 0 - (speed * SPEED_ACT * elapsed_time / (2000.0 * 255))
+        else:
+            act_dist = 0
+        angle += (360 * act_dist) / CIRC_ACT
     if angle <= MAXLEFT:
         angle = MAXLEFT
     elif angle >= MAXRIGHT:
