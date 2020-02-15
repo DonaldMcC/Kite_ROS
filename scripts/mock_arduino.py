@@ -38,7 +38,7 @@ import rospy
 import argparse
 from std_msgs.msg import String, Int16
 from kite_funcs import getresist
-motorvalue = 5  # stop
+motorvalue = 500  # stop
 barangle = 0
 MAXLEFT = -20  # These are to simulate limits of angles
 MAXRIGHT = 20  # similarly to protect bar as attached close to pivot
@@ -68,7 +68,7 @@ def get_motorv():
 def mock_kiteangle(message):
     global motorvalue
     global barangle
-    pub = rospy.Publisher(message, Int16, queue_size=3)
+    pub = rospy.Publisher(message, Int16, queue_size=1)
     rospy.init_node('mock_arduino', anonymous=False)
     rate = rospy.Rate(20)  # Cycles per Second
     # left_act_pos = get_coord(0-DIST_ACT, 0, barangle) not convinced this serves purpose
@@ -93,20 +93,25 @@ def mockangle(angle, elapsed_time):
     """This now attempts to simulate how we believe the bar should respond to messages sent to
     the actuator given known distance from 'fulcrum' to mounting points and speed of the actuator.
     Motorvalue is received for left and right and resistance is sent back as kiteangle message."""
-    global motorvalue
+    speed = 255
 
+    global motorvalue
     get_motorv()
-    if motorvalue:
-        if motorvalue == 1 or motorvalue == 2:
-            angle = 0
-        else:
-            if motorvalue == 3:  # Left
+
+    direction = motorvalue / 100
+    rawspeed = motorvalue % 100
+    speed = int((rawspeed * 255)/100) if rawspeed > 0 else 255
+
+    if direction == 1 or direction == 2:
+        angle = 0
+    else:
+        if direction == 3:  # Left
                 act_dist = 0 - (SPEED_ACT * elapsed_time / 1000.0)
-            elif motorvalue == 4:  # Right
+            elif direction == 4:  # Right
                 act_dist = SPEED_ACT * elapsed_time / 1000.0
-            elif motorvalue == 6:  # Left Motor Only ie going right
+            elif direction == 6:  # Left Motor Only ie going right
                 act_dist = (SPEED_ACT * elapsed_time / 2000.0)
-            elif motorvalue == 7:  # Right Motor only ie going left
+            elif direction == 7:  # Right Motor only ie going left
                 act_dist = 0 - SPEED_ACT * elapsed_time / 2000.0
             else:
                 act_dist = 0

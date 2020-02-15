@@ -42,7 +42,7 @@ int direction=0; //direction of motors
 direction = int_msg.data / 100;
 rawspeed = int_msg.data % 100;
 if (rawspeed > 0) {
-speed = int(rawspeed * 255);
+speed = int((rawspeed * 255)/100);
 }
 else {
   speed = 255;
