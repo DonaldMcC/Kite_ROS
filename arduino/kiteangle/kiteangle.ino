@@ -36,24 +36,37 @@ ros::Publisher kiteangle("kiteangle", &msg);
 // with 100-199 being left and 200-299 being right
 void callback (const std_msgs::Int16&int_msg)
 {
-switch (int_msg.data) {
+int speed = 255;
+int rawspeed; 
+int direction=0; //direction of motors
+direction = int_msg.data / 100;
+rawspeed = int_msg.data % 100;
+if (rawspeed > 0) {
+speed = int(rawspeed * 255);
+}
+else {
+  speed = 255;
+};
+
+
+switch (direction) {
     case 1:
-      backward();
+      backward(speed);
       break;
     case 2:
-      forward();
+      forward(speed);
       break;
     case 3:
-      left();
+      left(speed);
       break;
     case 4:
-      right();
+      right(speed);
       break;
     case 6:
-      leftonly();
+      leftonly(speed);
       break;
     case 7:
-      rightonly();
+      rightonly(speed);
       break;
     default:
         stop();
@@ -93,58 +106,58 @@ void setup()
 }
 
 
-void backward()
+void backward(int speed)
 {
-     analogWrite(speedpinA,spead);//input a simulation value to set the speed
-     analogWrite(speedpinB,spead);
+     analogWrite(speedpinA,speed);//input a simulation value to set the speed
+     analogWrite(speedpinB,speed);
      digitalWrite(pinI4,HIGH);//turn DC Motor B move clockwise
      digitalWrite(pinI3,LOW);
      digitalWrite(pinI2,LOW);//turn DC Motor A move anticlockwise
      digitalWrite(pinI1,HIGH);
 }
 
-void forward()//
+void forward(int speed)//
 {
-     analogWrite(speedpinA,spead);//input a simulation value to set the speed
-     analogWrite(speedpinB,spead);
+     analogWrite(speedpinA,speed);//input a simulation value to set the speed
+     analogWrite(speedpinB,speed);
      digitalWrite(pinI4,LOW);//turn DC Motor B move anticlockwise
      digitalWrite(pinI3,HIGH);
      digitalWrite(pinI2,HIGH);//turn DC Motor A move clockwise
      digitalWrite(pinI1,LOW);
 }
 
-void left()//
+void left(int speed)//
 {
-     analogWrite(speedpinA,spead);//input a simulation value to set the speed
-     analogWrite(speedpinB,spead);
+     analogWrite(speedpinA,speed);//input a simulation value to set the speed
+     analogWrite(speedpinB,speed);
      digitalWrite(pinI4,HIGH);//turn DC Motor B move clockwise
      digitalWrite(pinI3,LOW);
      digitalWrite(pinI2,HIGH);//turn DC Motor A move anticlockwise
      digitalWrite(pinI1,LOW);
 }
 
-void leftonly()//
+void leftonly(int speed)//
 {
-     analogWrite(speedpinA,spead);//input a simulation value to set the speed
-     analogWrite(speedpinB,spead);
+     analogWrite(speedpinA,speed);//input a simulation value to set the speed
+     analogWrite(speedpinB,speed);
      digitalWrite(pinI4,HIGH);//turn DC Motor B move clockwise
      digitalWrite(pinI3,LOW);
 }
 
-void right()//
+void right(int speed)//
 {
-     analogWrite(speedpinA,spead);//input a simulation value to set the speed
-     analogWrite(speedpinB,spead);
+     analogWrite(speedpinA,speed);//input a simulation value to set the speed
+     analogWrite(speedpinB,speed);
      digitalWrite(pinI4,LOW);//turn DC Motor B move anticlockwise
      digitalWrite(pinI3,HIGH);
      digitalWrite(pinI2,LOW);//turn DC Motor A move clockwise
      digitalWrite(pinI1,HIGH);
 }
 
-void rightonly()//
+void rightonly(int speed)//
 {
-     analogWrite(speedpinA,spead);//input a simulation value to set the speed
-     analogWrite(speedpinB,spead);
+     analogWrite(speedpinA,speed);//input a simulation value to set the speed
+     analogWrite(speedpinB,speed);
      digitalWrite(pinI2,LOW);//turn DC Motor A move clockwise
      digitalWrite(pinI1,HIGH);
 }

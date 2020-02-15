@@ -8,18 +8,6 @@ from cv_bridge import CvBridge, CvBridgeError
 pub=0
 
 
-def talker():
-    pub = rospy.Publisher('chatter', String, queue_size=10)
-    rospy.init_node('talker', anonymous=True)
-    rate = rospy.Rate(10)  # 10hz
-    while not rospy.is_shutdown():
-        hello_str = "hello world %s" % rospy.get_time()
-        rospy.loginfo(hello_str)
-        pub.publish(hello_str)
-        rate.sleep()
-    return
-
-
 def kite_pos(posx, posy, kiteangle, dirx, diry, routepoints, priorpos):
     pub = rospy.Publisher('kite_position', Kitepos, queue_size=10)
     msg = Kitepos()
@@ -43,13 +31,14 @@ def init_motor_msg():
     pub = rospy.Publisher('motormsg', Int16, queue_size=10)
 
 
-def motor_msg(barangle, targetbarangle, tolerance=10, action=None, doaction=False):
-    # TODO we are now adding ability to send motor message 6 for leftonly and 7 for rightonly
+def motor_msg(barangle, targetbarangle, tolerance=10, action=None, doaction=False, speed=100):
+    # Now added ability to send motor message 6 for leftonly and 7 for rightonly
+    # and will now add speed into the message as %age of max value up to 99 but 0 is max speed
     MAXLEFT = -20  # These are to try and avoid breaking the bar
     MAXRIGHT = 20  # similarly to protect bar as attached close to pivot
     msg = 0
     if doaction:
-        msg = action  # 1 for forward and 2 for backward - will now execute 0 as doaction drives
+        msg = action  # 1 for forward and 2 for backward - will now execute 0 as doaction drives but
     else:
         diff = barangle - targetbarangle
         if abs(diff) < tolerance:
@@ -58,6 +47,8 @@ def motor_msg(barangle, targetbarangle, tolerance=10, action=None, doaction=Fals
             msg = 3   # Left
         elif diff < 0 and barangle < MAXRIGHT:
             msg = 4  # Right
+    msg = msg * 100
+    msg = msg + speed if 0 < speed < 100 else msg
     pub.publish(msg)
     return msg
 

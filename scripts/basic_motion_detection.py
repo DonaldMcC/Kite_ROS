@@ -277,10 +277,10 @@ parser.add_argument('-l', '--load', type=str, default='yes',
                     help='Do we load cached matrix')
 parser.add_argument('-k', '--kite', type=str, default='Manual',
                     help='Kite either Standard or Manual')
-parser.add_argument('-s', '--setup', type=str, default='BarKiteActual',
+parser.add_argument('-s', '--setup', type=str, default='KiteBarTarget',
                     help='Standard, BarKiteActual, KiteBarInfer, KiteBarTarget')
 # Standard means no connections between KiteAngle, KiteTargetAngle and Bar Angles others
-# show connections from and to
+# show connections from and to ie BarKiteActual the Kite angle is updated from the bar Angle
 parser.add_argument('-m', '--motortest', type=int, default=0,
                     help='motortest either 0 or 1')  # This allows direct motor commands to be sent
 args = parser.parse_args()
