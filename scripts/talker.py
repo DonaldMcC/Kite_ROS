@@ -44,10 +44,9 @@ def motor_msg(barangle, targetbarangle, tolerance=10, action=None, doaction=Fals
         if abs(diff) < tolerance:
             msg = 0 # stop
         elif diff > 0 and barangle > MAXLEFT:
-            msg = 3   # Left
+            msg = 300   # Left
         elif diff < 0 and barangle < MAXRIGHT:
-            msg = 4  # Right
-    msg = msg * 100
+            msg = 400  # Right
     msg = msg + speed if 0 < speed < 100 else msg
     pub.publish(msg)
     return msg
