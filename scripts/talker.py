@@ -38,7 +38,7 @@ def motor_msg(barangle, targetbarangle, tolerance=10, action=None, doaction=Fals
     MAXRIGHT = 20  # similarly to protect bar as attached close to pivot
     msg = 0
     if doaction:
-        msg = action  # 1 for forward and 2 for backward - will now execute 0 as doaction drives but
+        msg = action  # 100 for forward and 200 for backward - will now execute 0 as doaction drives but
     else:
         diff = barangle - targetbarangle
         if abs(diff) < tolerance:
@@ -47,7 +47,7 @@ def motor_msg(barangle, targetbarangle, tolerance=10, action=None, doaction=Fals
             msg = 300   # Left
         elif diff < 0 and barangle < MAXRIGHT:
             msg = 400  # Right
-    msg = msg + speed if 0 < speed < 100 else msg
+    msg = int(msg + speed) if 0 < speed < 100 else int(msg)
     pub.publish(msg)
     return msg
 

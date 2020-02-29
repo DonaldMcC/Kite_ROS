@@ -505,7 +505,7 @@ class Controls(object):
                 kite.y -= self.step
             elif event == 'Down':  # down
                 kite.y += self.step
-            elif event == 'Expand' or joybuttons[3] == 1:  # slow
+            elif event == 'Expand' or (joybuttons and joybuttons[3] == 1):  # slow
                 if base.calibrate != 'Manual':
                     self.slow += 0.1
                 else:
@@ -557,9 +557,9 @@ class Controls(object):
                     elif joyaxes[2] >  0.2:
                         base.action = 400 + (joyaxes[2] * 99)
                     elif joyaxes[3] >  0.2:
-                        base.action = 100 + (joyaxes[2] * 99)
+                        base.action = 100 + (joyaxes[3] * 99)
                     elif joyaxes[3] <  -0.2:
-                        base.action = 200 - (joyaxes[2] * 99)
+                        base.action = 200 - (joyaxes[3] * 99)
                     else:
                         base.action = 0
                 else:  # c or z button pressed
