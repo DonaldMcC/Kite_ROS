@@ -20,17 +20,25 @@
 # video file if started without arguments it will generally use webcam input - however this can
 # change depending on what I am working on.
 #
-# while runing it is possible to
-# 1 amend the flight mode - which is the flight path we are looking for the kite to try and follow
-# 2 adjust the routing - it should default when the flight mode is changed
+# while runing it is possible there are 4 modes
+# 1 Std - the main controls adjust the height and shape of figure of 8 routing
+# 2 SetFlightMode - starting objective is stability of kite in park position - but also wiggle
+#   and then fig 8 are possible
+# 2 Manflight - the main controls adjust the position and angle of a manual kite
+# 3 Manbar - controls adjust the angle of the bar as well as key for the rout
 #
 # At startup it is possible to:
-# 1 switch from sending actual kite position to manually controlled one
-#
+# 1 detect an actual kite on video or manually controlled one for testing and simulation
+# 2 set the linkage between controls - Standard, BarKiteActual, KiteBarInfer, KiteBarTarget
+# Standard means no connections between KiteAngle, KiteTargetAngle and Bar Angles
+# KiteAngle means the observed or actual angle of the kite sets the actual bar angle
+# KiteTargetAngle - observed or actual angle of the kite sets the target bar angle
+# BarAngle - the actual angle of the bar sets the angle of the kite - this setup can
+# be achieved at any point by going into Manbar - but BarAngle basically starts with this setup
+# show connections from and to ie BarKiteActual the Kite angle is updated from the bar Angle
 #
 #
 # on playback it should be possible to go into slow motion
-
 
 # standard library imports
 import numpy as np
@@ -152,7 +160,6 @@ def getdirection(kte):
             # ensure there is significant movement in the y-direction
             if np.abs(kte.dY) > 20:
                 dirY = "South" if np.sign(kte.dY) == 1 else "North"
-
                 # handle when both directions are non-empty
             if dirX != "" and dirY != "":
                 kte.direction = f"{dirY}-{dirX}"
@@ -191,7 +198,6 @@ def display_base(width):
         cv2.putText(frame, 'Mock: ' + f'{base.mockangle:5.1f}', (outx + 15, centy + 70),
                     cv2.FONT_HERSHEY_SIMPLEX,
                     0.65, (128, 0, 0), 2)
-
     return
 
 
@@ -217,7 +223,6 @@ def display_flight(screenwidth):
     outx = screenwidth - 180
     fontsize = 0.5
     tempstr = "Found: Yes" if kite.found else "Found: No"
-
     cv2.putText(frame, 'Zone: ' + kite.zone, (outx, 40), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
     cv2.putText(frame, tempstr, (outx, 60), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
     cv2.putText(frame, 'Mode: ' + kite.mode, (outx, 80), cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 2)
@@ -251,10 +256,8 @@ def present_calibrate_row(row):
 def display_calibration_results():
     win2_active = False
     while True:
-
         if not win2_active:
             win2_active = True
-
             layout2 = []
             for y in range(4):
                 formatted = present_calibrate_row(base.calibrate_list[y])
