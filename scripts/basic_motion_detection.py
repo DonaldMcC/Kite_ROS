@@ -1,35 +1,36 @@
 #!/usr/bin/env python
 # this will be the main module for configuring the desired route and
-# for seeing and reporting back on the position and angle of
-# the kite - it will also be the only video output from the package and consequently
+# for showing the position and angle of the kite
+# it is the only video output from the package and consequently
 # will display and also allow direct updating of the proposed route
 
 # inputs
-# the module will support main input either input from a single webcam or from a video file - this may
-# extend to rosbag files in future and support for a second camera now seems required as cameras I have do not
-# provide coverage of a sufficiently large angle of the sky - possibly building in capability to angle cameras
-# during operation should be looked at
-# there will also be input from a resistor which is linked to the kitebar and will need to be calibrated in
-# advance - this will be received as kiteangle.data generally from arduino 
+# the module will support main input either input single or dual webcam or from a video file - this may
+# extend to rosbag files in future
+# there is input from a resistor which is linked to the kitebar and can be calibrated to provide
+# the angle of the bar which is now being moved via an arduino connect to two actuators
 #
 # outputs
-# the main output will be a ROS message reporting the x and y coordinates of the kite the current angle of the
-# control bar and the motor instruction to change the angle of the bar.  It should also be
-# possible to record the input if required - the motor instruction is on motormsg.data
+# the main output will be a ROS message reporting the x and y coordinates of the kite,
+# the current angle of the control bar and the motor instruction to change the angle of the bar.
+# It is possible to record the input if required - the motor instruction is on motormsg.data
 #
 # initial configuration
-# file can be started with arguments and should then not prompt for input
-# if started without arguments it should ask if webcam or file to be loaded
+# file can be started with  various arguments and can be easily changed to work with a specified
+# video file if started without arguments it will generally use webcam input - however this can
+# change depending on what I am working on.
 #
-# while in flow it should be possible to
+# while runing it is possible to
 # 1 amend the flight mode - which is the flight path we are looking for the kite to try and follow
-# 2 switch from sending actual kite position to manually controlled one
-# 3 adjust the routing - it should default when the flight mode is changed
-# 4 on playback it should be possible to go into slow motion
+# 2 adjust the routing - it should default when the flight mode is changed
+#
+# At startup it is possible to:
+# 1 switch from sending actual kite position to manually controlled one
+#
+#
+#
+# on playback it should be possible to go into slow motion
 
-# Currently working on option to support auxiliary camera - conceptually think this is ok
-# but should be optional and if present we will switch to that when kite goes above top of main
-# image ie for now auxiliary camera is always above and we try not to fly off the sides
 
 # standard library imports
 import numpy as np
