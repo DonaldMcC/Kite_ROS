@@ -190,6 +190,7 @@ class Base(object):
     def set_resistance(self, control):
         # this should set the resistance for particular angle on the base unit and
         # is triggered when the set button is pressed
+        # TODO refactor resistance into a list or dict
         if self.manual_calib_phase == 0:
             self.resistcentre = self.resistance
         elif self.manual_calib_phase == 1:
@@ -200,6 +201,8 @@ class Base(object):
             self.manual_calib_phase += 1
         else:
             self.manual_calib_phase = 0
+        print('Calibration Left Centre Right' + str(self.resistleft)
+              + ' ' + str(self.resistcentre) + ' ' + str(self.resistright) )
         #if self.manual_calib_phase < 2 else 0
         control.newbuttons = control.get_change_phase_buttons(self)
         return
