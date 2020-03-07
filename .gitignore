@@ -1,4 +1,5 @@
 /scripts/cachedH.npy
+/scripts/.idea
 *.pyc
 *.avi
 
