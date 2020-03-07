@@ -97,7 +97,6 @@ def mockangle(angle, elapsed_time):
 
     global motorvalue
     get_motorv()
-
     direction = motorvalue / 100
     rawspeed = motorvalue % 100
     speed = int((rawspeed * 255)/100) if rawspeed > 0 else 255
@@ -120,6 +119,7 @@ def mockangle(angle, elapsed_time):
         angle = MAXLEFT
     elif angle >= MAXRIGHT:
         angle = MAXRIGHT
+    print ('angle'+str(angle))
     return angle
 
 

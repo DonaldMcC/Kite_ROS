@@ -281,7 +281,7 @@ parser.add_argument('-l', '--load', type=str, default='yes',
                     help='Do we load cached matrix')
 parser.add_argument('-k', '--kite', type=str, default='Manual',
                     help='Kite either Standard or Manual')
-parser.add_argument('-s', '--setup', type=str, default='Standard',
+parser.add_argument('-s', '--setup', type=str, default='KiteBarInfer',
                     help='Standard, BarKiteActual, KiteBarInfer, KiteBarTarget')
 # Standard means no connections between KiteAngle, KiteTargetAngle and Bar Angles others
 # show connections from and to ie BarKiteActual the Kite angle is updated from the bar Angle
@@ -305,7 +305,7 @@ KITETYPE = 'kite1'
 
 # initiate class instances
 # config = Config(setup='Manfly', source=1, input='Joystick')
-config = Config(kite=args.kite, source=1, numcams=1, check_motor_sim=False, setup=args.setup)
+config = Config(source=1, kite=args.kite,  numcams=1, check_motor_sim=False, setup=args.setup)
 control = Controls(config.kite, step=16, motortest=args.motortest)
 kite = Kite(300, 400) if control.config == "Manual" else Kite(control.centrex, control.centrey)
 base = Base(kitebarratio=1)
@@ -401,7 +401,7 @@ fps = 15
 
 get_angles(kite, base, control, config)
 time.sleep(2)
-base.calibrate = True
+#base.calibrate = True # not sure why this was needed
 base.start_time = round(time.monotonic() * 1000)
 while True:  # Main module loop
     if base.reset:
@@ -500,6 +500,7 @@ while True:  # Main module loop
 
         # Establish route
         if kite.changezone or kite.changephase or kite.routechange:
+            # print('I triggered')
             control.routepoints = calc_route(control.centrex, control.centrey, control.halfwidth, control.radius)
             kite.update_target(control.routepoints[0][0], control.routepoints[0][1],
                                control.centrex, control.maxy, control.routepoints[3][0], control.routepoints[3][1])
