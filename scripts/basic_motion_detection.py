@@ -281,7 +281,7 @@ parser.add_argument('-l', '--load', type=str, default='yes',
                     help='Do we load cached matrix')
 parser.add_argument('-k', '--kite', type=str, default='Manual',
                     help='Kite either Standard or Manual')
-parser.add_argument('-s', '--setup', type=str, default='KiteBarInfer',
+parser.add_argument('-s', '--setup', type=str, default='Standard',
                     help='Standard, BarKiteActual, KiteBarInfer, KiteBarTarget')
 # Standard means no connections between KiteAngle, KiteTargetAngle and Bar Angles others
 # show connections from and to ie BarKiteActual the Kite angle is updated from the bar Angle

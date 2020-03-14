@@ -193,10 +193,12 @@ class Base(object):
         # TODO refactor resistance into a list or dict
         if self.manual_calib_phase == 0:
             self.resistcentre = self.resistance
-        elif self.manual_calib_phase == 1:
-            self.resistleft = self.resistance
-        else:
-            self.resistright = self.resistance
+        elif self.resistance != self.resistcentre: # avoid division by zero errs
+            if self.manual_calib_phase == 1:
+                self.resistleft = self.resistance
+            else:
+                self.resistright = self.resistance
+
         if self.manual_calib_phase < 2:
             self.manual_calib_phase += 1
         else:
@@ -513,6 +515,7 @@ class Controls(object):
                     self.slow += 0.1
                 else:
                     base.set_resistance(control)
+                    time.sleep(0.5)
             elif event == 'Contract':  # fast
                 self.slow = 0.0
 
