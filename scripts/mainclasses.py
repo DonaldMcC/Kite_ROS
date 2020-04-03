@@ -316,7 +316,6 @@ class Kite(object):
 
     def update_target(self, leftx, lefty, centrex, centrey, rightx, righty):
         # this gets called when mode, zone, phase or route changes
-        # print('update targ called')
         if self.mode == 'Park':
             # For park this is now OK we want to get kiteangle to zero
             self.targettype = 'Angle'
