@@ -308,7 +308,7 @@ KITETYPE = 'kite1'
 config = Config(source=1, kite=args.kite,  numcams=1, check_motor_sim=False, setup=args.setup)
 control = Controls(config.kite, step=16, motortest=args.motortest)
 kite = Kite(300, 400) if control.config == "Manual" else Kite(control.centrex, control.centrey)
-base = Base(kitebarratio=1)
+base = Base(kitebarratio=1, safety=True)
 
 while config.source not in {1, 2}:
     config.source = input('Key 1 for camera or 2 for source')
@@ -353,14 +353,14 @@ counter = 0
 foundcounter = 0
 
 listen_kiteangle('kiteangle')  # this then updates base.barangle via the callback function
-result = ""
-while result != "OK":
-    result = check_kite(kite, base, control, config)
-    print(base.resistance, result)
-    if result != "OK":
-        go_on = input("Contine (Y/N)")
-        if go_on == "Y":
-            break
+#result = ""
+#while result != "OK":
+#    result = check_kite(kite, base, control, config)
+#    print(base.resistance, result)
+#    if result != "OK":
+#        go_on = input("Contine (Y/N)")
+#        if go_on == "Y":
+#            break
 
 if config.check_motor_sim:
     listen_kiteangle('mockangle')  # this then subscribes to our simulation of expected movement of the bar
@@ -408,11 +408,11 @@ while True:  # Main module loop
         reset_bar(base)
         # base.calibrate = 'Auto' will redo this to show resutl
 
-    if base.calibrate == 'Auto':
-        base.calibration_check()
-        if not base.calibrate:
-            motor_msg(0, 0, 0, 500, 1)  # stop
-            display_calibration_results()
+    #if base.calibrate == 'Auto':
+    #    base.calibration_check()
+    #    if not base.calibrate:
+    #        motor_msg(0, 0, 0, 500, 1)  # stop
+    #        display_calibration_results()
 
     if config.numcams == 1:
         if config.source == 1:
@@ -532,7 +532,8 @@ while True:  # Main module loop
 
     doaction = True if control.motortest or base.calibrate or (
         config.setup == 'BarKiteActual' and control.inputmode == 3) else False
-    msg = motor_msg(base.barangle, base.targetbarangle, 2, base.action, doaction)
+
+    msg = motor_msg(base.barangle, base.targetbarangle, 2, base.action, doaction, safety=base.safety)
     if control.motortest:
         display_motor_msg(base.action, config.setup)
     else:

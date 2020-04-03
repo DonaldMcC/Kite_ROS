@@ -112,7 +112,7 @@ class Base(object):
 
     def __init__(self, barangle=0, parkangle=0, maxright=20, maxleft=-20, lag=1,
                  targetbarangle=0, kitebarratio=1, inferbarangle=0, resistleft=628,
-                 resistright=458, resistcentre=543):
+                 resistright=458, resistcentre=543, safety=False):
         self.barangle = barangle
         self.parkangle = parkangle
         self.maxright = maxright
@@ -141,6 +141,8 @@ class Base(object):
                                   'Bar to 20 degrees right and press set or - key on wii']
         self.manual_calib_phase=0
         self.plan_calibration()
+        self.safety = safety
+
 
     def get_calibrate_time(self):
         # idea here is to have an expectation of how the setup should work based on components
@@ -457,6 +459,7 @@ class Controls(object):
         elif (joybuttons and joybuttons[5] == 1) or event == 'Pause':  # pause on 1 key
             if control.inputmode == 3:  # Manbar Calibrate
                 base.calibrate = 'Manual' # then slow button becomes set to set and that actions and cycles
+                base.safety = False  # if starts true
                 self.newbuttons = self.get_change_phase_buttons(base)
             elif not control.motortest:
                 time.sleep(10)

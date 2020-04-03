@@ -31,7 +31,7 @@ def init_motor_msg():
     pub = rospy.Publisher('motormsg', Int16, queue_size=10)
 
 
-def motor_msg(barangle, targetbarangle, tolerance=10, action=None, doaction=False, speed=100):
+def motor_msg(barangle, targetbarangle, tolerance=10, action=None, doaction=False, speed=100, safety=True):
     # Now added ability to send motor message 6 for leftonly and 7 for rightonly
     # and will now add speed into the message as %age of max value up to 99 but 0 is max speed
     MAXLEFT = -20  # These are to try and avoid breaking the bar
@@ -48,7 +48,8 @@ def motor_msg(barangle, targetbarangle, tolerance=10, action=None, doaction=Fals
         elif diff < 0 and barangle < MAXRIGHT:
             msg = 400  # Right
     msg = int(msg + speed) if 0 < speed < 100 else int(msg)
-    pub.publish(msg)
+    if not safety:
+        pub.publish(msg)
     return msg
 
 
