@@ -56,6 +56,7 @@ def get_barangle(kite, base, control, config):
 def get_angles(kite, base, control, config):
     base.barangle = get_barangle(kite, base, control, config)
     base.resistance = resistance
+    print('setr to '+ str(resistance))
     if config.setup == 'KiteBarTarget':
         base.targetbarangle = kite.kiteangle / base.kitebarratio
     else:
