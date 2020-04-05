@@ -80,7 +80,7 @@ def checklimits(angle, maxleft, maxright):
     return angle
 
 
-def getangle(resistance, maxleft=-45, maxright=45, resistleft=740, resistright=340, resistcentre=540):
+def getangle(resistance, maxleft=-20, maxright=20, resistleft=628, resistright=458, resistcentre=543):
     """
     :param resistright:
     :param resistleft:
@@ -110,11 +110,12 @@ def getangle(resistance, maxleft=-45, maxright=45, resistleft=740, resistright=3
         angle = ((resistance - resistcentre) * maxright) / (resistright - resistcentre)
     else:
         angle = 0
-    print('angle+' + str(angle))
     return int(angle)
 
+#def getresist(angle, maxleft=-45, maxright=45, resistleft=740, resistright=340, resistcentre=540):
 
-def getresist(angle, maxleft=-45, maxright=45, resistleft=740, resistright=340):
+
+def getresist(angle, maxleft=-20, maxright=20, resistleft=628, resistright=458, resistcentre=543):
     """
     :param resistright:
     :param resistleft:
@@ -125,21 +126,27 @@ def getresist(angle, maxleft=-45, maxright=45, resistleft=740, resistright=340):
 
     >>> getresist(-45)
     740
+    >>> getresist(-5)
+    562
     >>> getresist(0)
     540
     >>> getresist(45)
     340
+    >>> getresist(10)
+    495
     """
 
     # calibration is based on 0 being the centre and maxleft and maxright being
     # defined in degrees - the corrsesponding values of the resistor should be taken
     # for all of these and we will for now assume resistor is linear
 
-    if maxleft <= angle <= maxright:
-        resistance = resistleft + ((angle - maxleft) * (resistright - resistleft) / (maxright - maxleft))
+
+    if angle < 0:
+        resistance = resistleft + ((angle - maxleft) * (resistcentre - resistleft) / (0 - maxleft))
+    elif angle > 0:
+        resistance = resistright + ((maxright - angle) * (resistcentre - resistright) / maxright)
     else:
-        # expected value at centrepoint
-        resistance = (resistleft + resistright) / 2
+        resistance = resistcentre
 
     return int(resistance)
 
