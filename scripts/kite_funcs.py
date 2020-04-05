@@ -106,11 +106,11 @@ def getangle(resistance, maxleft=-45, maxright=45, resistleft=740, resistright=3
 
     if resistance > resistcentre:
         angle = ((resistance - resistcentre) * maxleft) / (resistleft - resistcentre)
-        # angle = -45 + ((resistance - resistleft)/ 400.0)
     elif resistance < resistcentre:
         angle = ((resistance - resistcentre) * maxright) / (resistright - resistcentre)
     else:
         angle = 0
+    print('angle+' + str(angle))
     return int(angle)
 
 

@@ -17,6 +17,7 @@ mockresistance = 538
 
 def callback(data):
     global resistance
+    #print('callback')
     resistance = data.data
     return
 
@@ -54,8 +55,8 @@ def get_barangle(kite, base, control, config):
 
 
 def get_angles(kite, base, control, config):
-    base.barangle = get_barangle(kite, base, control, config)
     base.resistance = resistance
+    base.barangle = get_barangle(kite, base, control, config)
     print('setr to '+ str(resistance))
     if config.setup == 'KiteBarTarget':
         base.targetbarangle = kite.kiteangle / base.kitebarratio

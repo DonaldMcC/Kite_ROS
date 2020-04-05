@@ -215,6 +215,8 @@ def display_stats():
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
     cv2.putText(frame, "Mode: " + str(control.config), (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
     cv2.putText(frame, "Area: " + str(kite.contourarea), (10, 130), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+    if len(joyaxes) > 2:
+        cv2.putText(frame, "joy:" + str(joyaxes[2]), (10,150), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
     return
 
 
@@ -400,6 +402,7 @@ fps = 15
 
 
 get_angles(kite, base, control, config)
+joybuttons, joyaxes = get_joystick()
 time.sleep(2)
 #base.calibrate = True # not sure why this was needed
 base.start_time = round(time.monotonic() * 1000)
@@ -530,8 +533,8 @@ while True:  # Main module loop
 
     kite_pos(kite.x, kite.y, kite.kiteangle, kite.dX, kite.dY, 0, 0)
 
-    doaction = True if control.motortest or base.calibrate or (
-        config.setup == 'BarKiteActual' and control.inputmode == 3) else False
+    doaction = True if control.motortest or base.calibrate or (control.inputmode == 3) else False
+
 
     msg = motor_msg(base.barangle, base.targetbarangle, 2, base.action, doaction, safety=base.safety)
     if control.motortest:

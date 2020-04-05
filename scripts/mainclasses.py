@@ -560,16 +560,17 @@ class Controls(object):
         elif self.inputmode == 3:  # ManBar - maybe switch to arrows - let's do this all
             if joybuttons:
                 if joybuttons[7] == 0 and joybuttons[8] == 0:
-                    if joyaxes[2] < -0.2:
+                    if joyaxes[2] < -0.1:
                         base.action = 300 - (joyaxes[2] * 99)
-                    elif joyaxes[2] >  0.2:
+                    elif joyaxes[2] >  0.1:
                         base.action = 400 + (joyaxes[2] * 99)
-                    elif joyaxes[3] >  0.2:
+                    elif joyaxes[3] >  0.1:
                         base.action = 100 + (joyaxes[3] * 99)
-                    elif joyaxes[3] <  -0.2:
+                    elif joyaxes[3] <  -0.1:
                         base.action = 200 - (joyaxes[3] * 99)
                     else:
                         base.action = 0
+                    print(base.action)
                 else:  # c or z button pressed
                     kite.x += (self.step * joyaxes[2])
                     kite.y -= (self.step * joyaxes[3])

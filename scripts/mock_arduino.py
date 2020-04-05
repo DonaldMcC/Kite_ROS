@@ -3,7 +3,8 @@
 # or stop at 0.  1 and 2 are forward and backwards for initialisation - the purpose of this was initially to allow
 # test of the setup without any actual arduino hardware and that should be provided by the kiteangle function
 # testkiteangle is similar and possibly now redundant but both were receiving motormsg published by bascic_motion_det.
-# What we now also want to do is verif that our simulation and actual operation are aligned this seems to need a
+
+# What we now also want to do is verify that our simulation and actual operation are aligned this seems to need a
 # different approach in two ways
 # 1 We generate the motor_msg more simply - and possibly without the analysis
 # 2 the mock_arduino process returns a different message from the actual one and we can ideally compare them and
@@ -30,6 +31,9 @@ also got problem of not breaking lever which makes wider spacing tempting but I 
 aim to stop at certain bar angles but this relies on sensor forces presumably change a bit outside centre of arc
 but I think work on centre span needs first
 
+So issue now is we are operating with two different parameter sets on converting resistance to angle because mock
+arduino doesn't have our actual parameters but we need to make the defaults the same and that should avoid most of the
+oscilation that has been going on
 """
 
 import time
@@ -100,13 +104,13 @@ def mockangle(angle, elapsed_time):
     direction = motorvalue // 100
     rawspeed = motorvalue % 100
     speed = int((rawspeed * 255)/100) if rawspeed > 0 else 255
-    print('speed' + str(speed))
-    print(direction)
+    # print('speed' + str(speed))
+    # print(direction)
     if direction == 1 or direction == 2:
         angle = 0
     else:
         if direction == 3:  # Left
-            act_dist = 0 - (speed * SPEED_ACT * elapsed_time / 1000.0 * 255)
+            act_dist = 0 - (speed * SPEED_ACT * elapsed_time / (1000.0 * 255))
         elif direction == 4:  # Right
             act_dist = speed * SPEED_ACT * elapsed_time / (1000.0 * 255)
         elif direction == 6:  # Left Motor Only ie going right
@@ -120,7 +124,7 @@ def mockangle(angle, elapsed_time):
         angle = MAXLEFT
     elif angle >= MAXRIGHT:
         angle = MAXRIGHT
-    print ('angle'+str(angle))
+    #print ('angle'+str(angle))
     return angle
 
 
