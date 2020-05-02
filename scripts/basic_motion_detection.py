@@ -543,7 +543,8 @@ while True:  # Main module loop
 
     if not doaction:
         pid.SetPoint = base.targetbarangle
-        base.action = PID_(base.barangle, base.targetbarangle)
+        pid.update(base.barangle)
+        base.action = get_action(pid.ouput)
 
     msg = motor_msg(base.action)
     if control.motortest:
