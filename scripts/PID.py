@@ -25,10 +25,13 @@
 # python_version  :2.7
 # ==============================================================================
 
-"""Ivmech PID Controller is simple implementation of a Proportional-Integral-Derivative (PID) Controller in the Python Programming Language.
-More information about PID Controller: http://en.wikipedia.org/wiki/PID_controller
+
+"""Ivmech PID Controller is simple implementation of a Proportional-Integral-Derivative (PID) Controller in the Python
+Programming Language. More information about PID Controller: http://en.wikipedia.org/wiki/PID_controller
 """
+
 import time
+
 
 class PID:
     """PID Controller
@@ -128,4 +131,4 @@ class PID:
         """
         self.sample_time = sample_time
 
-#https://onion.io/2bt-pid-control-python/ - also useful - will do this tomorrow
+#https://onion.io/2bt-pid-control-python/ - also useful - will do this tomorrow - let's log output

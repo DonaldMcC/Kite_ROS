@@ -47,6 +47,7 @@ import time
 import cv2
 import argparse
 
+
 # pyimagesearch imports
 from imutils.video import VideoStream
 from panorama import Stitcher
@@ -61,6 +62,7 @@ from cvwriter import initwriter, writeframe
 from basic_listen_barangle import listen_kiteangle, check_kite, get_actmockangle, reset_bar, get_angles
 from listen_joystick import listen_joystick, get_joystick
 from kite_funcs import kitemask
+import PID
 
 
 # this is just for display flight decisions will be elsewhere
@@ -349,6 +351,10 @@ imagemessage = KiteImage()
 init_ros()
 init_motor_msg()
 
+# def test_pid(P = 1.0,  I = 0.0, D= 0.0, L=100):
+pid = PID.PID(1, 0, 0)
+pid.setSampleTime(0.01)
+
 # initialize the list of tracked points, the frame counter,
 # and the coordinate deltas
 counter = 0
@@ -535,8 +541,11 @@ while True:  # Main module loop
 
     doaction = True if control.motortest or base.calibrate or (control.inputmode == 3) else False
 
+    if not doaction:
+        pid.SetPoint = base.targetbarangle
+        base.action = PID_(base.barangle, base.targetbarangle)
 
-    msg = motor_msg(base.barangle, base.targetbarangle, 2, base.action, doaction, safety=base.safety)
+    msg = motor_msg(base.action)
     if control.motortest:
         display_motor_msg(base.action, config.setup)
     else:

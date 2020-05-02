@@ -30,8 +30,7 @@ def init_motor_msg():
     global pub
     pub = rospy.Publisher('motormsg', Int16, queue_size=10)
 
-
-def motor_msg(barangle, targetbarangle, tolerance=10, action=None, doaction=False, speed=100, safety=True):
+def OLD_motor_msg(barangle, targetbarangle, tolerance=10, action=None, doaction=False, speed=100, safety=True):
     # Now added ability to send motor message 6 for leftonly and 7 for rightonly
     # and will now add speed into the message as %age of max value up to 99 but 0 is max speed
     MAXLEFT = -20  # These are to try and avoid breaking the bar
@@ -51,6 +50,10 @@ def motor_msg(barangle, targetbarangle, tolerance=10, action=None, doaction=Fals
     if not safety:
         pub.publish(msg)
     return msg
+
+def motor_msg(action):
+    pub.publish(action)
+    return action
 
 
 class KiteImage:
@@ -72,7 +75,7 @@ if __name__ == '__main__':
         init_motor_msg()
         rate = rospy.Rate(10)  # 10hz
         while not rospy.is_shutdown():
-            motor_msg(0, 0, 0, 0, 1)
+            motor_msg(0)
             rate.sleep()
     except rospy.ROSInterruptException:
         pass
