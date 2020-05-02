@@ -61,7 +61,7 @@ from talker import kite_pos, KiteImage, motor_msg, init_motor_msg, init_ros
 from cvwriter import initwriter, writeframe
 from basic_listen_barangle import listen_kiteangle, check_kite, get_actmockangle, reset_bar, get_angles
 from listen_joystick import listen_joystick, get_joystick
-from kite_funcs import kitemask
+from kite_funcs import kitemask, get_action
 import PID
 
 

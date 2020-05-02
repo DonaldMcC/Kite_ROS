@@ -147,8 +147,25 @@ def getresist(angle, maxleft=-20, maxright=20, resistleft=628, resistright=458, 
         resistance = resistright + ((maxright - angle) * (resistcentre - resistright) / maxright)
     else:
         resistance = resistcentre
-
     return int(resistance)
+
+
+def get_action(output, barangle, targetbarangle):
+    # Now added ability to send motor message 6 for leftonly and 7 for rightonly
+    # and will now add speed into the message as %age of max value up to 99 but 0 is max speed
+    MAXLEFT = -20  # These are to try and avoid breaking the bar
+    MAXRIGHT = 20  # similarly to protect bar as attached close to pivot
+    TOLERANCE = 1 # degreee of tolerance
+
+    if abs(output) < TOLERANCE:
+        action = 0 # stop
+    elif output > 0 and barangle > MAXLEFT:
+        action = 300   # Left
+    elif output < 0 and barangle < MAXRIGHT:
+        action = 400  # Right
+    # TODO think about how PID
+    # action = int(msg + speed) if 0 < speed < 100 else int(msg)
+    return action
 
 
 def _test():
