@@ -156,14 +156,14 @@ def get_action(output, barangle, targetbarangle):
     MAXLEFT = -20  # These are to try and avoid breaking the bar
     MAXRIGHT = 20  # similarly to protect bar as attached close to pivot
     TOLERANCE = 1 # degreee of tolerance
-
+    action = 0
     if abs(output) < TOLERANCE:
         action = 0 # stop
     elif output > 0 and barangle > MAXLEFT:
         action = 300   # Left
     elif output < 0 and barangle < MAXRIGHT:
         action = 400  # Right
-    # TODO think about how PID
+    # TODO think about how PID impacts this if at all - speed should prob be used
     # action = int(msg + speed) if 0 < speed < 100 else int(msg)
     return action
 
