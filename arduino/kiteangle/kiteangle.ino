@@ -24,6 +24,13 @@
 
 ros::NodeHandle  nh;
 
+//  Now trying to build in some safety - two aspects - maxright and maxleft value of the sensor
+//  Will be set here and enforced in the callback - think we don't all left and right above
+//  Those values but can go opposite way obviously
+//  Second issue is motor commands being sent and resistor not changing
+//  Think we stop when that happens too but probably after a second or so of movement
+
+
 std_msgs::Int16 msg;
 // Declaring String variable
 std_msgs::Int16 int_msg; 
@@ -42,7 +49,7 @@ int direction=0; //direction of motors
 direction = int_msg.data / 100;
 rawspeed = int_msg.data % 100;
 if (rawspeed > 0) {
-speed = int((rawspeed * 255)/100);
+speed = int((rawspeed * 255) / 100);
 }
 else {
   speed = 255;
