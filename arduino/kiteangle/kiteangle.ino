@@ -30,6 +30,8 @@ ros::NodeHandle  nh;
 //  Second issue is motor commands being sent and resistor not changing
 //  Think we stop when that happens too but probably after a second or so of movement
 
+int MAXLEFT = 200;
+int MAXRIGHT = 600;
 
 std_msgs::Int16 msg;
 // Declaring String variable
@@ -64,7 +66,7 @@ switch (direction) {
       forward(speed);
       break;
     case 3:
-      left(speed);
+      left(speed) & sensorvalue < MAXLEFT;
       break;
     case 4:
       right(speed);
