@@ -66,7 +66,7 @@ switch (direction) {
       forward(speed);
       break;
     case 3:
-      left(speed) & sensorvalue < MAXLEFT;
+      left(speed)
       break;
     case 4:
       right(speed);
@@ -184,5 +184,6 @@ void loop()
   msg.data = sensorValue;
   kiteangle.publish(&msg);
   nh.spinOnce();
+  Serial.print(int_msg.data);
   delay(20);
 }
