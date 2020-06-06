@@ -30,8 +30,10 @@ ros::NodeHandle  nh;
 //  Second issue is motor commands being sent and resistor not changing
 //  Think we stop when that happens too but probably after a second or so of movement
 
-int MAXLEFT = 200;
-int MAXRIGHT = 600;
+int MAXLEFT = 4;
+int MAXRIGHT = 240;
+int currdirection = 0;
+
 
 std_msgs::Int16 msg;
 // Declaring String variable
@@ -57,6 +59,7 @@ else {
   speed = 255;
 };
 
+currdirection = direction;
 
 switch (direction) {
     case 1:
@@ -66,7 +69,7 @@ switch (direction) {
       forward(speed);
       break;
     case 3:
-      left(speed)
+      left(speed);
       break;
     case 4:
       right(speed);
@@ -112,6 +115,7 @@ void setup()
   pinMode(pinI3,OUTPUT);
   pinMode(pinI4,OUTPUT);
   pinMode(speedpinB,OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
 }
 
 
@@ -184,6 +188,14 @@ void loop()
   msg.data = sensorValue;
   kiteangle.publish(&msg);
   nh.spinOnce();
-  Serial.print(int_msg.data);
+  
+  if (currdirection == 3 && sensorValue < MAXLEFT) {
+    stop();
+  };
+ 
+  if (currdirection == 4 && sensorValue > MAXRIGHT) {
+    stop();
+  };      
+      
   delay(20);
 }
