@@ -55,6 +55,7 @@ ros::Publisher kiteangle("kiteangle", &msg);
 // left right or stop and logically 0 should be stop - possibly there will eventually be a range
 // of speeds so we will go with first digit being direction and final two being speed 
 // with 100-199 being left and 200-299 being right
+
 void callback (const std_msgs::Int16&int_msg)
 {
 int speed = 255;
@@ -71,7 +72,7 @@ else {
 
 currdirection = direction;
 
-if (!safetystop) {
+if (safetystop == false) {
 switch (direction) {
     case 1:
       backward(speed);
@@ -202,11 +203,11 @@ void loop()
   kiteangle.publish(&msg);
   nh.spinOnce();
 
- //some test code - should just go in the direction on startup but safety should still kick in
- //currdirection = 3;
- // if (currdirection == 3 && safetystop == false) {
- //   left(200);
- // };
+//some test code - should just go in the direction on startup but safety should still kick in
+// currdirection = 3;
+//  if (currdirection == 3 && safetystop == false) {
+//    left(200);
+//  };
  
   
   if (currdirection == 3 && sensorValue < MAXLEFT) {
