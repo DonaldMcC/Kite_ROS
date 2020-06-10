@@ -33,7 +33,17 @@ ros::NodeHandle  nh;
 int MAXLEFT = 4;
 int MAXRIGHT = 240;
 int currdirection = 0;
-
+bool motorson = false;
+bool safetystop = false;
+unsigned long startmotorstime;
+unsigned long runtime;
+int safetymove = 4;  // amount the resistance should change in safetycycle or safetystop goes true and motors no longer run 
+int startsensor;
+int sensormin;
+int sensormax;
+int safetycycle = 2000; // amount the resistor should move in period - if less motors stop until direction changes 
+int storedirection;
+int prevsensor = 0;
 
 std_msgs::Int16 msg;
 // Declaring String variable
@@ -61,6 +71,7 @@ else {
 
 currdirection = direction;
 
+if (!safetystop) {
 switch (direction) {
     case 1:
       backward(speed);
@@ -85,6 +96,7 @@ switch (direction) {
     break;
   }
 }
+}
 
 // Defining Subscriber 
 ros::Subscriber<std_msgs::Int16> 
@@ -101,8 +113,8 @@ int spead=255;//define the spead of motor as fast as poss
 int sensorPin = A0;    // select the input pin for the potentiometer
 int sensorValue = 0;  // variable to store the value coming from the sensor
 
-unsigned long previousMillis = 0;
-unsigned long intervalMills = 10;
+unsigned long previousmillis = 0;
+unsigned long previoussensor = 0;
 
 void setup()
 {
@@ -116,6 +128,7 @@ void setup()
   pinMode(pinI4,OUTPUT);
   pinMode(speedpinB,OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
+  Serial.begin(57600);
 }
 
 
@@ -188,6 +201,13 @@ void loop()
   msg.data = sensorValue;
   kiteangle.publish(&msg);
   nh.spinOnce();
+
+ //some test code - should just go in the direction on startup but safety should still kick in
+ //currdirection = 3;
+ // if (currdirection == 3 && safetystop == false) {
+ //   left(200);
+ // };
+ 
   
   if (currdirection == 3 && sensorValue < MAXLEFT) {
     stop();
@@ -196,6 +216,55 @@ void loop()
   if (currdirection == 4 && sensorValue > MAXRIGHT) {
     stop();
   };      
-      
+
+  //Serial.print(runtime);
+  //Serial.println();
+  
+  if (currdirection > 2) {
+    if (!motorson) {
+      startmotorstime = millis();
+      startsensor = sensorValue;
+      motorson = true;
+      sensormax = sensorValue;
+      sensormin = sensorValue;
+      //Serial.print("motorson");
+      //Serial.println();
+    } else {
+      // already running
+      runtime = millis() - startmotorstime; 
+      if (runtime > safetycycle) {
+          if ((sensormax - sensormin) > safetymove) {
+            //start a new interval
+            startmotorstime = millis();
+            sensormax = sensorValue;
+            sensormin = sensorValue;
+          } else {
+            //stop the motors until direction changes
+            safetystop = true;
+            //Serial.print("instopzone");
+            //Serial.println();
+            storedirection = currdirection;
+            stop();
+          }
+      } else {
+        //update max and min cumulation was unreliable
+        if (sensorValue > sensormax) {
+          sensormax = sensorValue;
+        }
+        if (sensorValue < sensormin) {
+          sensormin = sensorValue;
+        }
+      }
+    }
+  } else {
+      // stopped moving
+   motorson = false;        
+  };  
+
+  if (currdirection != storedirection) {
+    safetystop = false;
+  };
+  
+  prevsensor = sensorValue;    
   delay(20);
 }
