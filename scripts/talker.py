@@ -32,6 +32,7 @@ def init_motor_msg():
 
 
 def motor_msg(action):
+    print('action:',str(action))
     pub.publish(action)
     return action
 
