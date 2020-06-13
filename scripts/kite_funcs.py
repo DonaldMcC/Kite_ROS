@@ -11,7 +11,7 @@ import cv2
 
 # iphone video
 # contourmin = 3000
-# wind
+# msi wind
 contourmin = 800
 
 
@@ -26,7 +26,6 @@ def kitemask(c, frame, kitecolours='kite1'):
 
     if kitecolours == 'indoorkite':
         boundaries = [([10, 10, 140], [70, 70, 200])]
-
     else:
         boundaries = [([0, 0, 0], [30, 30, 30]),
                       ([10, 10, 100], [100, 100, 255]),
@@ -82,6 +81,7 @@ def checklimits(angle, maxleft, maxright):
 
 def getangle(resistance, maxleft=-20, maxright=20, resistleft=628, resistright=458, resistcentre=543):
     """
+    :param resistcentre:
     :param resistright:
     :param resistleft:
     :param maxright:
@@ -112,11 +112,10 @@ def getangle(resistance, maxleft=-20, maxright=20, resistleft=628, resistright=4
         angle = 0
     return int(angle)
 
-#def getresist(angle, maxleft=-45, maxright=45, resistleft=740, resistright=340, resistcentre=540):
-
 
 def getresist(angle, maxleft=-20, maxright=20, resistleft=628, resistright=458, resistcentre=543):
     """
+    :param resistcentre:
     :param resistright:
     :param resistleft:
     :param maxright:
@@ -140,7 +139,6 @@ def getresist(angle, maxleft=-20, maxright=20, resistleft=628, resistright=458, 
     # defined in degrees - the corrsesponding values of the resistor should be taken
     # for all of these and we will for now assume resistor is linear
 
-
     if angle < 0:
         resistance = resistleft + ((angle - maxleft) * (resistcentre - resistleft) / (0 - maxleft))
     elif angle > 0:
@@ -155,12 +153,12 @@ def get_action(output, barangle, targetbarangle):
     # and will now add speed into the message as %age of max value up to 99 but 0 is max speed
     MAXLEFT = -20  # These are to try and avoid breaking the bar
     MAXRIGHT = 20  # similarly to protect bar as attached close to pivot
-    TOLERANCE = 1 # degreee of tolerance
+    TOLERANCE = 1  # degreee of tolerance
     action = 0
     if abs(output) < TOLERANCE:
-        action = 0 # stop
+        action = 0  # stop
     elif output > 0 and barangle > MAXLEFT:
-        action = 300   # Left
+        action = 300  # Left
     elif output < 0 and barangle < MAXRIGHT:
         action = 400  # Right
     # TODO think about how PID impacts this if at all - speed should prob be used

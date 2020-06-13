@@ -5,7 +5,7 @@ from std_msgs.msg import String, Int16
 from kite_ros.msg import Kitepos
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
-pub=0
+pub = 0
 
 
 def kite_pos(posx, posy, kiteangle, dirx, diry, routepoints, priorpos):
@@ -32,7 +32,7 @@ def init_motor_msg():
 
 
 def motor_msg(action):
-    print('action:',str(action))
+    print('action:', str(action))
     pub.publish(action)
     return action
 

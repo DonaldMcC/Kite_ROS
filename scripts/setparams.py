@@ -21,6 +21,7 @@ def set_kite_base():
 def set_source():
     rospy.set_param('source', 'arduino')
 
+
 def set_params():
     set_source()
     set_kite_base()

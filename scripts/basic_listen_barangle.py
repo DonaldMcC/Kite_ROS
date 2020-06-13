@@ -1,23 +1,19 @@
 #!/usr/bin/env python
-# this gets the barangle from the arduino board and now also got an initialisation which
-# should retract the actuators
-# TODO - this needs reworked idea is to be able to support two resistors which will need two
-# global variables but both use the setup of the base so need its max and min settings etc
+# this gets the barangle from the arduino board
 
-import time, math
+import time
 import rospy
 from std_msgs.msg import Int16
 from kite_funcs import getangle
 from mainclasses import calcbarangle, inferangle
 from talker import motor_msg
 barangle = 0
-resistance = 543 # prefer to start with reasonable value
-mockresistance = 538
-
+resistance = 200
+mockresistance = 200
+mockangle = 0
 
 def callback(data):
     global resistance
-    #print('callback')
     resistance = data.data
     return
 
