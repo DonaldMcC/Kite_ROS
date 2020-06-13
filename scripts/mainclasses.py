@@ -110,9 +110,9 @@ class Config(object):
 
 class Base(object):
 
-    def __init__(self, barangle=0, parkangle=0, maxright=20, maxleft=-20, lag=1,
-                 targetbarangle=0, kitebarratio=1, inferbarangle=0, resistleft=628,
-                 resistright=458, resistcentre=543, safety=False):
+    def __init__(self, barangle=0, parkangle=0, maxright=20, maxleft=-30, lag=1,
+                 targetbarangle=0, kitebarratio=1, inferbarangle=0, resistleft=110,
+                 resistright=267, resistcentre=200, safety=False):
         self.barangle = barangle
         self.parkangle = parkangle
         self.maxright = maxright
