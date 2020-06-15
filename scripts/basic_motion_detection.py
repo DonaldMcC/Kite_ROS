@@ -414,14 +414,8 @@ time.sleep(2)
 base.start_time = round(time.monotonic() * 1000)
 while True:  # Main module loop
     if base.reset:
-        reset_bar(base)
-        # base.calibrate = 'Auto' will redo this to show resutl
-
-    #if base.calibrate == 'Auto':
-    #    base.calibration_check()
-    #    if not base.calibrate:
-    #        motor_msg(0, 0, 0, 500, 1)  # stop
-    #        display_calibration_results()
+        reset_bar(base) 
+        # TODO is reset bar needed base.calibrate = 'Auto' will redo this to show result
 
     if config.numcams == 1:
         if config.source == 1:
