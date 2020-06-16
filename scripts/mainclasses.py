@@ -20,7 +20,8 @@ This file should do the following things
     10  Upturns only for now
 """
 
-import time, math
+import time
+import math
 from collections import deque
 from kite_funcs import checklimits, getresist
 
@@ -136,13 +137,12 @@ class Base(object):
         self.resistright = resistright
         self.resistleft = resistleft
         self.resistcentre = resistcentre
-        self.manual_calib_phases=['Bar to straight (0 degrees) and press set or - key on wii',
-                                  'Bar to 20 degrees left and press set or - key on wii',
-                                  'Bar to 20 degrees right and press set or - key on wii']
-        self.manual_calib_phase=0
+        self.manual_calib_phases = ['Bar to straight (0 degrees) and press set or - key on wii',
+                                    'Bar to 20 degrees left and press set or - key on wii',
+                                    'Bar to 20 degrees right and press set or - key on wii']
+        self.manual_calib_phase = 0
         self.plan_calibration()
         self.safety = safety
-
 
     def get_calibrate_time(self):
         # idea here is to have an expectation of how the setup should work based on components
@@ -152,8 +152,8 @@ class Base(object):
         return 1000 * (rev_time * self.maxright / 360.0)  # expected time to get to max angle in millisecs
 
     def calibration_check(self):
-        #This should basically wiggle the bar and put it into position to start if results
-        #not good process would be to start manual calibration from the ManBar mode
+        # This should basically wiggle the bar and put it into position to start if results
+        # not good process would be to start manual calibration from the ManBar mode
         curr_millis = round(time.monotonic() * 1000)
         elapsed_millis = curr_millis - self.start_time
         if elapsed_millis > self.calibrate_list[self.calibrate_phase][1]:
@@ -195,7 +195,7 @@ class Base(object):
         # TODO refactor resistance into a list or dict
         if self.manual_calib_phase == 0:
             self.resistcentre = self.resistance
-        elif self.resistance != self.resistcentre: # avoid division by zero errs
+        elif self.resistance != self.resistcentre:  # avoid division by zero errs
             if self.manual_calib_phase == 1:
                 self.resistleft = self.resistance
             else:
@@ -206,8 +206,8 @@ class Base(object):
         else:
             self.manual_calib_phase = 0
         print('Calibration Left Centre Right' + str(self.resistleft)
-              + ' ' + str(self.resistcentre) + ' ' + str(self.resistright) )
-        #if self.manual_calib_phase < 2 else 0
+              + ' ' + str(self.resistcentre) + ' ' + str(self.resistright))
+        # if self.manual_calib_phase < 2 else 0
         control.newbuttons = control.get_change_phase_buttons(self)
         return
 
@@ -404,7 +404,7 @@ class Controls(object):
     @staticmethod
     def get_change_mode_buttons(inputmode):
         if inputmode == 0:
-            newbuttons = [('Mode: STD:', 'Mode: STD:'), ('Pause','Pause'), ('Wider', 'Wider'), ('Narrow', 'Narrow'),
+            newbuttons = [('Mode: STD:', 'Mode: STD:'), ('Pause', 'Pause'), ('Wider', 'Wider'), ('Narrow', 'Narrow'),
                           ('Expand', 'Expand'), ('Contract', 'Contract')]
         elif inputmode == 1:
             newbuttons = [('Mode: STD:', 'Mode: SETFLIGHTMODE:'), ('Wider', 'Park'), ('Narrow', 'Wiggle'),
@@ -413,13 +413,13 @@ class Controls(object):
             newbuttons = [('Mode: STD:', 'Mode: MANFLIGHT'), ('Wider', 'Anti'), ('Narrow', 'Clock'),
                           ('Expand', 'Slow'), ('Contract', 'Fast')]
         else:
-            newbuttons = [('Mode: STD:', 'Mode: MANBAR:'), ('Pause','Calib'), ('Expand', 'Set')]
+            newbuttons = [('Mode: STD:', 'Mode: MANBAR:'), ('Pause', 'Calib'), ('Expand', 'Set')]
         return newbuttons
 
-    def get_change_phase_buttons(self, base):
+    @staticmethod
+    def get_change_phase_buttons(base):
         newbuttons = [('Mode: STD:', 'Mode:' + base.manual_calib_phases[base.manual_calib_phase])]
         return newbuttons
-
 
     def joyhandler(self, joybuttons, joyaxes, kite, base, control, event=None):
         # Using https://github.com/arnaud-ramey/rosxwiimote as a ros package to capture
@@ -455,10 +455,10 @@ class Controls(object):
                 self.inputmode = 0
             self.modestring = self.getmodestring(self.inputmode)
             self.newbuttons = self.get_change_mode_buttons(self.inputmode)
-            base.calibrate = False # calibration always ends on Mode Change
+            base.calibrate = False  # calibration always ends on Mode Change
         elif (joybuttons and joybuttons[5] == 1) or event == 'Pause':  # pause on 1 key
             if control.inputmode == 3:  # Manbar Calibrate
-                base.calibrate = 'Manual' # then slow button becomes set to set and that actions and cycles
+                base.calibrate = 'Manual'  # then slow button becomes set to set and that actions and cycles
                 base.safety = False  # if starts true
                 self.newbuttons = self.get_change_phase_buttons(base)
             elif not control.motortest:
@@ -562,11 +562,11 @@ class Controls(object):
                 if joybuttons[7] == 0 and joybuttons[8] == 0:
                     if joyaxes[2] < -0.1:
                         base.action = int(300 - (joyaxes[2] * 99))
-                    elif joyaxes[2] >  0.1:
+                    elif joyaxes[2] > 0.1:
                         base.action = int(400 + (joyaxes[2] * 99))
-                    elif joyaxes[3] >  0.1:
+                    elif joyaxes[3] > 0.1:
                         base.action = int(100 + (joyaxes[3] * 99))
-                    elif joyaxes[3] <  -0.1:
+                    elif joyaxes[3] < -0.1:
                         base.action = int(200 - (joyaxes[3] * 99))
                     else:
                         base.action = 0
