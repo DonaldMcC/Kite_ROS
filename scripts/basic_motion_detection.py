@@ -257,26 +257,6 @@ def present_calibrate_row(row):
            f'T_Resist: {row[3]} A_Resist: {row[4]} {row[5]} Cycles: {row[6]} {row[7]} '
 
 
-def display_calibration_results():
-    win2_active = False
-    while True:
-        if not win2_active:
-            win2_active = True
-            layout2 = []
-            for y in range(4):
-                formatted = present_calibrate_row(base.calibrate_list[y])
-                layout2 += [sg.Text(formatted)],
-            layout2 += [[sg.Button('Continue')]]
-            win2 = sg.Window('Window 2', layout2)
-
-        if win2_active:
-            ev2, vals2 = win2.Read(timeout=100)
-            if ev2 is None or ev2 == 'Continue':
-                win2.hide()
-                break
-    return
-
-
 # MAIN ROUTINE START
 parser = argparse.ArgumentParser()
 parser.add_argument('-f', '--file', type=str, default='cachedH.npy',
@@ -301,11 +281,8 @@ masklimit = 1000
 # KITETYPE = 'indoorkite'  # need to comment out for external
 KITETYPE = 'kite1'
 
-# so thinking we have kite and controls, the video frame, posible sensor class
-# and perhaps a configuration class
 # controls setup self.inputmodes = ('Standard', 'SetFlight', 'ManFly')
 # setup options are Manfly, Standard
-# input now always joystick - but pysimplegui buttons also work
 
 # initiate class instances
 # config = Config(setup='Manfly', source=1, input='Joystick')
@@ -333,7 +310,6 @@ if config.source == 1:
                 stitcher.cachedH = np.load(args.file)
             except (FileNotFoundError, IOError):
                 print("File not found continuing:", args.file)
-
     config.logging = 1
 else:
     # TODO at some point will change this to current directory and append file - not urgent
@@ -361,24 +337,15 @@ counter = 0
 foundcounter = 0
 
 listen_kiteangle('kiteangle')  # this then updates base.barangle via the callback function
-#result = ""
-#while result != "OK":
-#    print(base.resistance, result)
-#    if result != "OK":
-#        go_on = input("Contine (Y/N)")
-#        if go_on == "Y":
-#            break
 
 if config.check_motor_sim:
     listen_kiteangle('mockangle')  # this then subscribes to our simulation of expected movement of the bar
 
 listen_joystick()  # subscribe to joystick messages - now only option
-
 sg.theme('Black')  # Pysimplegui setup
 
 # below is proving clunky if we may start with any mode as the buttons names get fixed here - so if keeping this logic
 # we must always create buttons with std setup and then cycle to correct mode
-
 initmodestring = control.getmodestring(0)  # now always get same initial modestring
 button_list = initmodestring.split()[1:]
 sgmodestring = 'Mode: ' + initmodestring.split()[0]
@@ -405,13 +372,13 @@ cv2.namedWindow('contours')
 fps = 15
 # fps = camera.get(cv2.CV_CAP_PROP_FPS)
 
-
 get_angles(kite, base, control, config)
 joybuttons, joyaxes = get_joystick()
 time.sleep(2)
-#base.calibrate = True # not sure why this was needed
 base.start_time = round(time.monotonic() * 1000)
-while True:  # Main module loop
+
+# Main module loop START
+while True:
 
     if config.numcams == 1:
         if config.source == 1:
@@ -528,7 +495,6 @@ while True:  # Main module loop
     display_base(width)
 
     kite_pos(kite.x, kite.y, kite.kiteangle, kite.dX, kite.dY, 0, 0)
-
     doaction = True if control.motortest or base.calibrate or (control.inputmode == 3) else False
 
     if not doaction:
