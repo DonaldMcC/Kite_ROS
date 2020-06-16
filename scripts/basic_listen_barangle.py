@@ -77,16 +77,6 @@ def check_kite(kite, base, control, config):
         return "Out of Tolerance "
 
 
-def reset_bar(base):
-    global resistance
-    max_retract_time = 5
-    motor_msg(100)  # send backward signal
-    time.sleep(max_retract_time)  # assumed to be time for motors to fully retract
-    motor_msg(500)  # stop
-    base.reset=False
-    return resistance
-
-
 if __name__ == '__main__':
     rospy.init_node('kite_main', anonymous=False)
     listen_kiteangle('kiteangle')

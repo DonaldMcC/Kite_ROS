@@ -59,7 +59,7 @@ from mainclasses import Kite, Controls, Base, Config, calc_route
 from move_func import get_angle
 from talker import kite_pos, KiteImage, motor_msg, init_motor_msg, init_ros
 from cvwriter import initwriter, writeframe
-from basic_listen_barangle import listen_kiteangle, check_kite, get_actmockangle, reset_bar, get_angles
+from basic_listen_barangle import listen_kiteangle, check_kite, get_actmockangle, get_angles
 from listen_joystick import listen_joystick, get_joystick
 from kite_funcs import kitemask, get_action
 import PID
@@ -413,9 +413,6 @@ time.sleep(2)
 #base.calibrate = True # not sure why this was needed
 base.start_time = round(time.monotonic() * 1000)
 while True:  # Main module loop
-    if base.reset:
-        reset_bar(base) 
-        # TODO is reset bar needed base.calibrate = 'Auto' will redo this to show result
 
     if config.numcams == 1:
         if config.source == 1:
