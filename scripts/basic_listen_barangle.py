@@ -53,7 +53,7 @@ def get_barangle(kite, base, control, config):
 def get_angles(kite, base, control, config):
     base.resistance = resistance
     base.barangle = get_barangle(kite, base, control, config)
-    print('setr to '+ str(resistance))
+    print('setr to ' + str(resistance))
     if config.setup == 'KiteBarTarget':
         base.targetbarangle = kite.kiteangle / base.kitebarratio
     else:
@@ -63,18 +63,6 @@ def get_angles(kite, base, control, config):
     elif config.setup == 'KiteBarInfer':
         base.inferbarangle = inferangle(kite, base, control)
     return
-
-
-def check_kite(kite, base, control, config):
-    # this will now generally be called when motion_detection starts - it will do the following things
-    # fully retract both actuators and once done confirm barangle is approximately zero
-    tolerance = 10
-    reset_bar(base)
-    actangle = get_barangle(kite, base, control, config)
-    if abs(actangle) < tolerance:
-        return "OK"
-    else:
-        return "Out of Tolerance "
 
 
 if __name__ == '__main__':
