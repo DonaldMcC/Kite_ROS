@@ -112,7 +112,8 @@ def getangle(resistance, maxleft=-20, maxright=20, resistleft=628, resistright=4
         angle = 0
     return int(angle)
 
-
+#TODO - this has default values which can be inconsistent with main classes - will redefine as
+# Constants and then use in both places
 def getresist(angle, maxleft=-20, maxright=20, resistleft=628, resistright=458, resistcentre=543):
     """
     :param resistcentre:

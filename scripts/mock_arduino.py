@@ -85,7 +85,7 @@ def mock_kiteangle(message):
         cycle_time = round(time.monotonic() * 1000) - loop_time
         loop_time = round(time.monotonic() * 1000)
         barangle = mockangle(barangle, cycle_time)
-        resistance = get_resistance(barangle)
+        resistance = getresist(barangle)
         pub.publish(resistance)
         rospy.loginfo(barangle)
         print(cycle_time, barangle, resistance)
@@ -104,8 +104,6 @@ def mockangle(angle, elapsed_time):
     direction = motorvalue // 100
     rawspeed = motorvalue % 100
     speed = int((rawspeed * 255)/100) if rawspeed > 0 else 255
-    # print('speed' + str(speed))
-    # print(direction)
     if direction == 1 or direction == 2:
         angle = 0
     else:
@@ -126,14 +124,6 @@ def mockangle(angle, elapsed_time):
         angle = MAXRIGHT
     #print ('angle'+str(angle))
     return angle
-
-
-def get_resistance(angle):
-    resistleft = 740
-    resistright = 340
-    resistance = getresist(angle)
-    print('get_r', resistance)
-    return resistright if resistance < resistright else resistleft if resistance > resistleft else resistance
 
 
 if __name__ == '__main__':
