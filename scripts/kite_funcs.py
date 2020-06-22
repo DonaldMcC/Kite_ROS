@@ -1,6 +1,12 @@
 import numpy as np
 import cv2
 
+conmaxright = 20
+conmaxleft = -30
+conresistleft =110
+conresistright = 267
+conresistcentre = 200
+
 # http://www.pyimagesearch.com/2014/08/04/opencv-python-color-detection/
 # define the list of boundaries
 # boundaries = [([0, 0, 0], [40, 40, 40])]
@@ -79,7 +85,8 @@ def checklimits(angle, maxleft, maxright):
     return angle
 
 
-def getangle(resistance, maxleft=-20, maxright=20, resistleft=628, resistright=458, resistcentre=543):
+def getangle(resistance, maxleft=conmaxleft, maxright=conmaxright,
+             resistleft=conresistleft, resistright=conresistright, resistcentre=conresistcentre):
     """
     :param resistcentre:
     :param resistright:
@@ -112,9 +119,9 @@ def getangle(resistance, maxleft=-20, maxright=20, resistleft=628, resistright=4
         angle = 0
     return int(angle)
 
-#TODO - this has default values which can be inconsistent with main classes - will redefine as
-# Constants and then use in both places
-def getresist(angle, maxleft=-20, maxright=20, resistleft=628, resistright=458, resistcentre=543):
+
+def getresist(angle, maxleft=conmaxleft, maxright=conmaxright, resistleft=conresistleft,
+              resistright=conresistright, resistcentre=conresistcentre):
     """
     :param resistcentre:
     :param resistright:

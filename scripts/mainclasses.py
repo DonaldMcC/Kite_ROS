@@ -23,7 +23,8 @@ This file should do the following things
 import time
 import math
 from collections import deque
-from kite_funcs import checklimits, getresist
+from kite_funcs import checklimits, getresist, conmaxleft, conmaxright, conresistleft,\
+    conresistright, conresistcentre
 
 
 def calcbarangle(kite, base, controls):
@@ -111,9 +112,9 @@ class Config(object):
 
 class Base(object):
 
-    def __init__(self, barangle=0, parkangle=0, maxright=20, maxleft=-30, lag=1,
-                 targetbarangle=0, kitebarratio=1, inferbarangle=0, resistleft=110,
-                 resistright=267, resistcentre=200, safety=False):
+    def __init__(self, barangle=0, parkangle=0, maxright=conmaxright, maxleft=conmaxleft, lag=1,
+                 targetbarangle=0, kitebarratio=1, inferbarangle=0, resistleft=conresistleft,
+                 resistright=conresistright, resistcentre=conresistcentre, safety=False):
         self.barangle = barangle
         self.parkangle = parkangle
         self.maxright = maxright
