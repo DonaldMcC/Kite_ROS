@@ -96,14 +96,14 @@ def getangle(resistance, maxleft=conmaxleft, maxright=conmaxright,
     :param resistance:
     :return angle:
 
-    >>> getangle(740)
-    -45
-    >>> getangle(540)
+    >>> getangle(267)
+    20
+    >>> getangle(200)
     0
-    >>> getangle(340)
-    45
-    >>> getangle(350)
-    42
+    >>> getangle(110)
+    -30
+    >>> getangle(155)
+    -15
     """
 
     # calibration is based on 0 being the centre and maxleft and maxright being
@@ -112,9 +112,9 @@ def getangle(resistance, maxleft=conmaxleft, maxright=conmaxright,
     # so that values beyond maxleft and maxright should be supported
 
     if resistance > resistcentre:
-        angle = ((resistance - resistcentre) * maxleft) / (resistleft - resistcentre)
-    elif resistance < resistcentre:
         angle = ((resistance - resistcentre) * maxright) / (resistright - resistcentre)
+    elif resistance < resistcentre:
+        angle = ((resistance - resistcentre) * maxleft) / (resistleft - resistcentre)
     else:
         angle = 0
     return int(angle)
@@ -131,16 +131,16 @@ def getresist(angle, maxleft=conmaxleft, maxright=conmaxright, resistleft=conres
     :param angle:
     :return angle:
 
-    >>> getresist(-45)
-    740
-    >>> getresist(-5)
-    562
+    >>> getresist(-30)
+    110
+    >>> getresist(-15)
+    155
     >>> getresist(0)
-    540
-    >>> getresist(45)
-    340
+    200
+    >>> getresist(20)
+    267
     >>> getresist(10)
-    495
+    233
     """
 
     # calibration is based on 0 being the centre and maxleft and maxright being
