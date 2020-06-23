@@ -156,18 +156,29 @@ def getresist(angle, maxleft=conmaxleft, maxright=conmaxright, resistleft=conres
     return int(resistance)
 
 
-def get_action(output, barangle, targetbarangle):
+def get_action(output, barangle):
     # Now added ability to send motor message 6 for leftonly and 7 for rightonly
     # and will now add speed into the message as %age of max value up to 99 but 0 is max speed
-    MAXLEFT = -20  # These are to try and avoid breaking the bar
-    MAXRIGHT = 20  # similarly to protect bar as attached close to pivot
+    """
+        :param output:
+        :param barangle:
+        :return action:
+
+        >>> get_action(-10, -5)
+        300
+        >>> get_action(0, 0)
+        0
+        """
+
+    MAXLEFT = conmaxleft  # These are to try and avoid breaking the bar
+    MAXRIGHT = conmaxright  # similarly to protect bar as attached close to pivot
     TOLERANCE = 1  # degreee of tolerance
     action = 0
     if abs(output) < TOLERANCE:
         action = 0  # stop
-    elif output > 0 and barangle > MAXLEFT:
+    elif output < 0 and barangle > MAXLEFT:
         action = 300  # Left
-    elif output < 0 and barangle < MAXRIGHT:
+    elif output > 0 and barangle < MAXRIGHT:
         action = 400  # Right
     # TODO think about how PID impacts this if at all - speed should prob be used
     # action = int(msg + speed) if 0 < speed < 100 else int(msg)
