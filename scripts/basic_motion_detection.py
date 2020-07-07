@@ -263,8 +263,8 @@ parser.add_argument('-f', '--file', type=str, default='cachedH.npy',
                     help='Filename to load cached matrix')
 parser.add_argument('-l', '--load', type=str, default='yes',
                     help='Do we load cached matrix')
-parser.add_argument('-k', '--kite', type=str, default='Manual',
-                    help='Kite either Standard or Manual')
+parser.add_argument('-k', '--kite', type=str, default='Manbar',
+                    help='Kite either Standard or Manual or Manbar')
 parser.add_argument('-s', '--setup', type=str, default='Standard',
                     help='Standard, BarKiteActual, KiteBarInfer, KiteBarTarget')
 # Standard means no connections between KiteAngle, KiteTargetAngle and Bar Angles others
@@ -287,9 +287,11 @@ KITETYPE = 'kite1'
 # initiate class instances
 # config = Config(setup='Manfly', source=1, input='Joystick')
 config = Config(source=1, kite=args.kite,  numcams=1, check_motor_sim=False, setup=args.setup)
+print(config.kite)
 control = Controls(config.kite, step=16, motortest=args.motortest)
 kite = Kite(300, 400) if control.config == "Manual" else Kite(control.centrex, control.centrey)
 base = Base(kitebarratio=1, safety=True)
+print('input', control.inputmode)
 
 while config.source not in {1, 2}:
     config.source = input('Key 1 for camera or 2 for source')

@@ -375,7 +375,7 @@ class Controls(object):
             self.halfwidth = 200
             self.radius = 100
         self.routepoints = calc_route(self.centrex, self.centrey, self.halfwidth, self.radius)
-        self.config = config  # possible config ('Standard', 'Manual')
+        self.config = config  # possible config ('Standard', 'Manual', 'Manbar')
         if self.config == 'Standard':
             self.inputmode = 0
         elif self.config == 'Manual':  # Manual kite start with kite fling
