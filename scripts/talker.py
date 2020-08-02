@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # from ros wiki for initial testing
 import rospy
 from std_msgs.msg import String, Int16

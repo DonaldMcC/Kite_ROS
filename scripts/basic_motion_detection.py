@@ -427,7 +427,16 @@ while True:
         diff = cv2.absdiff(background, gray_frame)
         diff = cv2.threshold(diff, 25, 255, cv2.THRESH_BINARY)[1]
         diff = cv2.dilate(diff, es, iterations=2)
-        image, cnts, hierarchy = cv2.findContours(diff.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+        if cv2.__version__.startswith('4'):
+            image = None
+            cnts, hierarchy = cv2.findContours(diff.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+        elif cv2.__version__.startswith('3'):
+            image, cnts, hierarchy = cv2.findContours(diff.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+        else:
+            raise AssertionError(
+                'cv2 must be either version 3 or 4 to call this method')
+
+
 
         # draw and move cross for manual flying
         if config.kite == 'Manual':
