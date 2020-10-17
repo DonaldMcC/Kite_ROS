@@ -263,7 +263,7 @@ parser.add_argument('-f', '--file', type=str, default='cachedH.npy',
                     help='Filename to load cached matrix')
 parser.add_argument('-l', '--load', type=str, default='yes',
                     help='Do we load cached matrix')
-parser.add_argument('-k', '--kite', type=str, default='Manbar',
+parser.add_argument('-k', '--kite', type=str, default='Standard',
                     help='Kite either Standard or Manual or Manbar')
 parser.add_argument('-s', '--setup', type=str, default='Standard',
                     help='Standard, BarKiteActual, KiteBarInfer, KiteBarTarget')
@@ -274,19 +274,20 @@ parser.add_argument('-m', '--motortest', type=int, default=0,
 args = parser.parse_args()
 
 # iphone
-# masklimit = 10000
-# wind
 masklimit = 1000
+# wind
+#masklimit = 1000
 # config = 'yellowballs'  # alternative when base not present will also possibly be combo
 # KITETYPE = 'indoorkite'  # need to comment out for external
 KITETYPE = 'kite1'
+KITETYPE = 'kite2' #  start for iphone SE video
 
 # controls setup self.inputmodes = ('Standard', 'SetFlight', 'ManFly')
 # setup options are Manfly, Standard
 
 # initiate class instances
 # config = Config(setup='Manfly', source=1, input='Joystick')
-config = Config(source=1, kite=args.kite,  numcams=1, check_motor_sim=False, setup=args.setup)
+config = Config(source=2, kite=args.kite,  numcams=1, check_motor_sim=False, setup=args.setup)
 print(config.kite)
 control = Controls(config.kite, step=16, motortest=args.motortest)
 kite = Kite(300, 400) if control.config == "Manual" else Kite(control.centrex, control.centrey)
@@ -315,7 +316,8 @@ if config.source == 1:
     config.logging = 1
 else:
     # TODO at some point will change this to current directory and append file - not urgent
-    camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
+    #camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
+    camera = cv2.VideoCapture(r'/home/ubuntu/catkin_ws/src/kite_ros/scripts/2020_test1.mp4')
     # Videostream seems to create errors with playback
     # camera = VideoStream(src=r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4').start()
     # camera =a VideoStream(src=r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4').start()
@@ -381,7 +383,7 @@ base.start_time = round(time.monotonic() * 1000)
 
 # Main module loop START
 while True:
-
+    #time.sleep(0.1)
     if config.numcams == 1:
         if config.source == 1:
             ret, frame = camera.stream.read()
@@ -435,14 +437,16 @@ while True:
         else:
             raise AssertionError(
                 'cv2 must be either version 3 or 4 to call this method')
+        #if cnts:
+        #    print('contours'+str(len(cnts)))
 
-
-
+        print(config.kite)
         # draw and move cross for manual flying
         if config.kite == 'Manual':
             drawkite(kite)
             kite.found = True
         elif config.kite == 'Standard':  # not detecting if in manual mode
+            print('here')
             kite.found = False
             maxmask = -1
             index = -1

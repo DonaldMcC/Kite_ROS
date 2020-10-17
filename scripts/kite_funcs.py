@@ -29,10 +29,14 @@ def kitemask(c, frame, kitecolours='kite1'):
     # and 
     if cv2.contourArea(c) < contourmin:
         return 0
-
+    print('kitemask')
     if kitecolours == 'indoorkite':
         boundaries = [([10, 10, 140], [70, 70, 200])]
-    else:
+    elif kitecolours == 'kite1':
+        boundaries = [([0, 0, 100], [100, 100, 255]),
+                      ([0, 50, 100], [120, 220, 255])
+                      ]
+    else: # 'kite2'
         boundaries = [([0, 0, 0], [30, 30, 30]),
                       ([10, 10, 100], [100, 100, 255]),
                       ([0, 50, 100], [120, 220, 255])
@@ -40,10 +44,6 @@ def kitemask(c, frame, kitecolours='kite1'):
         # iphone
         boundaries = [([0, 0, 100], [100, 100, 255]),
                       ([0, 50, 150], [120, 220, 255])
-                      ]
-        # wind 64,111,106
-        boundaries = [([0, 0, 100], [100, 100, 255]),
-                      ([0, 50, 100], [120, 220, 255])
                       ]
 
     totmask = 1
