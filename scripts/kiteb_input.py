@@ -16,7 +16,6 @@ def call_arduino(data):
 
 
 def call_kite_infer(data):
-    # message = msg_to_dict(data)
     message = {'timestamp': data.header.stamp, 'rleft': data.rleft, 'msgkiteangle': data.kiteangle,
                'msgdirx': data.dirx, 'msgdiry': data.diry}
     rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.name)

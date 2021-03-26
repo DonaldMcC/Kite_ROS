@@ -36,7 +36,7 @@ def kitemask(c, frame, kitecolours='kite1'):
         boundaries = [([0, 0, 100], [100, 100, 255]),
                       ([0, 50, 100], [120, 220, 255])
                       ]
-    else: # 'kite2'
+    else:   # 'kite2'
         boundaries = [([0, 0, 0], [30, 30, 30]),
                       ([10, 10, 100], [100, 100, 255]),
                       ([0, 50, 100], [120, 220, 255])
@@ -70,18 +70,16 @@ def checklimits(angle, maxleft, maxright):
     :param maxright:
     :return:
 
-    >>> checklimits(50,-45,30)
+    >>> checklimits(50, -45, 30)
     30
-    >>> checklimits(-50,-45,30)
+    >>> checklimits(-50, -45, 30)
     -45
-    >>> checklimits(-20,-45,30)
+    >>> checklimits(-20, -45, 30)
     -20
-
     """
-    if angle < maxleft:
-        angle = maxleft
-    elif angle > maxright:
-        angle = maxright
+
+    angle = max(angle, maxleft)
+    angle = min(angle, maxright)
     return angle
 
 
