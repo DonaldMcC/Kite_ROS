@@ -58,11 +58,11 @@ from move_func import get_heading_points, get_angled_corners
 from mainclasses import Kite, Controls, Base, Config, calc_route
 from move_func import get_angle
 from talker import kite_pos, KiteImage, motor_msg, init_motor_msg, init_ros
-from cvwriter import initwriter, writeframe
 from basic_listen_barangle import listen_kiteangle, get_actmockangle, get_angles
 from listen_joystick import listen_joystick, get_joystick
 from kite_funcs import kitemask, get_action
 import PID
+from logging import writelogs
 
 
 # this is just for display flight decisions will be elsewhere
@@ -338,7 +338,6 @@ pid.setSampleTime(0.01)
 # initialize the list of tracked points, the frame counter,
 # and the coordinate deltas
 counter = 0
-foundcounter = 0
 
 listen_kiteangle('kiteangle')  # this then updates base.barangle via the callback function
 
@@ -383,7 +382,6 @@ base.start_time = round(time.monotonic() * 1000)
 
 # Main module loop START
 while True:
-    #time.sleep(0.1)
     if config.numcams == 1:
         if config.source == 1:
             ret, frame = camera.stream.read()
@@ -437,16 +435,12 @@ while True:
         else:
             raise AssertionError(
                 'cv2 must be either version 3 or 4 to call this method')
-        #if cnts:
-        #    print('contours'+str(len(cnts)))
 
-        print(config.kite)
         # draw and move cross for manual flying
         if config.kite == 'Manual':
             drawkite(kite)
             kite.found = True
         elif config.kite == 'Standard':  # not detecting if in manual mode
-            print('here')
             kite.found = False
             maxmask = -1
             index = -1
@@ -477,7 +471,6 @@ while True:
 
                 cv2.drawContours(frame, [box], 0, (0, 0, 255), 2)
                 kite.kiteangle = get_angle(box, kite.dX, kite.dY)
-            # print index, maxmask
 
         # Establish route
         if kite.changezone or kite.changephase or kite.routechange:
@@ -508,7 +501,6 @@ while True:
     display_stats()
     display_flight(width)
     display_base(width)
-
     kite_pos(kite.x, kite.y, kite.kiteangle, kite.dX, kite.dY, 0, 0)
     doaction = True if control.motortest or base.calibrate or (control.inputmode == 3) else False
 
@@ -518,29 +510,13 @@ while True:
         base.action = get_action(pid.output, base.barangle)
 
     msg = motor_msg(base.action)
-    if control.motortest:
-        display_motor_msg(base.action, config.setup)
-    else:
-        display_motor_msg(msg, config.setup)
+    display_motor_msg(base.action, config.setup) if control.motortest else display_motor_msg(msg, config.setup)
 
     cv2.imshow("contours", frame)
     # below commented due to failing on 18.04
     # kiteimage.pubimage(imagemessage, frame)
 
-    counter += 1
-    if kite.found:
-        foundcounter += 1
-
-    if config.logging and writer is None:
-        # h, w = frame.shape[:2]
-        # height, width = 480, 640 - removed should now be set above
-        # height, width, channels = frame.shape
-        writer = initwriter("record.avi", height, width, fps)
-        origwriter = initwriter("origrecord.avi", height, width, fps)
-
-    if config.logging:  # not saving this either as it errors on other screen
-        writeframe(writer, frame, height, width)
-
+    writelogs(kite, base, control)
     # read pysimplegui events
     event, values = window.read(timeout=0)
     for x in control.newbuttons:  # change the button labels if mode has change
@@ -549,12 +525,12 @@ while True:
     joybuttons, joyaxes = get_joystick()
     quitkey, resetH = control.joyhandler(joybuttons, joyaxes, kite, base, control, event)
 
-    # print('mode', control.inputmode, base.updatemode)
     if quitkey or event in ('Quit', None):  # quit if controls window closed or home key
         break
 
     if resetH and stitcher:
         stitcher.cachedH = None
+    counter += 1
     time.sleep(control.slow)
 
 # Exit and clean up

@@ -108,6 +108,8 @@ class Config(object):
         self.numcams = numcams
         self.check_motor_sim = check_motor_sim
         self.setup = setup
+        self.writer = None
+
 
 
 class Base(object):
