@@ -62,7 +62,7 @@ from basic_listen_barangle import listen_kiteangle, get_actmockangle, get_angles
 from listen_joystick import listen_joystick, get_joystick
 from kite_funcs import kitemask, get_action
 import PID
-from logging import writelogs
+from logging import writelogs, writelogheader, closelogs
 
 
 # this is just for display flight decisions will be elsewhere
@@ -379,6 +379,7 @@ get_angles(kite, base, control, config)
 joybuttons, joyaxes = get_joystick()
 time.sleep(2)
 base.start_time = round(time.monotonic() * 1000)
+writelogheader()
 
 # Main module loop START
 while True:
@@ -535,6 +536,7 @@ while True:
 
 # Exit and clean up
 print("[INFO] cleaning up...")
+closelogs
 cv2.destroyAllWindows()
 if config.numcams == 1:
     camera.stop()

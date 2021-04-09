@@ -1,5 +1,9 @@
 from cvwriter import initwriter, writeframe
 
+def writelogheader():
+    # THis should initialise the logging
+    pass
+
 def writelogs(kite, base, control, config, height, width, fps):
     if config.logging and config.writer is None:
         # h, w = frame.shape[:2]
@@ -10,3 +14,6 @@ def writelogs(kite, base, control, config, height, width, fps):
 
     if config.logging:  # not saving this either as it errors on other screen
         writeframe(writer, frame, height, width)
+
+def close():
+    pass
