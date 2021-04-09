@@ -110,7 +110,10 @@ class Config(object):
         self.setup = setup
         self.writer = None
 
-
+    def log(self, get='details'):
+        if get == 'details':
+            return (self.source, self.kite, self.masklimit, self.logging, self.numcams,
+                    self.check_motor_sim, self.setup)
 
 class Base(object):
 
