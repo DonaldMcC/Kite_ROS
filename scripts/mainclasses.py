@@ -150,6 +150,14 @@ class Base(object):
         self.plan_calibration()
         self.safety = safety
 
+    @staticmethod
+    def getlogheaders():
+        return ('barangle', 'mockangle')
+
+    def getlogdata(self):
+        return (self.barangle, self.mockangle)
+
+
     def get_calibrate_time(self):
         # idea here is to have an expectation of how the setup should work based on components
         # believed to be there - and also identify if resistor is working as expected
@@ -249,6 +257,17 @@ class Kite(object):
         self.rightbally = 0
         self.turncomplete = False
         self.turncomplete_angle = 60
+
+    @staticmethod
+    def getlogheaders():
+        return ('x', 'y', 'mode', 'phase', 'direction', 'kiteangle', 'contourarea',
+                'targettype', 'targetx', 'targety', 'changezone', 'changephase', 'routechange',
+                'changephase', 'routechange', 'found', 'targetheading', 'targetangle')
+
+    def getlogdata(self):
+        return (self.x, self.y, self.mode, self.phase, self.direction, self.kiteangle, self.contourarea,
+                self.targettype, self.targetx, self.targety, self.changezone, self.changephase, self.routechange,
+                self.changephase, self.routechange, self.found, self.targetheading, self.targetangle)
 
     def get_zone(self, leftx, rightx):
         """
@@ -394,6 +413,13 @@ class Controls(object):
         self.slow = 0.0
         self.newbuttons = []
         self.motortest = motortest
+
+    @staticmethod
+    def getlogheaders():
+        return ('config', 'inputmode', 'motortest')
+
+    def getlogdata(self):
+        return (self.config, self.inputmode, self.motortest)
 
     def getmodestring(self, inputmode):
         # So now always 11 buttons and first 5 and last 2 are std and iteration through should be std
