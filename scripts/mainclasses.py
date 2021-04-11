@@ -61,9 +61,7 @@ def inferangle(kite, base, controls=None):
         >>> inferangle(k, b, c)
         5.0
         """
-
-    inferangle = kite.kiteangle / base.kitebarratio
-    return inferangle
+    return kite.kiteangle / base.kitebarratio
 
 
 def setangle(kite, base, controls):
@@ -110,13 +108,15 @@ class Config(object):
         self.setup = setup
         self.writer = None
 
-    def log(self, get='details'):
-        if get == 'details':
-            return (self.source, self.kite, self.masklimit, self.logging, self.numcams,
-                    self.check_motor_sim, self.setup)
+    @staticmethod
+    def getlogheaders():
+        return ('source', 'kite', 'masklimit', 'numcams', 'check_motor_sim', 'setup')
+
+    def getlogdata(self):
+        return (self.source, self.kite, self.masklimit, self.numcams, self.check_motor_sim, self.setup)
+
 
 class Base(object):
-
     def __init__(self, barangle=0, parkangle=0, maxright=conmaxright, maxleft=conmaxleft, lag=1,
                  targetbarangle=0, kitebarratio=1, inferbarangle=0, resistleft=conresistleft,
                  resistright=conresistright, resistcentre=conresistcentre, safety=False):
