@@ -62,7 +62,7 @@ from basic_listen_barangle import listen_kiteangle, get_actmockangle, get_angles
 from listen_joystick import listen_joystick, get_joystick
 from kite_funcs import kitemask, get_action
 import PID
-from logging import writelogs, writelogheader, writepictheader, closelogs
+from kite_logging import writelogs, writelogheader, writepictheader, closelogs
 
 
 # this is just for display flight decisions will be elsewhere
@@ -322,6 +322,7 @@ else:
     # camera = VideoStream(src=r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4').start()
     # camera =a VideoStream(src=r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4').start()
     # print('video:', camera.grab())
+    config.logging = 1
 
 # Initialisation steps
 es = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
@@ -518,7 +519,7 @@ while True:
     # below commented due to failing on 18.04
     # kiteimage.pubimage(imagemessage, frame)
 
-    writelogs(kite, base, control)
+    writelogs(config, kite, base, control, frame, height, width, fps)
     # read pysimplegui events
     event, values = window.read(timeout=0)
     for x in control.newbuttons:  # change the button labels if mode has change

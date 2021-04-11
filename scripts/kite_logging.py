@@ -5,9 +5,9 @@ def writelogheader(config):
     # THis should initialise the logging
     if config.logging:
         config.csvwriter = CSVDataWrite()
-        config.csvriter.open_output()
+        config.csvwriter.open_output()
         myheaders = config.getlogheaders()
-        config.csvriter.write_data(myheaders)
+        config.csvwriter.write_data(myheaders)
     return
 
 

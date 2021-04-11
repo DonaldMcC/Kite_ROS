@@ -12,7 +12,7 @@ class CSVDataWrite:
         self.file_ref = None
         self.csvwriter = None
 
-    def open_output(self, file_name='testouput.csv', path='', reset_file=False):
+    def open_output(self, file_name='testoutput.csv', path='', reset_file=True):
         """ Opens a file for CSV data ouptut.
 
             If path is not specified (an empty string is given as
