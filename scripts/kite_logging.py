@@ -1,13 +1,13 @@
 from file_csv_out import CSVDataWrite
 from cvwriter import initwriter, writeframe
 
-def writelogheader(config):
+def writelogheader(config, kite, base, control):
     # THis should initialise the logging
     if config.logging:
         config.csvwriter = CSVDataWrite()
         config.csvwriter.open_output()
-        myheaders = config.getlogheaders()
-        config.csvwriter.write_data(myheaders)
+        #myheaders = config.getlogheaders()
+        config.csvwriter.write_data(kite.getlogheaders() + base.getlogheaders() + control.getlogheaders())
     return
 
 
@@ -19,11 +19,11 @@ def writepictheader(config, height, width, fps):
         config.writer = initwriter("record.avi", height, width, fps)
 
 
-def writelogs(config, kite, base, control, frame, height, width, fps):
+def writelogs(config, kite, base, control, frame, height, width, counter):
     if config.logging:  # not saving this either as it errors on other screen
         writeframe(config.writer, frame, height, width)
-        mydata = config.getlogdata()
-        config.csvwriter.write_data(mydata)
+        #mydata = config.getlogdata()
+        config.csvwriter.write_data(kite.getlogdata() + base.getlogdata() + control.getlogdata())
 
 def closelogs(config):
     config.csvwriter.close_output()

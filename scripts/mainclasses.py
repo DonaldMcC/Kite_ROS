@@ -2,7 +2,6 @@
 #
 """
 This file should do the following things
-
     1   Calculate a default route for the kite based on settings or parameters applied - done
     2   Identify the flight zone which will be left, right or centre in fig8
         and park_left, park_right - done
@@ -89,10 +88,8 @@ def setangleturn(kite, base):
     >>> setangleturn(k,b)
     -40
     """
-    if kite.phase == "TurnR":
-        targetbarangle = base.maxright
-    else:
-        targetbarangle = base.maxleft
+
+    targetbarangle = base.maxright if kite.phase == "TurnR" else base.maxleft
     return targetbarangle
 
 
@@ -320,26 +317,20 @@ class Kite(object):
     def update_zone(self, control):
         currentzone = self.zone
         self.get_zone(control.routepoints[0][0], control.routepoints[3][0])
-        if self.zone != currentzone:
-            self.changezone = True
-        else:
-            self.changezone = False
+        self.changezone = True if self.zone != currentzone else False
         if self.changezone:  # set to false at start of next turn
             self.turncomplete = False
 
     def update_phase(self):
         currentphase = self.phase
         self.get_phase()
-        if self.phase != currentphase:
-            self.changephase = True
-        else:
-            self.changephase = False
+        self.changephase = True if self.phase != currentphase else False
+
 
     def get_wiggle_angle(self):
-        if self.kiteangle > 0:
-            return -10
-        else:
-            return 10
+        x = -10 if self.kiteangle > 0 else 10
+        return x
+
 
     def update_target(self, leftx, lefty, centrex, centrey, rightx, righty):
         # this gets called when mode, zone, phase or route changes
@@ -374,13 +365,12 @@ class Kite(object):
                     self.targetangle = 90
                 else:
                     self.targetangle = -90
-
                 # TODO - may compute the target location
             else:
                 print('End of update_target reached without cover expected cases most likely')
                 # TODO ensure change of flight mode is barred unless in the centre zone -
                 # seems sensible and should
-                # mena changemode and changephase generally only triggered in centre zone
+                # mean changemode and changephase generally only triggered in centre zone
         return
 
 
@@ -626,17 +616,14 @@ def calc_route(centrex=400, centrey=300, halfwidth=200, radius=100):
     [(200, 400), (100, 300), (200, 200), (600, 400), (700, 300), (600, 200)]
 
     """
-
     leftx = centrex - halfwidth
     rightx = centrex + halfwidth
-
     pt0 = (leftx, centrey + radius)
     pt1 = (leftx - radius, centrey)
     pt2 = (leftx, centrey - radius)
     pt3 = (rightx, centrey + radius)
     pt4 = (rightx + radius, centrey)
     pt5 = (rightx, centrey - radius)
-
     return [pt0, pt1, pt2, pt3, pt4, pt5]
 
 

@@ -28,11 +28,7 @@ def linearmap(value, minx, maxx, miny, maxy):
         0.0
         >>> linearmap(1005, 826.0, 990.0, 0.0, 47)
         51.29878048780488
-
-
     """
-
-
     return miny + (value-minx)/(1.0 * maxx-minx) * (maxy-miny)
 
 
@@ -51,13 +47,7 @@ def get_bar_angle(rcent, centremaxleft, centremiddle, centremaxright, maxanglele
         -33.08379888268156
 
     """
-
-    angle = 0
-    # allow resistor to operate either way +ve
-
-    angle = linearmap(rcent, centremiddle, centremaxright, 0, maxangleright)
-
-    return angle
+    return linearmap(rcent, centremiddle, centremaxright, 0, maxangleright)
 
 
 def proc_arduino(message):

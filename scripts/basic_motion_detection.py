@@ -46,13 +46,10 @@ import PySimpleGUI as sg
 import time
 import cv2
 import argparse
-
-
 # pyimagesearch imports
 from imutils.video import VideoStream
 from panorama import Stitcher
 import imutils
-
 # kite_ros imports
 from move_func import get_heading_points, get_angled_corners
 from mainclasses import Kite, Controls, Base, Config, calc_route
@@ -65,7 +62,7 @@ import PID
 from kite_logging import writelogs, writelogheader, writepictheader, closelogs
 
 
-# this is just for display flight decisions will be elsewhere
+# this is just for display of route
 def drawroute(route, centrex, centrey):
     global frame
     for k, l in enumerate(route):
@@ -98,10 +95,8 @@ def drawcross(manx, many, crosstype='Man', colour=(255, 0, 255)):
     endvery = many + crosssize
     endverx = manx
     startverx = manx
-    cv2.line(frame, (starthorx, starthory), (endhorx, endhory),
-             colour, thickness=thickness, lineType=8, shift=0)
-    cv2.line(frame, (startverx, startvery), (endverx, endvery),
-             colour, thickness=thickness, lineType=8, shift=0)
+    cv2.line(frame, (starthorx, starthory), (endhorx, endhory), colour, thickness=thickness, lineType=8, shift=0)
+    cv2.line(frame, (startverx, startvery), (endverx, endvery), colour, thickness=thickness, lineType=8, shift=0)
     return
 
 
@@ -127,18 +122,12 @@ def drawkite(kite):
     startverx, startvery = get_angled_corners(startverx, startvery, kite.kiteangle, kite.x, kite.y, 'int')
     endverx, endvery = get_angled_corners(endverx, endvery, kite.kiteangle, kite.x, kite.y, 'int')
 
-    cv2.line(frame, (starthorx, starthory), (endhorx, endhory),
-             colour, thickness=thickness, lineType=8, shift=0)
-    cv2.line(frame, (startverx, startvery), (endverx, endvery),
-             colour, thickness=thickness, lineType=8, shift=0)
-    cv2.line(frame, (starthorx, starthory), (endverx, endvery),
-             colour, thickness=thickness, lineType=8, shift=0)
-    cv2.line(frame, (endverx, endvery), (endhorx, endhory),
-             colour, thickness=thickness, lineType=8, shift=0)
-    cv2.line(frame, (endhorx, endhory), (startverx, startvery),
-             colour, thickness=thickness, lineType=8, shift=0)
-    cv2.line(frame, (startverx, startvery), (starthorx, starthory),
-             colour, thickness=thickness, lineType=8, shift=0)
+    cv2.line(frame, (starthorx, starthory), (endhorx, endhory), colour, thickness=thickness, lineType=8, shift=0)
+    cv2.line(frame, (startverx, startvery), (endverx, endvery), colour, thickness=thickness, lineType=8, shift=0)
+    cv2.line(frame, (starthorx, starthory), (endverx, endvery), colour, thickness=thickness, lineType=8, shift=0)
+    cv2.line(frame, (endverx, endvery), (endhorx, endhory), colour, thickness=thickness, lineType=8, shift=0)
+    cv2.line(frame, (endhorx, endhory), (startverx, startvery), colour, thickness=thickness, lineType=8, shift=0)
+    cv2.line(frame, (startverx, startvery), (starthorx, starthory), colour, thickness=thickness, lineType=8, shift=0)
     return
 
 
@@ -158,7 +147,6 @@ def getdirection(kte):
             # ensure there is significant movement in the x-direction
             if np.abs(kte.dX) > 20:
                 dirX = "East" if np.sign(kte.dX) == 1 else "West"
-
             # ensure there is significant movement in the y-direction
             if np.abs(kte.dY) > 20:
                 dirY = "South" if np.sign(kte.dY) == 1 else "North"
@@ -193,13 +181,11 @@ def display_base(width):
     if config.setup == 'KiteBarInfer':
         display_line(base.inferbarangle, centx, centy, radius, (255, 0, 0))
         cv2.putText(frame, 'Inf: ' + f'{base.inferbarangle:5.1f}', (outx + 15, centy + 160),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    0.65, (255, 0, 0), 2)
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.65, (255, 0, 0), 2)
     if config.check_motor_sim:
         display_line(base.mockangle, centx, centy, radius, (128, 0, 0))
         cv2.putText(frame, 'Mock: ' + f'{base.mockangle:5.1f}', (outx + 15, centy + 70),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    0.65, (128, 0, 0), 2)
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.65, (128, 0, 0), 2)
     return
 
 
@@ -218,7 +204,7 @@ def display_stats():
     cv2.putText(frame, "Mode: " + str(control.config), (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
     cv2.putText(frame, "Area: " + str(kite.contourarea), (10, 130), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
     if len(joyaxes) > 2:
-        cv2.putText(frame, "joy:" + str(joyaxes[2]), (10,150), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+        cv2.putText(frame, "joy:" + str(joyaxes[2]), (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
     return
 
 
@@ -269,18 +255,18 @@ parser.add_argument('-s', '--setup', type=str, default='Standard',
                     help='Standard, BarKiteActual, KiteBarInfer, KiteBarTarget')
 # Standard means no connections between KiteAngle, KiteTargetAngle and Bar Angles others
 # show connections from and to ie BarKiteActual the Kite angle is updated from the bar Angle
-parser.add_argument('-m', '--motortest', type=int, default=0,
-                    help='motortest either 0 or 1')  # This allows direct motor commands to be sent
+# This allows direct motor commands to be sent
+parser.add_argument('-m', '--motortest', type=int, default=0, help='motortest either 0 or 1')
 args = parser.parse_args()
 
 # iphone
 masklimit = 1000
 # wind
-#masklimit = 1000
+# masklimit = 1000
 # config = 'yellowballs'  # alternative when base not present will also possibly be combo
 # KITETYPE = 'indoorkite'  # need to comment out for external
-KITETYPE = 'kite1'
-KITETYPE = 'kite2' #  start for iphone SE video
+#KITETYPE = 'kite1'
+KITETYPE = 'kite2'  # start for iphone SE video
 
 # controls setup self.inputmodes = ('Standard', 'SetFlight', 'ManFly')
 # setup options are Manfly, Standard
@@ -288,7 +274,6 @@ KITETYPE = 'kite2' #  start for iphone SE video
 # initiate class instances
 # config = Config(setup='Manfly', source=1, input='Joystick')
 config = Config(source=2, kite=args.kite,  numcams=1, check_motor_sim=False, setup=args.setup)
-print(config.kite)
 control = Controls(config.kite, step=16, motortest=args.motortest)
 kite = Kite(300, 400) if control.config == "Manual" else Kite(control.centrex, control.centrey)
 base = Base(kitebarratio=1, safety=True)
@@ -316,7 +301,7 @@ if config.source == 1:
     config.logging = 1
 else:
     # TODO at some point will change this to current directory and append file - not urgent
-    #camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
+    # camera = cv2.VideoCapture(r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4')
     camera = cv2.VideoCapture(r'/home/ubuntu/catkin_ws/src/kite_ros/scripts/2020_test1.mp4')
     # Videostream seems to create errors with playback
     # camera = VideoStream(src=r'/home/donald/catkin_ws/src/kite_ros/scripts/choppedkite_horizshort.mp4').start()
@@ -353,9 +338,7 @@ sg.theme('Black')  # Pysimplegui setup
 initmodestring = control.getmodestring(0)  # now always get same initial modestring
 button_list = initmodestring.split()[1:]
 sgmodestring = 'Mode: ' + initmodestring.split()[0]
-buttons = [sg.Button(x, size=(7, 3), pad=(4, 0), font='Helvetica 14')
-           for i, x in enumerate(button_list)]
-
+buttons = [sg.Button(x, size=(7, 3), pad=(4, 0), font='Helvetica 14') for i, x in enumerate(button_list)]
 layout = [[sg.Text(sgmodestring, key=sgmodestring, size=(70, 1), font='Helvetica 20')], buttons]
 
 # create the window and show it without the plot
@@ -380,7 +363,7 @@ get_angles(kite, base, control, config)
 joybuttons, joyaxes = get_joystick()
 time.sleep(2)
 base.start_time = round(time.monotonic() * 1000)
-writelogheader(config)
+writelogheader(config, kite, base, control)
 
 # Main module loop START
 while True:
@@ -436,8 +419,7 @@ while True:
         elif cv2.__version__.startswith('3'):
             image, cnts, hierarchy = cv2.findContours(diff.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
         else:
-            raise AssertionError(
-                'cv2 must be either version 3 or 4 to call this method')
+            raise AssertionError('cv2 must be either version 3 or 4 to call this method')
 
         # draw and move cross for manual flying
         if config.kite == 'Manual':
@@ -471,13 +453,11 @@ while True:
                 rect = cv2.minAreaRect(c)
                 box = cv2.boxPoints(rect)  # cv2.boxPoints(rect) for OpenCV 3.x
                 box = np.int0(box)
-
                 cv2.drawContours(frame, [box], 0, (0, 0, 255), 2)
                 kite.kiteangle = get_angle(box, kite.dX, kite.dY)
 
         # Establish route
         if kite.changezone or kite.changephase or kite.routechange:
-            # print('I triggered')
             control.routepoints = calc_route(control.centrex, control.centrey, control.halfwidth, control.radius)
             kite.update_target(control.routepoints[0][0], control.routepoints[0][1],
                                control.centrex, control.maxy, control.routepoints[3][0], control.routepoints[3][1])
@@ -514,12 +494,10 @@ while True:
 
     msg = motor_msg(base.action)
     display_motor_msg(base.action, config.setup) if control.motortest else display_motor_msg(msg, config.setup)
-
     cv2.imshow("contours", frame)
     # below commented due to failing on 18.04
     # kiteimage.pubimage(imagemessage, frame)
 
-    writelogs(config, kite, base, control, frame, height, width, fps)
     # read pysimplegui events
     event, values = window.read(timeout=0)
     for x in control.newbuttons:  # change the button labels if mode has change
@@ -534,6 +512,7 @@ while True:
     if resetH and stitcher:
         stitcher.cachedH = None
     counter += 1
+    writelogs(config, kite, base, control, frame, height, width, counter)
     time.sleep(control.slow)
 
 # Exit and clean up

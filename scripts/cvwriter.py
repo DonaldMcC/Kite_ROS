@@ -2,7 +2,6 @@
 # zeros array
 
 from __future__ import print_function
-# from imutils.video import VideoStream
 import numpy as np
 import cv2
 
