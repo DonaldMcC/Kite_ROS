@@ -122,7 +122,6 @@ def mockangle(angle, elapsed_time):
         angle = MAXLEFT
     elif angle >= MAXRIGHT:
         angle = MAXRIGHT
-    #print ('angle'+str(angle))
     return angle
 
 
