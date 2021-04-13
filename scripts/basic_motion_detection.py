@@ -479,21 +479,21 @@ while True:
     drawcross(kite.targetx, kite.targety, 'Target', (0, 150, 250))
 
     if config.check_motor_sim:
-        base.mockangle = get_actmockangle()
+        base.mockangle = get_actmockangle(kite, base, control, config)
 
     display_stats()
     display_flight(width)
     display_base(width)
     kite_pos(kite.x, kite.y, kite.kiteangle, kite.dX, kite.dY, 0, 0)
-    doaction = True if control.motortest or base.calibrate or (control.inputmode == 3) else False
+    doaction = True if control.motortest or base.calibrate or control.inputmode == 3 else False
 
     if not doaction:
         pid.SetPoint = base.targetbarangle
         pid.update(base.barangle)
         base.action = get_action(pid.output, base.barangle)
 
-    msg = motor_msg(base.action)
-    display_motor_msg(base.action, config.setup) if control.motortest else display_motor_msg(msg, config.setup)
+    motor_msg(base.action)
+    display_motor_msg(base.action, config.setup)
     cv2.imshow("contours", frame)
     # below commented due to failing on 18.04
     # kiteimage.pubimage(imagemessage, frame)
@@ -505,7 +505,6 @@ while True:
 
     joybuttons, joyaxes = get_joystick()
     quitkey, resetH = control.joyhandler(joybuttons, joyaxes, kite, base, control, event)
-
     if quitkey or event in ('Quit', None):  # quit if controls window closed or home key
         break
 

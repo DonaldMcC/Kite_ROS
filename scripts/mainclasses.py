@@ -149,10 +149,14 @@ class Base(object):
 
     @staticmethod
     def getlogheaders():
-        return ('barangle', 'mockangle')
+        return ('barangle', 'parkangle', 'maxright', 'maxleft', 'mockangle', 'targetbarangle',
+                'inferbarangle', 'action', 'resistance', 'dist_act', 'speed_act', 'calibrate',
+                'manual_calib_phase')
 
     def getlogdata(self):
-        return (self.barangle, self.mockangle)
+        return (self.barangle, self.parkangle, self.maxright, self.maxleft, self.mockangle, self.targetbarangle,
+                self.inferbarangle, self.action, self.resistance, self.dist_act, self.speed_act, self.calibrate,
+                self.manual_calib_phase)
 
 
     def get_calibrate_time(self):

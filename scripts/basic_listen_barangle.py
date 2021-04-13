@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # this gets the barangle from the arduino board
 
-import time
 import rospy
 from std_msgs.msg import Int16
 from kite_funcs import getangle
