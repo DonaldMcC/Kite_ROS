@@ -7,7 +7,7 @@ def writelogheader(config, kite, base, control):
         config.csvwriter = CSVDataWrite()
         config.csvwriter.open_output()
         #myheaders = config.getlogheaders()
-        config.csvwriter.write_data(kite.getlogheaders() + base.getlogheaders() + control.getlogheaders())
+        config.csvwriter.write_data(('Seq No',) + kite.getlogheaders() + base.getlogheaders() + control.getlogheaders())
     return
 
 
@@ -23,7 +23,7 @@ def writelogs(config, kite, base, control, frame, height, width, counter):
     if config.logging:  # not saving this either as it errors on other screen
         writeframe(config.writer, frame, height, width)
         #mydata = config.getlogdata()
-        config.csvwriter.write_data(kite.getlogdata() + base.getlogdata() + control.getlogdata())
+        config.csvwriter.write_data(counter + kite.getlogdata() + base.getlogdata() + control.getlogdata())
 
 def closelogs(config):
     config.csvwriter.close_output()

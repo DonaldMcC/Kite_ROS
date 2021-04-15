@@ -511,7 +511,8 @@ while True:
     if resetH and stitcher:
         stitcher.cachedH = None
     counter += 1
-    writelogs(config, kite, base, control, frame, height, width, counter)
+    countertup = (counter,)
+    writelogs(config, kite, base, control, frame, height, width, countertup)
     time.sleep(control.slow)
 
 # Exit and clean up
