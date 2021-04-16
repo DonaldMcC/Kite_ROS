@@ -62,7 +62,6 @@ import PID
 from kite_logging import writelogs, writelogheader, writepictheader, closelogs
 
 
-# this is just for display of route
 def drawroute(route, centrex, centrey):
     global frame
     for k, l in enumerate(route):
@@ -205,6 +204,7 @@ def display_stats():
     cv2.putText(frame, "Area: " + str(kite.contourarea), (10, 130), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
     if len(joyaxes) > 2:
         cv2.putText(frame, "joy:" + str(joyaxes[2]), (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+    cv2.putText(frame, "Counter:" + str(counter), (10, 170), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
     return
 
 
@@ -231,8 +231,10 @@ def display_line(angle, cx, cy, radius, colour):
 
 
 def display_motor_msg(action, setup):
+    outx = width - 250
+    outy = height - 30
     fontsize = 0.5
-    cv2.putText(frame, 'Motor Msg: ' + str(action) + ' ' + setup, (20, 20), cv2.FONT_HERSHEY_SIMPLEX, fontsize,
+    cv2.putText(frame, 'Motor Msg: ' + str(action) + ' ' + setup, (outx, outy), cv2.FONT_HERSHEY_SIMPLEX, fontsize,
                 (0, 255, 255), 2)
     return
 
