@@ -275,7 +275,7 @@ KITETYPE = 'kite2'  # start for iphone SE video
 
 # initiate class instances
 # config = Config(setup='Manfly', source=1, input='Joystick')
-config = Config(source=2, kite=args.kite,  numcams=1, check_motor_sim=True, setup=args.setup)
+config = Config(source=2, kite=args.kite,  numcams=1, check_motor_sim=True, setup=args.setup, logging=1)
 control = Controls(config.kite, step=16, motortest=args.motortest)
 kite = Kite(300, 400) if control.config == "Manual" else Kite(control.centrex, control.centrey)
 base = Base(kitebarratio=1, safety=True)

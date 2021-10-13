@@ -149,9 +149,9 @@ class Base(object):
 
     @staticmethod
     def getlogheaders():
-        return ('barangle', 'parkangle', 'maxright', 'maxleft', 'mockangle', 'targetbarangle',
-                'inferbarangle', 'action', 'resistance', 'dist_act', 'speed_act', 'calibrate',
-                'manual_calib_phase')
+        return ('B.barangle', 'B.parkangle', 'B.maxright', 'B.maxleft', 'B.mockangle', 'B.targetbarangle',
+                'B.inferbarangle', 'B.action', 'B.resistance', 'B.dist_act', 'B.speed_act', 'B.calibrate',
+                'B.manual_calib_phase')
 
     def getlogdata(self):
         return (self.barangle, self.parkangle, self.maxright, self.maxleft, self.mockangle, self.targetbarangle,
@@ -261,9 +261,9 @@ class Kite(object):
 
     @staticmethod
     def getlogheaders():
-        return ('x', 'y', 'mode', 'phase', 'direction', 'kiteangle', 'contourarea',
-                'targettype', 'targetx', 'targety', 'changezone', 'changephase', 'routechange',
-                'changephase', 'routechange', 'found', 'targetheading', 'targetangle')
+        return ('K.x', 'K.y', 'K.mode', 'K.phase', 'K.direction', 'K.kiteangle', 'K.contourarea',
+                'K.targettype', 'K.targetx', 'K.targety', 'K.changezone', 'K.changephase', 'K.routechange',
+                'K.changephase', 'K.routechange', 'K.found', 'K.targetheading', 'K.targetangle')
 
     def getlogdata(self):
         return (self.x, self.y, self.mode, self.phase, self.direction, self.kiteangle, self.contourarea,
@@ -410,7 +410,7 @@ class Controls(object):
 
     @staticmethod
     def getlogheaders():
-        return ('config', 'inputmode', 'motortest')
+        return ('C.config', 'C.inputmode', 'C.motortest')
 
     def getlogdata(self):
         return (self.config, self.inputmode, self.motortest)
