@@ -1,13 +1,15 @@
+import datetime
 from file_csv_out import CSVDataWrite
 from cvwriter import initwriter, writeframe
+
 
 def writelogheader(config, kite, base, control):
     # THis should initialise the logging
     if config.logging:
         config.csvwriter = CSVDataWrite()
         config.csvwriter.open_output()
-        #myheaders = config.getlogheaders()
-        config.csvwriter.write_data(('Seq No',) + kite.getlogheaders() + base.getlogheaders() + control.getlogheaders())
+        config.csvwriter.write_data(('Seq No',) + kite.getlogheaders() + base.getlogheaders()
+                                    + control.getlogheaders() + 'DateTime')
     return
 
 
@@ -23,7 +25,8 @@ def writelogs(config, kite, base, control, frame, height, width, counter):
     if config.logging:  # not saving this either as it errors on other screen
         writeframe(config.writer, frame, height, width)
         #mydata = config.getlogdata()
-        config.csvwriter.write_data(counter + kite.getlogdata() + base.getlogdata() + control.getlogdata())
+        config.csvwriter.write_data(counter + kite.getlogdata() + base.getlogdata() +
+                                    control.getlogdata() + datetime.now.strftime("%m/%d/%Y, %H:%M:%S.%f"))
 
 def closelogs(config):
     config.csvwriter.close_output()
