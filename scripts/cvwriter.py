@@ -12,7 +12,6 @@ zeros = None
 
 
 # check if the writer is None
-# TODO check why h,w has been converted
 def initwriter(output, h, w, fps):
     # store the image dimensions, initialzie the video writer,
     # and construct the zeros array

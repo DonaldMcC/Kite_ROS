@@ -22,8 +22,7 @@ This file should do the following things
 import time
 import math
 from collections import deque
-from kite_funcs import checklimits, getresist, conmaxleft, conmaxright, conresistleft,\
-    conresistright, conresistcentre
+from kite_funcs import checklimits, getresist, conmaxleft, conmaxright, conresistleft, conresistright, conresistcentre
 
 
 def calcbarangle(kite, base, controls):
@@ -40,8 +39,8 @@ def calcbarangle(kite, base, controls):
     >>> c=Controls(1)
     >>> calcbarangle(k,b,c)
     40
-
     """
+
     if kite.phase == "TurnR" or kite.phase == "TurnL":
         return setangleturn(kite, base)
     else:
@@ -258,12 +257,15 @@ class Kite(object):
         self.rightbally = 0
         self.turncomplete = False
         self.turncomplete_angle = 60
+        return
+
 
     @staticmethod
     def getlogheaders():
         return ('K.x', 'K.y', 'K.mode', 'K.phase', 'K.direction', 'K.kiteangle', 'K.contourarea',
                 'K.targettype', 'K.targetx', 'K.targety', 'K.changezone', 'K.changephase', 'K.routechange',
                 'K.changephase', 'K.routechange', 'K.found', 'K.targetheading', 'K.targetangle')
+
 
     def getlogdata(self):
         return (self.x, self.y, self.mode, self.phase, self.direction, self.kiteangle, self.contourarea,
@@ -279,18 +281,12 @@ class Kite(object):
         >>> l=Kite(400)
         >>> l.get_zone(300,600)
         'Centre'
-
         :param leftx:
         :param rightx:
         :return:
         """
 
-        if self.x < leftx:
-            self.zone = 'Left'
-        elif self.x > rightx:
-            self.zone = 'Right'
-        else:
-            self.zone = 'Centre'
+        self.zone = 'Left' if self.x < leftx else 'Right' if self.x > rightx else 'Centre'
         return self.zone
 
     def get_phase(self):
@@ -324,17 +320,17 @@ class Kite(object):
         self.changezone = True if self.zone != currentzone else False
         if self.changezone:  # set to false at start of next turn
             self.turncomplete = False
+        return
 
     def update_phase(self):
         currentphase = self.phase
         self.get_phase()
         self.changephase = True if self.phase != currentphase else False
-
+        return
 
     def get_wiggle_angle(self):
         x = -10 if self.kiteangle > 0 else 10
         return x
-
 
     def update_target(self, leftx, lefty, centrex, centrey, rightx, righty):
         # this gets called when mode, zone, phase or route changes
@@ -394,12 +390,7 @@ class Controls(object):
             self.radius = 100
         self.routepoints = calc_route(self.centrex, self.centrey, self.halfwidth, self.radius)
         self.config = config  # possible config ('Standard', 'Manual', 'Manbar')
-        if self.config == 'Standard':
-            self.inputmode = 0
-        elif self.config == 'Manual':  # Manual kite start with kite fling
-            self.inputmode = 2
-        else:
-            self.inputmode = 3  # Manbar
+        self.inputmode = 0 if self.config == 'Standard' else 2 if self.config == 'Manual' else 3
         self.step = step
         self.modestring = self.getmodestring(True)
         self.route = False

@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from file_csv_out import CSVDataWrite
 from cvwriter import initwriter, writeframe
 
@@ -9,7 +9,7 @@ def writelogheader(config, kite, base, control):
         config.csvwriter = CSVDataWrite()
         config.csvwriter.open_output()
         config.csvwriter.write_data(('Seq No',) + kite.getlogheaders() + base.getlogheaders()
-                                    + control.getlogheaders() + 'DateTime')
+                                    + control.getlogheaders() + config.getlogheaders() + ('DateTime',))
     return
 
 
@@ -26,7 +26,7 @@ def writelogs(config, kite, base, control, frame, height, width, counter):
         writeframe(config.writer, frame, height, width)
         #mydata = config.getlogdata()
         config.csvwriter.write_data(counter + kite.getlogdata() + base.getlogdata() +
-                                    control.getlogdata() + datetime.now.strftime("%m/%d/%Y, %H:%M:%S.%f"))
+                                    control.getlogdata() + config.getlogdata() + (datetime.now().strftime("%m/%d/%Y, %H:%M:%S.%f"),) )
 
 def closelogs(config):
     config.csvwriter.close_output()

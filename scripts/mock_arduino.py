@@ -41,12 +41,15 @@ import math
 import rospy
 import argparse
 from std_msgs.msg import String, Int16
-from kite_funcs import getresist
+from kite_funcs import getresist, conmaxleft, conmaxright
+
+# from kite_funcs import checklimits, getresist, conmaxleft, conmaxright, conresistleft,\
+#     conresistright, conresistcentre
+MAXLEFT = conmaxleft  # These are to simulate limits of angles
+MAXRIGHT = conmaxright  # similarly to protect bar as attached close to pivot
+
 motorvalue = 500  # stop
 barangle = 0
-MAXLEFT = -20  # These are to simulate limits of angles
-MAXRIGHT = 20  # similarly to protect bar as attached close to pivot
-
 DIST_ACT = 35.0  # mm # this is horizontal distance between centre and bar
 DIST_HANDLE = 350.0  # mm
 SPEED_ACT = 30.0  # mm/sec

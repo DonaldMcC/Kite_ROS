@@ -1,11 +1,18 @@
+import os
 import numpy as np
 import cv2
+from dotenv import load_dotenv
+load_dotenv()
 
-conmaxright = 20
-conmaxleft = -30
-conresistleft =110
-conresistright = 267
-conresistcentre = 200
+try:
+    conmaxright=int(os.getenv("conmaxright"))
+    conmaxleft=int(os.getenv("conmaxleft"))
+    conresistleft=int(os.getenv("conresistelft"))
+    conresistright=267
+    conresistcentre=200
+except:
+    print("An exception occurred")
+
 
 # http://www.pyimagesearch.com/2014/08/04/opencv-python-color-detection/
 # define the list of boundaries
@@ -17,7 +24,6 @@ conresistcentre = 200
 
 # iphone video
 # contourmin = 3000
-# msi wind
 contourmin = 800
 
 
@@ -29,7 +35,6 @@ def kitemask(c, frame, kitecolours='kite1'):
     # and 
     if cv2.contourArea(c) < contourmin:
         return 0
-    print('kitemask')
     if kitecolours == 'indoorkite':
         boundaries = [([10, 10, 140], [70, 70, 200])]
     elif kitecolours == 'kite1':
