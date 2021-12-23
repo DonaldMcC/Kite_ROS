@@ -19,10 +19,13 @@ This file should do the following things
     10  Upturns only for now
 """
 
-import time
+import os, time
 import math
 from collections import deque
-from kite_funcs import checklimits, getresist, conmaxleft, conmaxright, conresistleft, conresistright, conresistcentre
+from kite_funcs import checklimits, getresist, conmaxright, conmaxleft, conresistleft, conresistright, conresistcentre
+from move_func import move_item
+from dotenv import find_dotenv, load_dotenv
+load_dotenv(find_dotenv())
 
 
 def calcbarangle(kite, base, controls):
@@ -163,6 +166,7 @@ class Base(object):
         # believed to be there - and also identify if resistor is working as expected
         circ_act = 2 * math.pi * self.dist_act * 2  # because going to move each army separately
         rev_time = circ_act / self.speed_act  # time for one revolution
+        print(f"self.maxright=")
         return 1000 * (rev_time * self.maxright / 360.0)  # expected time to get to max angle in millisecs
 
     def calibration_check(self):
@@ -257,6 +261,7 @@ class Kite(object):
         self.rightbally = 0
         self.turncomplete = False
         self.turncomplete_angle = 60
+        self.autofly = False
         return
 
 
@@ -373,12 +378,26 @@ class Kite(object):
                 # mean changemode and changephase generally only triggered in centre zone
         return
 
+    def move_kite(self, control, speed=10):
+        # This moves a manual kite in autofly mode towards the target while in the centre zone - however when
+        # in turn the target only moves when we get back out of the turn zone so instead we probalby want to pick up
+        # the apex of fig 8 and then on up to the top which we just fly through and then the target will change again
+        # pass lets start with figuring out the actual targetx and targety
+        if self.zone == 'Centre':
+            movex, movey = self.targetx, self.targety
+        elif self.zone == 'Left': # this just takes us to top of zone
+            movex, movey = control.routepoints[0]
+        else:
+            movex, movey = control.routepoints[3]
+
+        self.x, self.y = move_item(self.x, self.y, movex, movey, speed)
+        return
 
 class Controls(object):
 
     def __init__(self, config='Standard', step=8, motortest=False):
         try:  # this will fail on windows but don't need yet and not convinced I need to set parameters separately
-            self.centrex = rospy.get_param('centrex', 400)
+            self.centrex = rospy.get_param('centrex', 800)
             self.centrey = rospy.get_param('centrey', 300)
             self.halfwidth = rospy.get_param('halfwidth', 200)
             self.radius = rospy.get_param('radius', 100)
@@ -420,16 +439,16 @@ class Controls(object):
 
     @staticmethod
     def get_change_mode_buttons(inputmode):
-        if inputmode == 0:
+        if inputmode == 0: # STD
             newbuttons = [('Mode: STD:', 'Mode: STD:'), ('Pause', 'Pause'), ('Wider', 'Wider'), ('Narrow', 'Narrow'),
                           ('Expand', 'Expand'), ('Contract', 'Contract')]
-        elif inputmode == 1:
+        elif inputmode == 1:  # SETFLIGHTMODE
             newbuttons = [('Mode: STD:', 'Mode: SETFLIGHTMODE:'), ('Wider', 'Park'), ('Narrow', 'Wiggle'),
-                          ('Expand', 'Fig8'), ('Contract', 'Reset')]
+                          ('Expand', 'Fig8'), ('Contract', 'Autofly')]
         elif inputmode == 2:
             newbuttons = [('Mode: STD:', 'Mode: MANFLIGHT'), ('Wider', 'Anti'), ('Narrow', 'Clock'),
                           ('Expand', 'Slow'), ('Contract', 'Fast')]
-        else:
+        else: # MANBAR
             newbuttons = [('Mode: STD:', 'Mode: MANBAR:'), ('Pause', 'Calib'), ('Expand', 'Set')]
         return newbuttons
 
@@ -561,8 +580,9 @@ class Controls(object):
                 kite.mode = 'Wiggle'
             elif event == 'Expand' and kite.zone == 'Centre':  # must be in central zone to change mode
                 kite.mode = 'Fig8'
-            elif event == 'Contract':  # Reset message
-                base.reset = True
+            elif event == 'Contract':  # Autofly
+                # base.reset = True # don't think this ever did anything
+                kite.autofly = True
         elif self.inputmode == 2:  # ManFlight - maybe switch to arrows - let's do this all
             if joybuttons:
                 if joybuttons[7] == 0 and joybuttons[8] == 0:

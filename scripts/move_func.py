@@ -200,10 +200,10 @@ def get_heading(x, y):
     
 def get_heading_points(pt1, pt2):
     """Calcs the angle between 2 points
-    >>> get_heading_points((3,3),(4,2))
+    >>> get_heading_points((3,3), (4,2))
     45.0
     """
-    x,y = heading(pt1, pt2)
+    x, y = heading(pt1, pt2)
     return get_heading(x, y)
 
 
@@ -444,6 +444,27 @@ def get_plan_pos(p, h, t, s):
     """
     mvmt = vector_mult(h, t*s)
     return vector_add(p, mvmt)
+
+
+def move_item(x, y, targetx, targety, distance):
+    """
+        :param x:
+        :param y:
+        :param targetx
+        :param targety
+        :return x, y:
+
+        >>> move_item(1, 1, 4, 5, 5)
+        (4.0, 5.0)
+        >>> move_item(0, 0, 2, 2, 4)
+        (2.82842712474619, 2.82842712474619)
+        """
+    # approach is work out distance between
+    # use the distance function and then we have a ratio of how much of the distance we got
+    # then we do vectormult and that gives us the new point which we add to the start??
+    myheading = heading((x,y), (targetx,targety))
+
+    return get_plan_pos((x,y), myheading, 1, distance)
 
 
 def _test():

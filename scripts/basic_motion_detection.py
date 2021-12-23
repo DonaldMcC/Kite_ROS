@@ -251,7 +251,7 @@ parser.add_argument('-f', '--file', type=str, default='cachedH.npy',
                     help='Filename to load cached matrix')
 parser.add_argument('-l', '--load', type=str, default='yes',
                     help='Do we load cached matrix')
-parser.add_argument('-k', '--kite', type=str, default='Standard',
+parser.add_argument('-k', '--kite', type=str, default='Manual',
                     help='Kite either Standard or Manual or Manbar')
 parser.add_argument('-s', '--setup', type=str, default='Standard',
                     help='Standard, BarKiteActual, KiteBarInfer, KiteBarTarget')
@@ -275,7 +275,7 @@ KITETYPE = 'kite2'  # start for iphone SE video
 
 # initiate class instances
 # config = Config(setup='Manfly', source=1, input='Joystick')
-config = Config(source=2, kite=args.kite,  numcams=1, check_motor_sim=True, setup=args.setup, logging=1)
+config = Config(source=1, kite=args.kite,  numcams=1, check_motor_sim=True, setup=args.setup, logging=1)
 control = Controls(config.kite, step=16, motortest=args.motortest)
 kite = Kite(300, 400, mode='fig8') if control.config == "Manual" else Kite(control.centrex, control.centrey, mode='fig8')
 base = Base(kitebarratio=1, safety=True)
@@ -479,6 +479,8 @@ while True:
 
     drawroute(control.routepoints, control.centrex, control.centrey)
     drawcross(kite.targetx, kite.targety, 'Target', (0, 150, 250))
+    if kite.autofly:
+        kite.move_kite(control, 10)
 
     if config.check_motor_sim:
         base.mockangle = get_actmockangle(kite, base, control, config)

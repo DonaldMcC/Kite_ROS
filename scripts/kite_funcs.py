@@ -1,18 +1,23 @@
 import os
 import numpy as np
 import cv2
-from dotenv import load_dotenv
-load_dotenv()
+from dotenv import find_dotenv, load_dotenv
+load_dotenv(find_dotenv())
 
 try:
-    conmaxright=int(os.getenv("conmaxright"))
-    conmaxleft=int(os.getenv("conmaxleft"))
-    conresistleft=int(os.getenv("conresistelft"))
-    conresistright=267
-    conresistcentre=200
-except:
+    conmaxright=int(os.getenv("envmaxright"))
+    conmaxleft=int(os.getenv("envmaxleft"))
+    conresistleft=int(os.getenv("envresistleft"))
+    conresistright=int(os.getenv("envresistright"))
+    conresistcentre=int(os.getenv("envresistcentre"))
+except TypeError:
+    conmaxright=9999
+    conmaxleft=0
+    conresistleft=9999
+    conresistright=99999
+    conresistcentre=0
     print("An exception occurred")
-
+    #may now set value to something to force calibration
 
 # http://www.pyimagesearch.com/2014/08/04/opencv-python-color-detection/
 # define the list of boundaries
