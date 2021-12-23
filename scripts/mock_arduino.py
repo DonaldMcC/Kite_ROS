@@ -16,6 +16,7 @@ lever with short distance to the actuator - using ones designed for automatic do
 to the kite handle.
 
 Actuator currently in use is https://www.ebay.co.uk/itm/303125148840
+above link long gone
 
 dist_act will be from fulcrum to actuator
 dist_handle will be from fulcrum to kite handle
@@ -50,7 +51,7 @@ MAXRIGHT = conmaxright  # similarly to protect bar as attached close to pivot
 
 motorvalue = 500  # stop
 barangle = 0
-DIST_ACT = 35.0  # mm # this is horizontal distance between centre and bar
+DIST_ACT = 70.0  # mm # this is horizontal distance between centre and bar - doubled to reflect curr setup
 DIST_HANDLE = 350.0  # mm
 SPEED_ACT = 30.0  # mm/sec
 FORCE_ACT = 200  # N but not sure if will actually use this
