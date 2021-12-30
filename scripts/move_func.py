@@ -462,7 +462,7 @@ def move_item(x, y, targetx, targety, distance):
     # approach is work out distance between
     # use the distance function and then we have a ratio of how much of the distance we got
     # then we do vectormult and that gives us the new point which we add to the start??
-    myheading = heading((x,y), (targetx,targety))
+    myheading = heading((x, y), (targetx, targety))
 
     return get_plan_pos((x,y), myheading, 1, distance)
 

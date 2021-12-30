@@ -380,16 +380,20 @@ class Kite(object):
 
     def move_kite(self, control, speed=10):
         # This moves a manual kite in autofly mode towards the target while in the centre zone - however when
-        # in turn the target only moves when we get back out of the turn zone so instead we probalby want to pick up
+        # in turn the target only moves when we get back out of the turn zone so instead we probaby want to pick up
         # the apex of fig 8 and then on up to the top which we just fly through and then the target will change again
         # pass lets start with figuring out the actual targetx and targety
         if self.zone == 'Centre':
             movex, movey = self.targetx, self.targety
+            # want to move beyond the target so extend x
         elif self.zone == 'Left': # this just takes us to top of zone
-            movex, movey = control.routepoints[0]
-        else:
             movex, movey = control.routepoints[3]
+        else: # Right
+            movex, movey = control.routepoints[0]
 
+        # Ensure we go past the point which toggles the change of zone
+        adjustx = 20 if movex >= control.centrex else -20
+        movex += adjustx
         self.x, self.y = move_item(self.x, self.y, movex, movey, speed)
         return
 
@@ -582,7 +586,7 @@ class Controls(object):
                 kite.mode = 'Fig8'
             elif event == 'Contract':  # Autofly
                 # base.reset = True # don't think this ever did anything
-                kite.autofly = True
+                kite.autofly = True if kite.autofly == False else False
         elif self.inputmode == 2:  # ManFlight - maybe switch to arrows - let's do this all
             if joybuttons:
                 if joybuttons[7] == 0 and joybuttons[8] == 0:
