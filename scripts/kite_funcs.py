@@ -57,7 +57,6 @@ def kitemask(c, frame, kitecolours='kite1'):
                       ]
 
     totmask = 1
-
     for (lower, upper) in boundaries:
         # create NumPy arrays from the boundaries
         low = np.array(lower, dtype="uint8")

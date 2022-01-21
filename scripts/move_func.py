@@ -143,14 +143,10 @@ def vector_add(vector1, vector2):
         return vector1[0] + vector2[0], vector1[1] + vector2[1], vector1[2] + vector2[2]
 
 
-def rotate90(x, y, dir='Clockwise'):
+def rotate90(x: int, y: int, dir='Clockwise') -> tuple:
     """
-    :param x:
-    :param y:
-    :param dir:
-    :return:
     This rotates a 2d vector 90 degrees either clockwise or anti-clockwise
-       >>> rotate90(2,1)
+       >>> rotate90(2, 1)
        (1, -2)
        >>> rotate90(2,1,'Anti')
        (-1, 2)
@@ -180,7 +176,7 @@ def rotate3d(point, angle, axis='y'):
     return x, y, z
     
 
-def get_heading(x, y):
+def get_heading(x: any, y: any) -> float:
     """Calcs angle in degrees based on single point and origin
        >>> get_heading(0, -1)
        0.0
@@ -198,7 +194,7 @@ def get_heading(x, y):
         return math.degrees(math.atan2(x, y))
 
     
-def get_heading_points(pt1, pt2):
+def get_heading_points(pt1, pt2) -> float:
     """Calcs the angle between 2 points
     >>> get_heading_points((3,3), (4,2))
     45.0
@@ -235,16 +231,8 @@ def get_coord(x, y, anglechange):
     return newx, newy
 
 
-def get_angled_corners(x, y, anglechange, centx=0, centy=0, format='float'):
+def get_angled_corners(x: int, y: int, anglechange: int, centx=0, centy=0, format='float') -> tuple:
     """
-
-    :param x:
-    :param y:
-    :param anglechange:
-    :param centx:
-    :param centy:
-    :return:
-
     This calculates the new co-ordinates of a point on a circle with centre centx, centy
     when rotated through anglechange degrees
     This was stuff for points on a circlex = 30
@@ -274,7 +262,6 @@ def get_angled_corners(x, y, anglechange, centx=0, centy=0, format='float'):
     y = y - centy
     
     radius = math.sqrt(x * x + y * y)
-   
     rads = math.radians(anglechange)
 
     if x >= 0 and y >= 0:
@@ -285,8 +272,7 @@ def get_angled_corners(x, y, anglechange, centx=0, centy=0, format='float'):
         angle = 0 + math.asin(x/radius)
     else:  # x<0 and y<0
         angle = math.pi + math.asin(-x / radius)
-    
-    # print(angle * 180/math.pi)
+
     newangle = angle + rads
     # print(newangle * 180/math.pi)
     cx = radius * math.sin(newangle) + centx
@@ -297,7 +283,7 @@ def get_angled_corners(x, y, anglechange, centx=0, centy=0, format='float'):
     return cx, cy
 
 
-def get_corners(x, y, width, height, shape='rectangle', bottom=0, angle=0):
+def get_corners(x, y, width, height, shape='rectangle', bottom=0, angle=0) -> tuple:
     """
         This takes a centre point and calculates the corresponding corners of a rectangle of given width and height
        optional parameters are to return a kite based diamond in which case the bottom would typically be longer
@@ -332,7 +318,7 @@ def get_corners(x, y, width, height, shape='rectangle', bottom=0, angle=0):
         return angledcorners
 
 
-def get_coord_sphere(long, lat, r):
+def get_coord_sphere(long, lat, r) -> tuple:
     """ Let r = radius of a sphere, omega = longitude angle, and phi = latitude angle.
        Omega = 0 at London's longitude. phi = 0 at the equator.
        r varies from r = 0 to R Earth's radius to R + h where h is the height above the surface of Earth. 
@@ -353,7 +339,6 @@ def get_coord_sphere(long, lat, r):
 
     omega = math.radians(long)
     phi = math.radians(lat)
-
     z = r * math.cos(phi) * math.cos(omega)
     x = r * math.cos(phi) * math.sin(omega)
     y = r * math.sin(phi)
@@ -373,7 +358,6 @@ def get_long_lat(x, y, z):
     >>> get_long_lat(10.0, 14.14213562373095, 10.000000000000002)
     (44.99999999999999, 44.99999999999999, 20.0)
     >>>
-       
     """
 
     r = math.sqrt(x ** 2 + y ** 2 + z ** 2)
@@ -385,7 +369,6 @@ def get_long_lat(x, y, z):
     except ZeroDivisionError:
         long = 0
         lat = 0
-
     return long, lat, r
 
 
@@ -403,25 +386,18 @@ def conv_lin(a, b=1.0, c=0.0, inverse=False):
         return (a - c) / b
 
 
-def adjust_line_length(x, y, z, r):
+def adjust_line_length(x:int, y:int, z:int, r:int) -> tuple:
     """
-
-    :param x:
-    :param y:
-    :param z:
-    :param r:
-    :return:
-    This adjusts kite line length based to ensure kite is at line length
+        This adjusts kite line length based to ensure kite is at line length
        and is required because we are assuming straight line motion so x,y,z
        input to this function probably won't have radius r but the nearest point will
        be a projection through the sphere if x,y,z is outwith
        so all we need to do is get the unit vector for the heading
        x,y,z and then multiply by r
-       
-       
-       >>> adjust_line_length(6,8,3,10)
+
+       >>> adjust_line_length(6, 8, 3, 10)
        (5.746957711326908, 7.662610281769211, 2.873478855663454)
-       >>> adjust_line_length(5,8,3,10)
+       >>> adjust_line_length(5, 8, 3, 10)
        (5.050762722761054, 8.081220356417685, 3.0304576336566322)
     """
 
@@ -430,30 +406,18 @@ def adjust_line_length(x, y, z, r):
     return finalv[0], finalv[1], finalv[2]
 
     
-def get_plan_pos(p, h, t, s):
+def get_plan_pos(p:int, h:int, t:int, s:int) ->tuple:
     """
-
-    :param p:
-    :param h:
-    :param t:
-    :param s:
-    :return:
     Return the position of an object in position p on heading h (unit vector after time t if travelling at speed s
-       >>> get_plan_pos((1,2,3),(0,0.707,0.707),1,5)
+       >>> get_plan_pos((1, 2, 3), (0, 0.707,0.707), 1, 5)
        (1, 5.535, 6.535)
     """
     mvmt = vector_mult(h, t*s)
     return vector_add(p, mvmt)
 
 
-def move_item(x, y, targetx, targety, distance):
+def move_item(x:int, y:int, targetx:int, targety:int, distance:int) -> tuple:
     """
-        :param x:
-        :param y:
-        :param targetx
-        :param targety
-        :return x, y:
-
         >>> move_item(1, 1, 4, 5, 5)
         (4.0, 5.0)
         >>> move_item(0, 0, 2, 2, 4)
@@ -463,7 +427,6 @@ def move_item(x, y, targetx, targety, distance):
     # use the distance function and then we have a ratio of how much of the distance we got
     # then we do vectormult and that gives us the new point which we add to the start??
     myheading = heading((x, y), (targetx, targety))
-
     return get_plan_pos((x,y), myheading, 1, distance)
 
 

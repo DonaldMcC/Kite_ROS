@@ -30,8 +30,8 @@ ros::NodeHandle  nh;
 //  Second issue is motor commands being sent and resistor not changing
 //  Think we stop when that happens too but probably after a second or so of movement
 
-int MAXLEFT = 110;
-int MAXRIGHT = 270;
+int MAXLEFT = 770;
+int MAXRIGHT = 930;
 int currdirection = 0;
 bool motorson = false;
 bool safetystop = false;
